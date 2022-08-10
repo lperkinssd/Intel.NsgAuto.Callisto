@@ -1,0 +1,345 @@
+﻿@model Intel.NsgAuto.Callisto.UI.Models.OSAT.PasVersionDetailsModel
+
+@{
+    ViewBag.Title = "OSAT - PAS Version Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var specification = Intel.NsgAuto.Callisto.Business.Core.ImportSpecifications.OsatPas;
+}
+
+<script type="text/javascript">
+
+    var entity = null;
+    var model = null;
+    var importMessages = null;
+    var records = null;
+    var userId = "@(Html.Raw(Intel.NsgAuto.Web.Mvc.Core.Functions.GetCurrentUserIdSid()))";
+
+    updateFromEntity(@(JsonHelper.Serialize(Model.Entity)));
+
+    function updateFromEntity(entityNew) {
+        entity = entityNew;
+        model = entity.Version;
+        importMessages = entity.ImportMessages;
+        records = model.Records;
+    }
+
+    function refreshFields() {
+        $("#spnId").text(model.Id);
+        $("#spnVersion").text(model.Version);
+        $("#spnIsActive").text(model.IsActive);
+        $("#spnIsPOR").text(model.IsPOR);
+        $("#spnStatus").text(model.Status.Name);
+        $("#spnCreatedBy").text(model.CreatedByUserName ? model.CreatedByUserName : model.CreatedBy);
+        $("#spnCreatedOn").text(Nsga.Callisto.Dates.isoToLocaleString(model.CreatedOn));
+        $("#spnUpdatedBy").text(model.UpdatedByUserName ? model.UpdatedByUserName : model.UpdatedBy);
+        $("#spnUpdatedOn").text(Nsga.Callisto.Dates.isoToLocaleString(model.UpdatedOn));
+        $("#lnkOriginalFileName").text(model.OriginalFileName);
+        $("#spnOsat").text(model.Combination.Osat.Name);
+        $("#spnDesignFamily").text(model.Combination.DesignFamily.Name);
+    }
+
+    function refreshRecordsDataSource() {
+        $("#grdRecords").dxDataGrid("instance").option("dataSource", records);
+    };
+
+    function refreshImportMessagesDataSource() {
+        $("#grdImportMessages").dxDataGrid("instance").option("dataSource", importMessages);
+    };
+
+    function refreshImportMessages() {
+        var accImportMessages = $("#accImportMessages");
+        var divImportMessages = $("#divImportMessages");
+        if (importMessages && importMessages.length > 0) {
+            accImportMessages.show();
+            divImportMessages.show();
+        }
+        else {
+            accImportMessages.hide();
+            divImportMessages.hide();
+        }
+        refreshImportMessagesDataSource();
+    }
+
+    function refreshReview() {
+        var accReview = $("#accReview");
+        var divReview = $("#divReview"); 
+        if (model && model.CreatedBy === userId && model.Status.Name === "Draft") {
+            accReview.show();
+            divReview.show();
+        }
+        else {
+            accReview.hide();
+            divReview.hide();
+        }
+    }
+
+    function refreshUi() {
+        refreshFields();
+        refreshReview();
+        refreshImportMessages();
+        refreshRecordsDataSource();
+    }
+
+    function refreshFromEntity(entityNew) {
+        updateFromEntity(entityNew);
+        refreshUi();
+    }
+
+    function onSuccess(result) {
+        refreshFromEntity(result.Entity);
+    }
+
+    function onError(xhr, status) {
+        var message = "An unexpected error occurred. If the problem persists, contact support.";
+        var result = null;
+        if (xhr && xhr.responseJSON) {
+            result = xhr.responseJSON;
+            if (xhr.responseJSON.ExceptionMessage) message = xhr.responseJSON.ExceptionMessage;
+            else if (xhr.responseJSON.Message) message = xhr.responseJSON.Message;
+        }
+        Nsga.Callisto.Messages.showError(message);
+        if (result && result.Entity) {
+            refreshFromEntity(result.Entity);
+        }
+    };
+
+    function cancel() {
+        Nsga.Callisto.Osat.cancelPasVersion(model.Id, onSuccess, onError);
+    }
+
+    function submit1() {
+        Nsga.Callisto.Osat.submitPasVersion(model.Id, onSuccess, onError);
+    }
+
+    $("document").ready(function () {
+
+        // grdImportMessages
+        var config = Nsga.Callisto.Dx.dataGridDefaultConfig();
+        config.keyExpr = "Id";
+        config.columns = [
+            {
+                caption: "Worksheet Row",
+                calculateCellValue: function (rowData) {
+                    return rowData.RecordNumber + @(specification.RowDataBegins) - 1;
+                },
+            },
+            {
+                caption: "Message Type",
+                dataField: "MessageType",
+            },
+            {
+                caption: "Field Name",
+                dataField: "FieldName",
+            },
+            {
+                caption: "Message",
+                dataField: "Message",
+            },
+        ];
+        $("#grdImportMessages").dxDataGrid(config);
+
+        // grdRecords
+        config = Nsga.Callisto.Dx.dataGridDefaultConfig();
+        config.keyExpr = "Id";
+        config.columns = [
+            {
+                caption: "Worksheet Row",
+                calculateCellValue: function (rowData) {
+                    return rowData.RecordNumber + @(specification.RowDataBegins) - 1;
+                },
+                fixed: true,
+                fixedPosition: "left",
+            },
+            {
+                caption: "@Html.Raw(specification.Field("ProductGroup").DisplayName)",
+                dataField: "ProductGroup",
+            },
+            {
+                caption: "@Html.Raw(specification.Field("Project").DisplayName)",
+                dataField: "Project",
+            },
+            {
+                caption: "@Html.Raw(specification.Field("IntelProdName").DisplayName)",
+                dataField: "IntelProdName",
+            },
+            {
+                caption: "@Html.Raw(specification.Field("IntelLevel1PartNumber").DisplayName)",
+                dataField: "IntelLevel1PartNumber",
+            },
+            {
+                caption: "@Html.Raw(specification.Field("Line1TopSideMarking").DisplayName)",
+                dataField: "Line1TopSideMarking",
+            },
+            {
+                caption: "@Html.Raw(specification.Field("CopyrightYear").DisplayName)",
+                dataField: "CopyrightYear",
+            },
+            {
+                caption: "@Html.Raw(specification.Field("SpecNumberField").DisplayName)",
+                dataField: "SpecNumberField",
+            },
+            {
+                caption: "@Html.Raw(specification.Field("MaterialMasterField").DisplayName)",
+                dataField: "MaterialMasterField",
+            },
+            {
+                caption: "@Html.Raw(specification.Field("MaxQtyPerMedia").DisplayName)",
+                dataField: "MaxQtyPerMedia",
+            },
+            {
+                caption: "@Html.Raw(specification.Field("Media").DisplayName)",
+                dataField: "Media",
+            },
+            {
+                caption: "@Html.Raw(specification.Field("RoHsCompliant").DisplayName)",
+                dataField: "RoHsCompliant",
+            },
+            {
+                caption: "@Html.Raw(specification.Field("LotNo").DisplayName)",
+                dataField: "LotNo",
+            },
+            {
+                caption: "@Html.Raw(specification.Field("FullMediaReqd").DisplayName)",
+                dataField: "FullMediaReqd",
+            },
+            {
+                caption: "@Html.Raw(specification.Field("SupplierPartNumber").DisplayName)",
+                dataField: "SupplierPartNumber",
+            },
+            {
+                caption: "@Html.Raw(specification.Field("IntelMaterialPn").DisplayName)",
+                dataField: "IntelMaterialPn",
+            },
+            {
+                caption: "@Html.Raw(specification.Field("TestUpi").DisplayName)",
+                dataField: "TestUpi",
+            },
+            {
+                caption: "@Html.Raw(specification.Field("PgTierAndSpeedInfo").DisplayName)",
+                dataField: "PgTierAndSpeedInfo",
+            },
+            {
+                caption: "@Html.Raw(specification.Field("AssyUpi").DisplayName)",
+                dataField: "AssyUpi",
+            },
+            {
+                caption: "@Html.Raw(specification.Field("DeviceName").DisplayName)",
+                dataField: "DeviceName",
+            },
+            {
+                caption: "@Html.Raw(specification.Field("Mpp").DisplayName)",
+                dataField: "Mpp",
+            },
+            {
+                caption: "@Html.Raw(specification.Field("SortUpi").DisplayName)",
+                dataField: "SortUpi",
+            },
+            {
+                caption: "@Html.Raw(specification.Field("ReclaimUpi").DisplayName)",
+                dataField: "ReclaimUpi",
+            },
+            {
+                caption: "@Html.Raw(specification.Field("ReclaimMm").DisplayName)",
+                dataField: "ReclaimMm",
+            },
+            {
+                caption: "@Html.Raw(specification.Field("ProductNaming").DisplayName)",
+                dataField: "ProductNaming",
+            },
+            {
+                caption: "@Html.Raw(specification.Field("TwoDidApproved").DisplayName)",
+                dataField: "TwoDidApproved",
+            },
+            {
+                caption: "@Html.Raw(specification.Field("TwoDidStartedWw").DisplayName)",
+                dataField: "TwoDidStartedWw",
+            },
+            {
+                caption: "@Html.Raw(specification.Field("Did").DisplayName)",
+                dataField: "Did",
+            },
+            {
+                caption: "@Html.Raw(specification.Field("Group").DisplayName)",
+                dataField: "Group",
+            },
+            {
+                caption: "@Html.Raw(specification.Field("Note").DisplayName)",
+                dataField: "Note",
+            },
+        ];
+        config.scrolling = { showScrollbar: "always" };
+        config.columnFixing = { enabled: true };
+        $("#grdRecords").dxDataGrid(config);
+
+        refreshUi();
+
+    });
+
+</script>
+
+<div class="padeightpixel">
+    <div class="rightalign">
+        <div class="padeightpixel">
+            <span><a title="Click here to download file" id="lnkDownload" href="/api/OSAT/DownloadPasVersion/@(Model?.Entity.Version.Id)"><span class="imagelinkbutton bordered"><span class="margintwopixel">Download</span></span></a></span>
+            <span><a title="Click here to view all versions" id="lnkAllVersions" href="/OSAT/ListPasVersions/"><span class="imagelinkbutton bordered"><span class="fa fa-list-alt "></span><span class="margintwopixel">All Versions</span></span></a></span>
+        </div>
+    </div>
+    <div id="accDetails" class="accordion-label open">Details</div>
+    <div id="divDetails" class="accordion-panel" style="padding: 8px;">
+        <table style="width:96%; padding:2px;margin:2px;">
+            <tr>
+                <td style="width:25%"><label for="spnId" class="formlabel">Id</label></td>
+                <td style="width:25%"><span type="text" id="spnId"></span></td>
+                <td style="width:25%"><label for="spnCreatedBy" class="formlabel">Created By</label></td>
+                <td style="width:25%"><span type="text" id="spnCreatedBy"></span></td>
+            </tr>
+            <tr>
+                <td><label for="spnVersion" class="formlabel">Version</label></td>
+                <td><span type="text" id="spnVersion"></span></td>
+                <td><label for="spnCreatedOn" class="formlabel">Created On</label></td>
+                <td><span type="text" id="spnCreatedOn"></span></td>
+            </tr>
+            <tr>
+                <td><label for="spnIsActive" class="formlabel">Is Active?</label></td>
+                <td><span type="text" id="spnIsActive"></span></td>
+                <td><label for="spnUpdatedBy" class="formlabel">Updated By</label></td>
+                <td><span type="text" id="spnUpdatedBy"></span></td>
+            </tr>
+            <tr>
+                <td><label for="spnIsPOR" class="formlabel">Is POR?</label></td>
+                <td><span type="text" id="spnIsPOR"></span></td>
+                <td><label for="spnUpdatedOn" class="formlabel">Last Updated On</label></td>
+                <td><span type="text" id="spnUpdatedOn"></span></td>
+            </tr>
+            <tr>
+                <td><label for="spnStatus" class="formlabel">Status</label></td>
+                <td><span type="text" id="spnStatus"></span></td>
+                <td><label for="lnkOriginalFileName" class="formlabel">Original File Name</label></td>
+                <td><a title="Click here to download file" id="lnkOriginalFileName" href="/api/Osat/DownloadPasVersion/@(Model?.Entity.Version.Id)" /></td>
+            </tr>
+            <tr>
+                <td><label for="spnOsat" class="formlabel">OSAT</label></td>
+                <td><span type="text" id="spnOsat"></span></td>
+                <td><label for="spnDesignFamily" class="formlabel">Design Family</label></td>
+                <td><span type="text" id="spnDesignFamily"></span></td>
+            </tr>
+        </table>
+    </div>
+    <div id="accReview" class="accordion-label open">Review</div>
+    <div id="divReview" class="accordion-panel">
+    @if (Intel.NsgAuto.Web.Mvc.Core.Functions.IsOsatPasAuthor())
+    {
+        <div style="padding: 8px; width: 100%; text-align: center;"><button id="btnCancel" onclick="cancel()">Cancel</button>&nbsp;&nbsp;<button id="btnSubmit" onclick="submit1()">Submit</button></div>
+    }
+    </div>
+    <div id="accImportMessages" class="accordion-label open">Import Messages</div>
+    <div id="divImportMessages" class="accordion-panel">
+        <div id="grdImportMessages"></div>
+    </div>
+    <div id="accRecords" class="accordion-label open">Records</div>
+    <div id="divRecords" class="accordion-panel">
+        <div id="grdRecordsContainer" style="height: 100%; width: 98%; position: absolute; box-sizing: border-box;">
+            <div id="grdRecords"></div>
+        </div>
+    </div>
+</div>

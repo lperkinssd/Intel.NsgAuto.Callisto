@@ -1,0 +1,132 @@
+﻿@{
+    ViewBag.Title = "Tasks";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<script type="text/javascript">
+
+    function onError(xhr, status) {
+        $("#indicator").dxLoadIndicator("instance").option("visible", false);
+        Nsga.Callisto.Messages.showError("An unexpected error occurred. If the problem persists, contact support.");
+    };
+
+    function refresh() {
+        var refreshType = $("#drpRefreshType").val();
+        $("#indicator").dxLoadIndicator({ visible: true });
+        if (refreshType == "recent_3") {
+            Nsga.Callisto.Tasks.getRecent(3, function (result) { updateGridDataSource(result); }, onError);
+        }
+        else if (refreshType == "recent_7") {
+            Nsga.Callisto.Tasks.getRecent(7, function (result) { updateGridDataSource(result); }, onError);
+        }
+        else {
+            Nsga.Callisto.Tasks.getOpen(function (result) { updateGridDataSource(result); }, onError);
+        }
+    }
+
+    function updateGridDataSource(records) {
+        var element = $("#grdRecords");
+        element.hide();
+        if (records) {
+            element.dxDataGrid("instance").option("dataSource", records);
+            element.show();
+        }
+        $("#indicator").dxLoadIndicator("instance").option("visible", false);
+    };
+
+    $(document).ready(function () {
+
+        // grdRecords
+        var config = Nsga.Callisto.Dx.dataGridDefaultConfig();
+        config.columns = [
+            {
+                dataField: "Id",
+            },
+            {
+                dataField: "TaskType.Name",
+                caption: "Name",
+            },
+            {
+                dataField: "Status",
+            },
+            {
+                dataField: "ProgressPercent",
+                caption: "Progress %",
+            },
+            {
+                dataField: "StartDateTime",
+                caption: "Started On",
+                dataType: "datetime",
+                format: "MM/dd/yyyy hh:mm:ss a",
+                allowFiltering: false,
+            },
+            {
+                dataField: "EndDateTime",
+                caption: "Ended On",
+                dataType: "datetime",
+                format: "MM/dd/yyyy hh:mm:ss a",
+                allowFiltering: false,
+            },
+            {
+                dataField: "AbortDateTime",
+                caption: "Aborted On",
+                dataType: "datetime",
+                format: "MM/dd/yyyy hh:mm:ss a",
+                allowFiltering: false,
+            },
+            {
+                dataField: "ResolvedDateTime",
+                caption: "Resolved On",
+                dataType: "datetime",
+                format: "MM/dd/yyyy hh:mm:ss a",
+                allowFiltering: false,
+            },
+            {
+                dataField: "ResolvedBy",
+            },
+            {
+                dataField: "ElapsedMinutes",
+                caption: "Elapsed Minutes",
+            },
+            {
+                dataField: "Problematic",
+                falseText: "N",
+                trueText: "Y",
+                alignment: "center",
+                showEditorAlways: false
+            },
+            {
+                cellTemplate: function (container, options) {
+                    $("<a>Details</a>")
+                        .attr("href", "/Tasks/Details/" + options.data["Id"])
+                        .appendTo(container);
+                },
+                allowFiltering: false,
+            },
+        ];
+        $("#grdRecords").dxDataGrid(config);
+
+        refresh();
+
+    });
+
+</script>
+
+
+<div id="indicator"></div>
+<div id="divResults" class="centeralign">
+    <select name="drpRefreshType" id="drpRefreshType">
+        <option value="open" selected>Open</option>
+        <option value="recent_3">Last 3 Days</option>
+        <option value="recent_7">Last 7 Days</option>
+    </select>
+    <button id="btnRefresh" onclick="refresh()">Refresh</button>
+    <div class="grid-wrapper" style="margin-top:4px;">
+        <div class="marginfourpixel">
+            <div class="gridcontainer">
+                <div id="grdRecords" style="margin-right:20px;margin-left:10px;"></div>
+            </div>
+        </div>
+    </div>
+</div>

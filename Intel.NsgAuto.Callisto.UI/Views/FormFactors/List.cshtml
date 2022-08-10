@@ -1,0 +1,84 @@
+﻿@{
+    ViewBag.Title = "FormFactors";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<script type="text/javascript">
+
+    function onError(xhr, status) {
+        $("#indicator").dxLoadIndicator("instance").option("visible", false);
+        Nsga.Callisto.Messages.showError("An unexpected error occurred. If the problem persists, contact support.");
+    };
+
+    function refresh() {
+        $("#indicator").dxLoadIndicator({ visible: true });
+        Nsga.Callisto.FormFactors.getAll(function (result) { updateGridDataSource(result); }, onError);
+    }
+
+    function updateGridDataSource(records) {
+        var element = $("#grdRecords");
+        element.hide();
+        if (records) {
+            element.dxDataGrid("instance").option("dataSource", records);
+            element.show();
+        }
+        $("#indicator").dxLoadIndicator("instance").option("visible", false);
+    };
+
+    $(document).ready(function () {
+
+        // grdRecords
+        var config = Nsga.Callisto.Dx.dataGridDefaultConfig();
+        config.columns = [
+            {
+                dataField: "Id",
+            },
+            {
+                dataField: "Name",
+            },
+            {
+                dataField: "NameSpeed",
+                caption: "Name In Speed",
+            },
+            {
+                dataField: "CreatedBy",
+                caption: "Created By",
+            },
+            {
+                dataField: "CreatedOn",
+                caption: "Created On",
+                dataType: "datetime",
+                format: "MM/dd/yyyy hh:mm:ss a",
+            },
+            {
+                dataField: "UpdatedBy",
+                caption: "Updated By",
+            },
+            {
+                dataField: "UpdatedOn",
+                caption: "Updated On",
+                dataType: "datetime",
+                format: "MM/dd/yyyy hh:mm:ss a",
+            },
+        ];
+        $("#grdRecords").dxDataGrid(config);
+
+        refresh();
+
+    });
+
+</script>
+
+
+<div id="indicator"></div>
+<div id="divResults" class="centeralign">
+    <button id="btnRefresh" onclick="refresh()">Refresh</button>
+    <div class="grid-wrapper" style="margin-top:4px;">
+        <div class="marginfourpixel">
+            <div class="gridcontainer">
+                <div id="grdRecords" style="margin-right:20px;margin-left:10px;"></div>
+            </div>
+        </div>
+    </div>
+</div>

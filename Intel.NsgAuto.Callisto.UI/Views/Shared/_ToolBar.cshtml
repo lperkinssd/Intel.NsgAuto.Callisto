@@ -1,0 +1,40 @@
+﻿@model Intel.NsgAuto.Web.Mvc.Models.ToolBarModel
+@if (Model != null && Model.Visible)
+{
+    <div class="toolbarwrapper showinline floatright bluebox">
+        <div id="toolBarMenu" class="showinline"></div>
+        <script type="text/javascript">
+            ; (function ($, window, document, undefined) {
+                var toolBarData = getMenuData();
+                if (toolBarData) {
+                    var dxMenu = $("#toolBarMenu").dxMenu({
+                        dataSource: toolBarData,
+                        hideSubmenuOnMouseLeave: false,
+                        displayExpr: "DisplayText",
+                        itemsExpr: "SubItems",
+                        onItemRendered: function (e) {
+                            var itemData = e.itemData;
+                            if (itemData) {
+                                if (itemData.ActionType === "hyperlink" && (!itemData.SubItems)) {
+                                    var link = $('<a>', { href: itemData.Url });
+                                    link.addClass('toolbarlink');
+                                    $(e.itemElement).addClass(' toolbarlink ');
+                                    if (e.itemData.IsExternal) {
+                                        link.attr('target', '_blank');
+
+                                    }
+                                    e.itemElement.wrap(link);
+                                } else {
+                                    if (itemData.ActionType === "heading") {
+                                        $(e.itemElement).addClass(' toolbarheading ');
+                                    }
+                                }
+                            }
+                        },
+                    }).dxMenu("instance");
+                }
+            })(jQuery, window, document);
+        </script>
+    </div>
+}
+

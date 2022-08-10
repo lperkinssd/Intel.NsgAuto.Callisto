@@ -1,0 +1,174 @@
+﻿@model Intel.NsgAuto.Callisto.UI.Models.TaskModel
+
+@{
+    ViewBag.Title = "Task Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<script type="text/javascript">
+
+    var model = @(JsonHelper.Serialize(Model.Task));
+
+    function populateFields() {
+        $("#spnId").text(model.Id);
+        $("#spnTaskTypeId").text(model.TaskType.Id);
+        $("#spnTaskTypeName").text(model.TaskType.Name);
+        $("#spnTaskTypeThresholdTimeLimit").text(model.TaskType.ThresholdTimeLimit);
+        $("#spnTaskTypeCodeLocation").text(model.TaskType.CodeLocation);
+        $("#spnStartDateTime").text(Nsga.Callisto.Dates.isoToLocaleString(model.StartDateTime));
+        $("#spnEndDateTime").text(Nsga.Callisto.Dates.isoToLocaleString(model.EndDateTime));
+        $("#spnAbortDateTime").text(Nsga.Callisto.Dates.isoToLocaleString(model.AbortDateTime));
+        $("#spnResolvedDateTime").text(Nsga.Callisto.Dates.isoToLocaleString(model.ResolvedDateTime));
+        $("#spnResolvedBy").text(model.ResolvedBy);
+        $("#spnProgressPercent").text(model.ProgressPercent);
+        $("#spnProgressText").text(model.ProgressText);
+        $("#spnElapsedMinutes").text(model.ElapsedMinutes);
+        $("#spnProblematic").text(model.Problematic ? "Y" : "N");
+        var accActions = $("#accActions");
+        var divActions = $("#divActions");
+        if (model.EndDateTime)
+        {
+            accActions.hide();
+            divActions.hide();
+        }
+        else
+        {
+            accActions.show();
+            divActions.show();
+        }
+    }
+
+    function onError(xhr, status) {
+        Nsga.Callisto.Messages.showError("An unexpected error occurred. If the problem persists, contact support.");
+    }
+
+    function onSuccess(result) {
+        model = result;
+        populateFields();
+    }
+
+    function toggleResolved()
+    {
+        if (model.ResolvedDateTime)
+        {
+            Nsga.Callisto.Tasks.unresolve(model.Id, onSuccess, onError);
+        }
+        else
+        {
+            Nsga.Callisto.Tasks.resolve(model.Id, onSuccess, onError);
+        }
+    }
+
+    function resolveAllAborted() {
+        Nsga.Callisto.Tasks.resolveAllAborted(model.Id, onSuccess, onError);
+    }
+
+    function updateGridDataSource(records) {
+        var element = $("#grdRecords");
+        element.hide();
+        if (records) {
+            element.dxDataGrid("instance").option("dataSource", records);
+            element.show();
+        }
+    };
+
+    $("document").ready(function () {
+
+        populateFields();
+
+        var records = null;
+        @if (Model.Messages != null)
+        {
+        <text>
+        records = @(JsonHelper.Serialize(Model.Messages));
+        </text>
+        }
+
+        // grdRecords
+        var config = Nsga.Callisto.Dx.dataGridDefaultConfig();
+        config.columns = [
+            {
+                dataField: "CreatedOn",
+                caption: "Created On",
+                dataType: "datetime",
+                format: "MM/dd/yyyy hh:mm:ss a",
+                allowFiltering: false,
+            },
+            {
+                dataField: "Type",
+            },
+            {
+                dataField: "Text",
+            },
+        ];
+        config.dataSource = records;
+        config.wordWrapEnabled = true;
+        $("#grdRecords").dxDataGrid(config);
+    });
+
+</script>
+
+
+<div class="padeightpixel">
+    <div class="rightalign">
+        <div class="padeightpixel">
+            <span><a title="Click here to view all tasks" id="lnkViewAll" href="/Tasks/List/"><span class="imagelinkbutton bordered"><span class="fa fa-list-alt "></span><span class="margintwopixel">All Tasks</span> </span></a></span>
+        </div>
+    </div>
+    <div id="accDetails" class="accordion-label open">Details</div>
+    <div id="divDetails" class="accordion-panel">
+        <table style="width:96%; padding:2px;margin:2px;">
+            <tr>
+                <td style="width:25%"><label for="spnId" class="formlabel">Id</label></td>
+                <td style="width:25%"><span type="text" id="spnId"></span></td>
+                <td style="width:25%"><label for="spnStartDateTime" class="formlabel">Start Date Time</label></td>
+                <td style="width:25%"><span type="text" id="spnStartDateTime"></span></td>
+            </tr>
+            <tr>
+                <td><label for="spnTaskTypeId" class="formlabel">Task Type Id</label></td>
+                <td><span type="text" id="spnTaskTypeId"></span></td>
+                <td><label for="spnEndDateTime" class="formlabel">End Date Time</label></td>
+                <td><span type="text" id="spnEndDateTime"></span></td>
+            </tr>
+            <tr>
+                <td><label for="spnTaskTypeName" class="formlabel">Name</label></td>
+                <td><span type="text" id="spnTaskTypeName"></span></td>
+                <td><label for="spnAbortDateTime" class="formlabel">Abort Date Time</label></td>
+                <td><span type="text" id="spnAbortDateTime"></span></td>
+            </tr>
+            <tr>
+                <td><label for="spnTaskTypeThresholdTimeLimit" class="formlabel">Threshold Time Limit</label></td>
+                <td><span type="text" id="spnTaskTypeThresholdTimeLimit"></span></td>
+                <td><label for="spnResolvedDateTime" class="formlabel">Resolved Date Time</label></td>
+                <td><span type="text" id="spnResolvedDateTime"></span></td>
+            </tr>
+            <tr>
+                <td><label for="spnTaskTypeCodeLocation" class="formlabel">Code Location</label></td>
+                <td><span type="text" id="spnTaskTypeCodeLocation"></span></td>
+                <td><label for="spnResolvedBy" class="formlabel">Resolved By</label></td>
+                <td><span type="text" id="spnResolvedBy"></span></td>
+            </tr>
+            <tr>
+                <td><label for="spnElapsedMinutes" class="formlabel">Elapsed Minutes</label></td>
+                <td><span type="text" id="spnElapsedMinutes"></span></td>
+                <td><label for="spnProblematic" class="formlabel">Problematic</label></td>
+                <td><span type="text" id="spnProblematic"></span></td>
+            </tr>
+            <tr>
+                <td><label for="spnProgressPercent" class="formlabel">Progress %</label></td>
+                <td><span type="text" id="spnProgressPercent"></span></td>
+                <td><label for="spnProgressText" class="formlabel">Progress Text</label></td>
+                <td><span type="text" id="spnProgressText"></span></td>
+            </tr>
+        </table>
+    </div>
+    <div id="accActions" class="accordion-label open">Actions</div>
+    <div id="divActions" class="accordion-panel">
+        <div style="padding: 8px; width: 100%; text-align: center;"><button id="btnToggleResolved" onclick="toggleResolved()">Toggle Resolved</button>&nbsp;&nbsp;<button id="btnResolveAllAborted" onclick="resolveAllAborted()">Resolve All Aborted Of This Type</button></div>
+    </div>
+    <div id="accMessages" class="accordion-label open">Messages</div>
+    <div id="divMessages" class="accordion-panel">
+        <div id="grdRecords"></div>
+    </div>
+</div>

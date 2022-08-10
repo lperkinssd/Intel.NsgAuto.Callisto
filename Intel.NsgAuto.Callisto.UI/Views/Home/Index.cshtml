@@ -1,0 +1,313 @@
+﻿@model Intel.NsgAuto.Web.Mvc.Models.HomeModel
+@using Intel.NsgAuto.Web.Mvc.Core
+
+@{
+    ViewBag.Title = "Welcome!";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style scoped>
+    .widgetrow {
+        margin-top: 25px;
+        display: block;
+        padding: 4px;
+    }
+
+    .widgetbox { /*display:inline-block;height:250px; */
+        float: left;
+        width: 250px;
+        margin: 4px;
+    }
+
+    .widgetboxheader {
+        margin: 0px;
+        padding: 10px;
+        border-bottom: 1px solid #dcdcdc;
+    }
+
+    .widgetbox li {
+        margin: 4px;
+    }
+    
+    .dx-radiobutton-checked .dx-radiobutton-icon .dx-radiobutton-icon-dot {
+        background: orange;
+    }
+</style>
+<script>
+    var currentSelectedRole = null;
+
+    var onConfirmSwitchRole = function () {
+        // Save user selected role preference to database 
+        var activeRole = null;
+        switch (currentSelectedRole) {
+            case "Nand":
+                activeRole = "Callisto_Nand_User";
+                break;
+            case "Optane":
+                activeRole = "Callisto_Optane_User";
+                break;
+        }
+
+        Nsga.Callisto.Administration.savePreferredRole(
+            activeRole,
+            onSavePreferredRoleSuccess,
+            onSavePreferredRoleError,
+            function () {
+                document.body.style.cursor = "wait";
+            },
+            function () {
+                document.body.style.cursor = "default";
+                hideSwitchRolePopup();
+            }
+        );        
+    }
+
+    var onSavePreferredRoleSuccess = function (result) {
+        if (result.Succeeded) {
+            Nsga.Callisto.Messages.showSuccess("Switched to " + currentSelectedRole + " role and preference saved.");
+        }
+        else {
+            Nsga.Callisto.Messages.showError("An error occurred while saving preferred role: \r\n" + result.Message);
+        }
+    }
+
+    var onSavePreferredRoleSend = function () {
+        document.body.style.cursor = "wait";
+    }
+
+    var onSavePreferredRoleComplete = function () {
+        document.body.style.cursor = "default";
+        hideSwitchRolePopup();
+    }
+
+    var onSavePreferredRoleError = function (xhr, status) {
+        var message = "An unexpected error occurred while saving user preferrence. ";
+        if (xhr && xhr.responseJSON) {
+            if (xhr.responseJSON.ExceptionMessage) message += xhr.responseJSON.ExceptionMessage;
+            else if (xhr.responseJSON.Message) message += xhr.responseJSON.Message;
+                else message += "If the problem persists, contact support.";
+        }
+        Nsga.Callisto.Messages.showError(message);
+    };
+
+    var onCancelSwitchRole = function () {
+        hideSwitchRolePopup();
+    }
+
+    var hideSwitchRolePopup = function () {
+        var popupSwitchRole = $("#divSwitchRolePopup").dxPopup("instance");
+        popupSwitchRole.hide();
+    }
+
+    var switchUserRole = function () {
+        Nsga.Callisto.Administration.getPreferredRole(
+            onGetPreferredRoleSuccess,
+            onGetPreferredRoleError
+        );
+    }
+
+    var onGetPreferredRoleError = function (xhr, status) {
+        var message = "An unexpected error occurred while retrieving user preferrence. ";
+        if (xhr && xhr.responseJSON) {
+            if (xhr.responseJSON.ExceptionMessage) message += xhr.responseJSON.ExceptionMessage;
+            else if (xhr.responseJSON.Message) message += xhr.responseJSON.Message;
+                else message += "If the problem persists, contact support.";
+        }
+        Nsga.Callisto.Messages.showError(message);
+    }
+
+    var onGetPreferredRoleSuccess = function (preferredRole) {
+        var popup;
+
+        var popupOptions = {
+            width: "350px",
+            height: "230px",
+            showTitle: true,
+            title: "Appear As User Of",
+            visible: false,
+            dragEnabled: false,
+            closeOnOutsideClick: false
+        }
+
+        var roleTypes = ["Optane", "Nand"];
+        switch (preferredRole) {
+            case "Callisto_Nand_User":
+                currentSelectedRole = "Nand";
+                break;
+            case "Callisto_Optane_User":
+                currentSelectedRole = "Optane";
+                break;
+        }
+
+        $("#radio-group-roles").dxRadioGroup({
+            items: roleTypes,
+            value: currentSelectedRole,
+            onValueChanged: function (e) {
+                currentSelectedRole = e.value;
+            },
+            layout: "horizontal"
+        });
+
+        if (popup) {
+            popup.option("contentTemplate", popupOptions.contentTemplate.bind(this));
+        } else {
+            popup = $("#divSwitchRolePopup").dxPopup(popupOptions).dxPopup("instance");
+        }
+
+        popup.show();
+    };
+
+</script>
+<div class="fixed">
+    <div class="widgetrow">
+        <div class="widgetbox graybox">
+            <div>
+                <div class="widgetboxheader bglightblue heading">Auto Checker</div>
+            </div>
+            <div class="padeightpixel">
+                <div class="subheading">Build Criteria</div>
+                <ul>
+                    <li><a href="/AutoChecker/AttributeTypes" target="_self">Attribute Types</a> </li>
+                    <li><a href="/AutoChecker/ListDesigns" target="_self">Designs</a> </li>
+                    <li><a href="/AutoChecker/CreateBuildCriteria" target="_self">Create Build Criteria</a> </li>
+                    <li><a href="/AutoChecker/ListBuildCriteriaPOR" target="_self">PRQ Builds</a> </li>
+                    <li><a href="/AutoChecker/ListBuildCriteriaNonPOR" target="_self">Non-PRQ Builds</a> </li>
+                    <li><a href="/AutoChecker/ListBuildCriteriaExportConditions" target="_self">All PRQ Criteria</a> </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="widgetbox graybox">
+            <div>
+                <div class="widgetboxheader bglightblue heading">OSAT Build Management</div>
+            </div>
+            <div class="padeightpixel">
+                <ul>
+                    <li><a href="/OSAT/ListPasVersions" target="_self">PAS Versions</a> </li>
+                    @if (!Functions.IsProduction())
+                    {
+                        <li><a href="/OSAT/AttributeTypes" target="_self">Attribute Types</a> </li>
+                        <li><a href="/OSAT/ListDesigns" target="_self">Designs</a> </li>
+                        <li><a href="/OSAT/DesignSummary" target="_self">Component Parts</a> </li>
+                        <li><a href="/OSAT/CreateBuildCriteriaSet" target="_self">Create Build Criteria</a> </li>
+                        <li><a href="/OSAT/QualFilter" target="_self">Qual Filter Preview</a> </li>
+
+                        @*<li><a href="/OSAT/ListQualFilterImports" target="_self">QF Imports</a> </li>*@
+                        <li><a href="/OSAT/BulkUpdates" target="_self">Qual Filter Bulk Updates</a> </li>
+                        <li><a href="/OSAT/ListQualFilterExports" target="_self">Publish Qual Filter</a> </li>
+                    }
+                </ul>
+            </div>
+        </div>
+
+        @*@if (!Functions.IsProduction())
+        {*@
+            <div class="widgetbox graybox">
+                <div>
+                    <div class="widgetboxheader bglightblue heading">MM Recipe</div>
+                </div>
+                <div class="padeightpixel">
+                    <ul>
+                        <li><a href="/ProductOwnerships/Index" target="_self">Product Ownerships</a> </li>
+                        <li><a href="/AccountOwnerships/Index" target="_self">Account Ownerships</a> </li>
+                        <li><a href="/PCNApprovers/Index" target="_self">PCN Approvers</a> </li>
+                        <li><a href="/PCNManagerFinder/Index" target="_self">PCN Manager Finder</a> </li>
+                        @if (!Functions.IsProduction())
+                        {
+                            <li><a href="/MMRecipes/Index" target="_self">MM Recipe Home</a> </li>
+                            <li><a href="/MATVersions" target="_self">MAT Versions</a> </li>
+                            <li><a href="/ProductLabelSetVersions" target="_self">Product Labels</a> </li>
+                            <li><a href="/MMRecipes/List" target="_self">View MM Recipes</a> </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        @*}*@
+    </div>
+
+    <div class="widgetrow" style="clear:left;">
+        <div class="widgetbox graybox">
+            <div>
+                <div class="widgetboxheader bglightblue heading">ODM Build Management</div>
+            </div>
+            <div class="padeightpixel">
+                <ul>
+                    <li><a href="/ODM/PRF" target="_self">Manage PRF</a> </li>
+                    <li><a href="/ODM/MAT" target="_self">Manage MAT (Media Attributes Table)</a> </li>
+                    <li><a href="/ODM/QFScenarios" target="_self">Qual Filters Scenarios &amp; Results</a> </li>
+                    <!--<li><a href="/ODM/QualFilterExplanations" target="_self">Qual Filter Explanations (Non Scenario)</a> </li>-->
+                    <li><a href="/ODM/Dispositions" target="_self">S-Lot Dispositioning</a> </li>
+                    <li><a href="/ODM/QFRemovableSLotReport" target="_self">Qual Filters Removable SLot Report</a> </li>
+                    <li><a href="/ODM/QFHistoricalScenarios" target="_self">Qual Filters Historical Scenarios</a> </li>
+                </ul>
+            </div>
+        </div>
+
+        @if (!Functions.IsProduction())
+        {
+            <div class="widgetbox graybox">
+                <div>
+                    <div class="widgetboxheader bglightblue heading">Reports Center</div>
+                </div>
+                <div class="padeightpixel">
+                    <div class="subheading">Analytics & Reports</div>
+                    <ul>
+                        <li><a href="/AC/Reports/" target="_blank">Auto Checker Dashboard</a> </li>
+                        <li><a href="/OSAT/Reports/" target="_blank">OSAT Dashboard</a> </li>
+                        <li><a href="/MMRecipes/Reports/" target="_blank">MM Recipe Dashboard</a> </li>
+                        <li><a href="/ODM/Reports/" target="_blank">ODM Dashboard</a> </li>
+                    </ul>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="widgetrow" style="clear:left;">
+        <div class="widgetbox graybox">
+            <div>
+                <div class="widgetboxheader bglightblue heading">Help Center</div>
+            </div>
+            <div class="padeightpixel">
+                <div class="subheading">Help &amp; Support</div>
+                <ul>
+                    <li><a href="/Help/Support/">Get Support</a> </li>
+                </ul>
+            </div>
+        </div>
+
+        @if (Functions.IsSuperUser())
+        {
+            <div class="widgetbox graybox">
+                <div>
+                    <div class="widgetboxheader bglightblue heading">Administration</div>
+                </div>
+                <div class="padeightpixel">
+                    <div class="subheading">Speed</div>
+                    <ul>
+                        <li><a href="/SpeedItems/List" target="_self">Items (Local)</a></li>
+                    </ul>
+                </div>
+                <div class="padeightpixel">
+                    <div class="subheading">System Tasks</div>
+                    <ul>
+                        <li><a href="/Tasks" target="_self">View Tasks</a> </li>
+                    </ul>
+                </div>
+                <div class="padeightpixel">
+                    <div class="subheading">Switch Role</div>
+                    <ul>
+                        <li><a href="javascript:void(0)" onclick="switchUserRole()">Appear As User Of</a></li>
+                    </ul>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<div id="divSwitchRolePopup" class="dx-fieldset" style="display:none">
+    <div class="dx-field">Switch Role To:</div>
+    <div class="dx-field"><div id="radio-group-roles"></div></div>
+    <div class="floatright">
+        <span class="marginfourpixel"><input id="btnConfirm" type="button" onclick="onConfirmSwitchRole()" value="Confirm" /></span>
+        <span class="marginfourpixel"><input id="btnCancel" type="button" onclick="onCancelSwitchRole()" value="Cancel" /></span>
+    </div>
+</div>

@@ -1,0 +1,143 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MMRecipes.PCNManagerFinder.AccountCustomer" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="2.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\MMRecipes\PCNManagerFinder\AccountCustomer.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MMRecipes.PCNManagerFinder.AccountCustomers" Collapsed="true">
+    <Position X="4.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\MMRecipes\PCNManagerFinder\AccountCustomers.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MMRecipes.PCNManagerFinder.Approver" Collapsed="true">
+    <Position X="6" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAAAAAAAAAgAAAAAAAAAAAAAAAAEAAAAAA=</HashCode>
+      <FileName>Entities\MMRecipes\PCNManagerFinder\Approver.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MMRecipes.PCNManagerFinder.Approvers" Collapsed="true">
+    <Position X="7.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\MMRecipes\PCNManagerFinder\Approvers.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MMRecipes.PCNManagerFinder.PCNManagerFilter" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="2.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAACABAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\MMRecipes\PCNManagerFinder\PCNManagerFilter.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MMRecipes.PCNManagerFinder.PCNManagerMetadata" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="4.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAACAAAAAAAAAAAAAAEAAAQAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\MMRecipes\PCNManagerFinder\PCNManagerMetadata.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MMRecipes.PCNManagerFinder.PCNManagerRole" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="6" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\MMRecipes\PCNManagerFinder\PCNManagerRole.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MMRecipes.PCNManagerFinder.PCNManagerRoles" Collapsed="true">
+    <Position X="7.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\MMRecipes\PCNManagerFinder\PCNManagerRoles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MMRecipes.PCNManagerFinder.PCNRole" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="2.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAAAAAAEAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\MMRecipes\PCNManagerFinder\PCNRole.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MMRecipes.PCNManagerFinder.PCNRoles" Collapsed="true">
+    <Position X="4.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\MMRecipes\PCNManagerFinder\PCNRoles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MMRecipes.PCNManagerFinder.ProductCodeName" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="6" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\MMRecipes\PCNManagerFinder\ProductCodeName.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MMRecipes.PCNManagerFinder.ProductCodeNames" Collapsed="true">
+    <Position X="7.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\MMRecipes\PCNManagerFinder\ProductCodeNames.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Interface Name="Intel.NsgAuto.Callisto.Business.Entities.MMRecipes.PCNManagerFinder.IAccountCustomer" Collapsed="true">
+    <Position X="2.5" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\MMRecipes\PCNManagerFinder\IAccountCustomer.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Intel.NsgAuto.Callisto.Business.Entities.MMRecipes.PCNManagerFinder.IApprover" Collapsed="true">
+    <Position X="4.25" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAAAAAAAAAgAAAAAAAAAAAAAAAAEAAAAAA=</HashCode>
+      <FileName>Entities\MMRecipes\PCNManagerFinder\IApprover.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Intel.NsgAuto.Callisto.Business.Entities.MMRecipes.PCNManagerFinder.IPCNManagerFilter" Collapsed="true">
+    <Position X="6" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAACABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\MMRecipes\PCNManagerFinder\IPCNManagerFilter.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Intel.NsgAuto.Callisto.Business.Entities.MMRecipes.PCNManagerFinder.IPCNManagerMetaData" Collapsed="true">
+    <Position X="7.75" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAACAAAAAAAAAAAAAAEAAAQAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\MMRecipes\PCNManagerFinder\IPCNManagerMetaData.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Intel.NsgAuto.Callisto.Business.Entities.MMRecipes.PCNManagerFinder.IPCNManagerRole" Collapsed="true">
+    <Position X="2.5" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\MMRecipes\PCNManagerFinder\IPCNManagerRole.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Intel.NsgAuto.Callisto.Business.Entities.MMRecipes.PCNManagerFinder.IPCNRole" Collapsed="true">
+    <Position X="4.25" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAAAAAAEAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\MMRecipes\PCNManagerFinder\IPCNRole.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Intel.NsgAuto.Callisto.Business.Entities.MMRecipes.PCNManagerFinder.IProductCodeName" Collapsed="true">
+    <Position X="6" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\MMRecipes\PCNManagerFinder\IProductCodeName.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

@@ -1,0 +1,936 @@
+﻿@model Intel.NsgAuto.Callisto.UI.Models.AutoChecker.CreateBuildCriteriaModel
+
+@{
+    ViewBag.Title = "Create Auto Checker Build Criteria";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script>
+
+    var enforceAttributeTypeValues = true;
+    var useAttributeTypeValues = true;
+    var entity = @(JsonHelper.Serialize(Model.Entity));
+    var attributeTypes = entity.AttributeTypes;
+    var attributeTypeValues = entity.AttributeTypeValues;
+    var attributeDataTypes = entity.AttributeDataTypes;
+    var buildCombinations = entity.BuildCombinations;
+    var buildCriteria = entity.BuildCriteria; // if the url has an id specified, this is the build criteria corresponding to that id
+    var designs = entity.Designs;
+    var fabricationFacilities = entity.FabricationFacilities;
+    var probeConversions = entity.ProbeConversions;
+    var startFromItems = [
+        { Id: 1, Name: "Existing Version" },
+        { Id: 2, Name: "Template" },
+        { Id: 3, Name: "Scratch" },
+    ];
+    var templates = entity.Templates;
+    var testFlows = entity.TestFlows;
+    var versions = entity.Versions;
+
+    // dictionaries for fast/easy lookups
+    var dictAttributeTypeValues = []; // { AttributeType.Id: [AttributeTypeValues] }
+    var dictCombinations = {}; // { Designs: Designs, Design.Id: { DesignFamilyId: DesignFamily.Id, FabricationFacilities: FabricationFacilities, FabricationFacility.Id: (TestFlows or ProbeConversions) } }
+    var dictDesigns = {}; // { Design.Id: Design }
+    var dictFabricationFacilities = {}; // { FabricationFacility.Id: FabricationFacility }
+    var dictProbeConversions = {}; // { ProbeConversions.Id: ProbeConversions }
+    var dictTestFlows = {}; // { TestFlow.Id: TestFlow }
+    var dictTemplates = {}; // { BuildCriteriaTemplate.DesignFamilyId: BuildCriteriaTemplate }
+    var dictVersions = {}; // { BuildCriteria.Id: BuildCriteria }
+
+    var initialized = false;
+    var chkRestrictToCombinations;
+    var ddlDesigns;
+    var ddlFabricationFacilities;
+    var ddlProbeConversions;
+    var ddlStartFrom;
+    var ddlTestFlows;
+    var ddlVersions;
+    var fbBuildCriteria;
+    var txtComment;
+
+    // populate dictionaries
+    updateDictAttributeTypeValues();
+    updateDictDesigns();
+    updateDictFabricationFacilities();
+    updateDictProbeConversions();
+    updateDictTestFlows();
+    updateDictTemplates();
+    updateDictVersions();
+    updateDictCombinations(); // must come after updateDictDesigns(), updateDictFabricationFacilities(), updateDictProbeConversions(), and updateDictTestFlows()
+
+    function updateDictAttributeTypeValues() {
+        dictAttributeTypeValues = {};
+        for (var i = 0; i < attributeTypes.length; i++) {
+            var values = [];
+            for (var j = 0; j < attributeTypeValues.length; j++) {
+                if (attributeTypes[i].Id === attributeTypeValues[j].AttributeTypeId) {
+                    values.push(attributeTypeValues[j]);
+                }
+            }
+            dictAttributeTypeValues[attributeTypes[i].Id] = values;
+        }
+    }
+
+    function updateDictCombinations() {
+        var designIds = [];
+        dictCombinations = {
+            Designs: [],
+        };
+        for (var i = 0; i < buildCombinations.length; i++) {
+            var combination = buildCombinations[i];
+            var designId = combination.Design.Id;
+            if (!includes(designIds, designId)) {
+                dictCombinations.Designs.push(dictDesigns[designId]);
+                designIds.push(designId);
+            }
+            var item;
+            if (dictCombinations.hasOwnProperty(designId)) {
+                item = dictCombinations[designId];
+            }
+            else {
+                item = {
+                    DesignFamilyId: combination.Design.DesignFamily.Id,
+                    FabricationFacilities: [],
+                };
+                dictCombinations[designId] = item;
+            }
+
+            if (!item.hasOwnProperty(combination.FabricationFacility.Id)) {
+                item.FabricationFacilities.push(dictFabricationFacilities[combination.FabricationFacility.Id]);
+                item[combination.FabricationFacility.Id] = [];
+            }
+            if (item.DesignFamilyId == 1) {
+                item[combination.FabricationFacility.Id].push(dictTestFlows[combination.TestFlow.Id]);
+            }
+            else {
+                item[combination.FabricationFacility.Id].push(dictProbeConversions[combination.ProbeConversion.Id]);
+            }
+        }
+    }
+
+    function updateDictDesigns() {
+        dictDesigns = {};
+        for (var i = 0; i < designs.length; i++) {
+            dictDesigns[designs[i].Id] = designs[i];
+        }
+    }
+
+    function updateDictFabricationFacilities() {
+        dictFabricationFacilities = {};
+        for (var i = 0; i < fabricationFacilities.length; i++) {
+            dictFabricationFacilities[fabricationFacilities[i].Id] = fabricationFacilities[i];
+        }
+    }
+
+    function updateDictProbeConversions() {
+        dictProbeConversions = {};
+        for (var i = 0; i < probeConversions.length; i++) {
+            dictProbeConversions[probeConversions[i].Id] = probeConversions[i];
+        }
+    }
+
+    function updateDictTestFlows() {
+        dictTestFlows = {};
+        for (var i = 0; i < testFlows.length; i++) {
+            dictTestFlows[testFlows[i].Id] = testFlows[i];
+        }
+    }
+
+    function updateDictTemplates() {
+        dictTemplates = {};
+        for (var i = 0; i < templates.length; i++) {
+            dictTemplates[templates[i].DesignFamily.Id] = templates[i];
+        }
+    }
+
+    function updateDictVersions() {
+        dictVersions = {};
+        for (var i = 0; i < versions.length; i++) {
+            dictVersions[versions[i].Id] = versions[i];
+        }
+    }
+
+    function updateVersionsDataSource(records, id) {
+        ddlVersions.option("dataSource", versions);
+        ddlVersions.option("value", id);
+    }
+
+    function onError(xhr, status) {
+        var result = null;
+        var message = "An unexpected error occurred. If the problem persists, contact support.";
+        if (xhr && xhr.responseJSON) {
+            result = xhr.responseJSON;
+            if (result.ExceptionMessage) message = result.ExceptionMessage;
+            else if (result.Message) message = result.Message;
+        }
+        Nsga.Callisto.Messages.showError(message);
+        return result;
+    }
+
+    function onSuccessBuildCriteriaAndVersions(result) {
+        var id = null;
+        versions = result.Versions;
+        updateDictVersions();
+        buildCriteria = result.BuildCriteria;
+        if (buildCriteria) id = buildCriteria.Id;
+        updateVersionsDataSource(result.Versions, id);
+        updateFilterFrom(result.BuildCriteria);
+    }
+
+    function restrictToExistingCombinations() {
+        var value = chkRestrictToCombinations.option("value");
+        if (value) return true;
+        return false;
+    }
+
+    function updateUiFromSelections() {
+        if (initialized) {
+            var clearFilter = true;
+            var clearVersions = true;
+            var sufficientSelections = false;
+            var designId = ddlDesigns.option("value");
+            var fabricationFacilityId = ddlFabricationFacilities.option("value");
+            var testFlowId = ddlTestFlows.option("value");
+            var probeConversionId = ddlProbeConversions.option("value");
+            var startFromId = ddlStartFrom.option("value");
+            var design = null;
+            if (designId) design = dictDesigns[designId];
+            var designFamilyId = null;
+            if (design && design.DesignFamily && fabricationFacilityId) {
+                designFamilyId = design.DesignFamily.Id;
+                if (designFamilyId == 1) { // NAND
+                    if (testFlowId) sufficientSelections = true;
+                }
+                else if (designFamilyId == 2) { // 
+                    if (probeConversionId) sufficientSelections = true;
+                }
+            }
+            if (startFromId == 1) { // Existing Version
+                if (sufficientSelections) {
+                    clearFilter = false;
+                    clearVersions = false;
+                    Nsga.Callisto.AutoChecker.getBuildCriteriaAndVersions(designId, fabricationFacilityId, testFlowId, probeConversionId, onSuccessBuildCriteriaAndVersions, onError);
+                }
+            }
+            else if (startFromId == 2) { // Template
+                if (designFamilyId) {
+                    clearFilter = false;
+                    updateFilterFrom(dictTemplates[designFamilyId]);
+                }
+            }
+            if (clearVersions) {
+                ddlVersions.option("dataSource", []);
+                ddlVersions.option("value", null);
+            }
+            if (clearFilter) {
+                updateFilterFrom(null);
+            }
+        }
+    }
+
+    function onSuccessBuildCriteria(result) {
+        buildCriteria = result;
+        updateFilterFrom(result);
+    }
+
+    function versionSelected(id) {
+        if (initialized && id) {
+            Nsga.Callisto.AutoChecker.getBuildCriteria(id, onSuccessBuildCriteria, onError);
+        }
+    }
+
+    // update drop down list's data source and attempt to preserve the existing value (if it exists in the new data source)
+    function updateDdlDataSourceWithIdValue(ddl, dataSource) {
+        var newValue = null;
+        var existingValue = ddl.option("value");
+        ddl.option("dataSource", dataSource);
+        if (dataSource) {
+            for (var i = 0; i < dataSource.length; i++) {
+                if (dataSource[i].Id === existingValue) {
+                    newValue = existingValue;
+                    break;
+                }
+            }
+        }
+        var validator = ddl.element().dxValidator("instance");
+        if (validator) validator.reset();
+        ddl.option("value", newValue);
+        return newValue;
+    }
+
+    function updateUiFromRestrictToCombinations(restrict) {
+        if (restrict) {
+            var designId = updateDdlDataSourceWithIdValue(ddlDesigns, dictCombinations.Designs);
+            updateUiFromDesign(designId);
+        }
+        else {
+            updateDdlDataSourceWithIdValue(ddlDesigns, designs);
+            updateDdlDataSourceWithIdValue(ddlFabricationFacilities, fabricationFacilities);
+            updateDdlDataSourceWithIdValue(ddlProbeConversions, probeConversions);
+            updateDdlDataSourceWithIdValue(ddlTestFlows, testFlows);
+        }
+    }
+
+    function updateUiFromDesign(id) {
+        var divTestFlows = $("#divTestFlows");
+        var divProbeConversions = $("#divProbeConversions");
+        var design = null;
+        if (id) design = dictDesigns[id];
+        if (design) {
+            if (design.DesignFamily.Id == 1) { // NAND
+                divTestFlows.show();
+                divProbeConversions.hide();
+            }
+            else {
+                divTestFlows.hide();
+                divProbeConversions.hide();
+            }
+        }
+        else {
+            divTestFlows.hide();
+            divProbeConversions.hide();
+        }
+        var fabricationFacilitiesNew = [];
+        if (restrictToExistingCombinations()) {
+            if (id && dictCombinations.hasOwnProperty(id)) {
+                fabricationFacilitiesNew = dictCombinations[id].FabricationFacilities;
+            }
+        }
+        else {
+            fabricationFacilitiesNew = fabricationFacilities;
+        }
+        if (initialized) {
+            var fabricationFacilityId = updateDdlDataSourceWithIdValue(ddlFabricationFacilities, fabricationFacilitiesNew);
+            updateUiFromFabricationFacility(fabricationFacilityId);
+        }
+    }
+
+    function updateUiFromFabricationFacility(id) {
+        var designId = ddlDesigns.option("value");
+        var design = null;
+        if (designId) design = dictDesigns[designId];
+        var testFlowsNew = [];
+        var probeConversionsNew = [];
+        if (restrictToExistingCombinations()) {
+            if (id && design && dictCombinations.hasOwnProperty(designId)) {
+                if (dictCombinations[designId].hasOwnProperty(id)) {
+                    if (design.DesignFamily.Id == 1) { // NAND
+                        testFlowsNew = dictCombinations[designId][id];
+                    }
+                    
+                }
+            }
+        }
+        else {
+            if (design.DesignFamily.Id == 1) { // NAND
+                testFlowsNew = testFlows;
+            }
+           
+        }
+        if (initialized) {
+            updateDdlDataSourceWithIdValue(ddlTestFlows, testFlowsNew);
+            updateDdlDataSourceWithIdValue(ddlProbeConversions, probeConversionsNew);
+            updateUiFromSelections();
+        }
+    }
+
+    function updateUiFromStartFrom(id) {
+        var divVersions = $("#divVersions");
+        if (id == 1) { // Existing Version
+            divVersions.show();
+        }
+        else {
+            divVersions.hide();
+        }
+        if (initialized) {
+            updateUiFromSelections();
+        }
+    }
+
+    function updateFilterFrom(item) {
+        var filterValue = null;
+        if (item && item.Conditions) {
+            filterValue = [];
+            var condition;
+            var conditionValue;
+            for (var i = 0; i < item.Conditions.length; i++) {
+                condition = item.Conditions[i];
+                conditionValue = condition.Value;
+                if (condition.ComparisonOperation.OperandType.Id === 3) { // 3 = List
+                    if (conditionValue) {
+                        if (includes(conditionValue, ",")) {
+                            conditionValue = conditionValue.split(",");
+                        }
+                        else {
+                            conditionValue = [conditionValue];
+                        }
+                    }
+                    else {
+                        conditionValue = [];
+                    }
+                }
+                if (i > 0) filterValue.push("and");
+                filterValue.push([condition.AttributeType.Name, condition.ComparisonOperation.Key, conditionValue]);
+            }
+        }
+        fbBuildCriteria.option("value", filterValue);
+    }
+
+    function cancel() {
+        window.location.href = "/AutoChecker/ListBuildCriteriaPOR/";
+    }
+
+    function onCreateSuccess(result) {
+        window.location.href = "/AutoChecker/BuildCriteriaDetails/" + result.Entity;
+    }
+
+    function create() {
+        var createEntity = {
+            DesignId: ddlDesigns.option("value"),
+            FabricationFacilityId: ddlFabricationFacilities.option("value"),
+            TestFlowId: ddlTestFlows.option("value"),
+            ProbeConversionId: ddlProbeConversions.option("value"),
+            Conditions: [],
+            Comment: txtComment.val().trim(),
+            RestrictToExistingCombinations: restrictToExistingCombinations(),
+        };
+        var filterValue = fbBuildCriteria.option("value");
+        if (filterValue && Array.isArray(filterValue)) { // if the filter has a non null value and is an array then populate the array createEntity.Conditions
+            if (filterValue.length > 0 && !Array.isArray(filterValue[0])) filterValue = [filterValue]; // fix for filter value with only a single condition
+            for (var i = 0; i < filterValue.length; i++) {
+                // this is how the devExtreme filter builder value works:
+                // the value is an array with each element being one of the following:
+                // (1) a group operation: "and", "or" (we are currently only allowing "and" in this implementation, i.e. fbBuildCriteria.groupOperations == ["and"])
+                // (2) an array with each element being one of the following:
+                //    (a) a group operation: "and", "or" (we are currently disallowing any group operations at this level in this in this implementation, i.e. fbBuildCriteria.maxGroupLevel == 0)
+                //    (b) an array, say item, representing the filter condition with the following elements:
+                //        item[0] is the field (AttributeType.Name)
+                //        item[1] is the operation (ComparisonOperation.Key)
+                //        item[2] is the condition value(s) which is either: null (no values), a string (single value), or an array containing the values (multiple values)
+                var item = filterValue[i];
+                if (item && Array.isArray(item) && item.length >= 2) {
+                    var conditionValue = null;
+                    // if there is a non-null condition value, convert it to a comma delimited string
+                    if (item.length >= 3) {
+                        if (Array.isArray(item[2])) {
+                            conditionValue = item[2].join(",");
+                        }
+                        else {
+                            conditionValue = item[2];
+                        }
+                    }
+                    var condition = {
+                        AttributeTypeName: item[0],
+                        ComparisonOperationKey: item[1],
+                        Value: conditionValue,
+                    };
+                    createEntity.Conditions.push(condition);
+                }
+            }
+        }
+        Nsga.Callisto.AutoChecker.createBuildCriteria(createEntity, onCreateSuccess, onError);
+    }
+
+    function fbEditorTemplateAutocomplete(conditionInfo) {
+        var config = {
+            dataSource: conditionInfo.field.editorOptions.dataSource,
+            displayExpr: conditionInfo.field.editorOptions.displayExpr,
+            maxItemCount: 100,
+            minSearchLength: 0,
+            onValueChanged: function (e) {
+                conditionInfo.setValue(e.value ? e.value : null);
+            },
+            openOnFieldClick: true,
+            value: conditionInfo.value,
+            valueExpr: conditionInfo.field.editorOptions.valueExpr,
+            width: "auto",
+        };
+        return $("<div>").dxAutocomplete(config);
+    }
+
+    function fbEditorTemplateTagBox(conditionInfo) {
+        var config = {
+            value: conditionInfo.value,
+            searchEnabled: true,
+            onValueChanged: function (e) {
+                conditionInfo.setValue(e.value && e.value.length ? e.value : null);
+            },
+            width: "auto",
+            dropDownOptions: { minWidth: 300 },
+        };
+        if (enforceAttributeTypeValues || useAttributeTypeValues) {
+            config.items = conditionInfo.field.editorOptions.dataSource;
+            config.valueExpr = conditionInfo.field.editorOptions.valueExpr;
+            config.displayExpr = conditionInfo.field.editorOptions.displayExpr;
+            config.showSelectionControls = true;
+            config.applyValueMode = "useButtons";
+            /*
+            config.acceptCustomValue = true;
+            config.onCustomItemCreating = function (args) {
+                var newValue = args.text,
+                    component = args.component,
+                    currentItems = component.option("items");
+                var newItem = { Value: newValue, ValueDisplay: newValue };
+                currentItems.unshift(newItem);
+                component.option("items", currentItems);
+                args.customItem = newItem;
+            }
+            */
+        }
+        else {
+            config.acceptCustomValue = true;
+            /*
+            config.onCustomItemCreating = function (args) {
+                var newValue = args.text,
+                    component = args.component,
+                    currentItems = component.option("items");
+                currentItems.unshift(newValue);
+                component.option("items", currentItems);
+                args.customItem = newValue;
+            };
+            */
+        }
+        return $("<div>").dxTagBox(config);
+    }
+
+    $("document").ready(function () {
+
+        var designId = null;
+        var designsInitial = dictCombinations.Designs;
+        var fabricationFacilityId = null;
+        var fabricationFacilitiesInitial = null;
+        var testFlowId = null;
+        var testFlowsInitial = null;
+        var probeConversionId = null;
+        var probeConversionsInitial = null;
+        var restrictToCombinationsInitial = false;
+        var versionIdInitial = null;
+
+        if (buildCriteria === null) { }
+        else {
+            versionIdInitial = buildCriteria.Id;
+            designId = buildCriteria.Design.Id;
+            fabricationFacilityId = buildCriteria.FabricationFacility.Id;
+            if (buildCriteria.TestFlow) {
+                testFlowId = buildCriteria.TestFlow.Id;
+            }
+            if (buildCriteria.ProbeConversion) {
+                probeConversionId = buildCriteria.ProbeConversion.Id;
+            }
+        }
+
+        if (restrictToCombinationsInitial) {
+            designsInitial = dictCombinations.Designs;
+            fabricationFacilitiesInitial = dictCombinations[designId].FabricationFacilities;
+            if (fabricationFacilityId && testFlowId) {
+                testFlowsInitial = dictCombinations[designId][fabricationFacilityId];
+            }
+            else if (fabricationFacilityId && probeConversionId) {
+                probeConversionsInitial = dictCombinations[designId][fabricationFacilityId];
+            }
+        }
+        else {
+            designsInitial = designs;
+            fabricationFacilitiesInitial = fabricationFacilities;
+            testFlowsInitial = testFlows;
+            probeConversionsInitial = probeConversions;
+        }
+
+        chkRestrictToCombinations = $("#chkRestrictToCombinations").dxCheckBox({
+            value: restrictToCombinationsInitial,
+            onValueChanged: function (e) {
+                if (e.event !== undefined) { // only enter this block if the value was changed by the user (not programatically)
+                    updateUiFromRestrictToCombinations(e.value);
+                }
+            },
+        }).dxCheckBox("instance");
+
+        ddlDesigns = $("#ddlDesigns").dxSelectBox({
+            items: designsInitial,
+            value: designId,
+            displayExpr: "Name",
+            valueExpr: "Id",
+            searchEnabled: true,
+            width: "100px",
+            placeholder: "Select",
+            onValueChanged: function (e) {
+                if (e.event !== undefined) { // only enter this block if the value was changed by the user (not programatically)
+                    updateUiFromDesign(e.value);
+                }
+            }
+        }).dxValidator({
+            validationRules: [{
+                type: "required",
+                message: "Design is required",
+            }],
+        }).dxSelectBox("instance");
+
+        ddlFabricationFacilities = $("#ddlFabricationFacilities").dxSelectBox({
+            items: fabricationFacilitiesInitial,
+            value: fabricationFacilityId,
+            displayExpr: "Name",
+            valueExpr: "Id",
+            searchEnabled: true,
+            width: "100px",
+            placeholder: "Select",
+            onValueChanged: function (e) {
+                if (e.event !== undefined) { // only enter this block if the value was changed by the user (not programatically)
+                    updateUiFromFabricationFacility(e.value);
+                }
+            }
+        }).dxValidator({
+            validationRules: [{
+                type: "required",
+                message: "Fabrication Facility is required"
+            }],
+        }).dxSelectBox("instance");
+
+        ddlTestFlows = $("#ddlTestFlows").dxSelectBox({
+            items: testFlowsInitial,
+            value: testFlowId,
+            displayExpr: "Name",
+            valueExpr: "Id",
+            searchEnabled: true,
+            width: "150px",
+            placeholder: "Select",
+            onValueChanged: function (e) {
+                if (e.event !== undefined) { // only enter this block if the value was changed by the user (not programatically)
+                    updateUiFromSelections();
+                }
+            }
+        }).dxValidator({
+            validationRules: [{
+                type: "custom",
+                message: "Test Flows is required",
+                validationCallback: function (e) {
+                    var result = false;
+                    if (e.value) {
+                        result = true;
+                    }
+                    else { // the value is null
+                        var id = ddlDesigns.option("value");
+                        if (id) {
+                            if (dictDesigns[id].DesignFamily.Id == 2) { // 
+                                result = true;
+                            }
+                        }
+                    }
+                    return result;
+                },
+                reevaluate: true,
+            }],
+        }).dxSelectBox("instance");
+
+        ddlProbeConversions = $("#ddlProbeConversions").dxSelectBox({
+            items: probeConversionsInitial,
+            value: probeConversionId,
+            displayExpr: "Name",
+            valueExpr: "Id",
+            searchEnabled: true,
+            width: "100px",
+            placeholder: "Select",
+            onValueChanged: function (e) {
+                if (e.event !== undefined) { // only enter this block if the value was changed by the user (not programatically)
+                    updateUiFromSelections();
+                }
+            }
+        }).dxValidator({
+            validationRules: [{
+                type: "custom",
+                message: "Probe Conversions is required",
+                validationCallback: function (e) {
+                    var result = false;
+                    if (e.value) {
+                        result = true;
+                    }
+                    else { // the value is null
+                        var id = ddlDesigns.option("value");
+                        if (id) {
+                            if (dictDesigns[id].DesignFamily.Id == 1) { // NAND
+                                result = true;
+                            }
+                        }
+                    }
+                    return result;
+                },
+                reevaluate: true,
+            }],
+        }).dxSelectBox("instance");
+
+        ddlStartFrom = $("#ddlStartFrom").dxSelectBox({
+            items: startFromItems,
+            value: 1, // Default option: Existing Version
+            displayExpr: "Name",
+            valueExpr: "Id",
+            searchEnabled: true,
+            width: "150px",
+            placeholder: "Select",
+            onValueChanged: function (e) {
+                if (e.event !== undefined) { // only enter this block if the value was changed by the user (not programatically)
+                    updateUiFromStartFrom(e.value);
+                }
+            }
+        }).dxSelectBox("instance");
+
+        ddlVersions = $("#ddlVersions").dxSelectBox({
+            items: versions,
+            value: versionIdInitial,
+            displayExpr: "Name",
+            valueExpr: "Id",
+            searchEnabled: true,
+            width: "250px",
+            placeholder: "Select",
+            onValueChanged: function (e) {
+                if (e.event !== undefined) { // only enter this block if the value was changed by the user (not programatically)
+                    versionSelected(e.value);
+                }
+            }
+        }).dxSelectBox("instance");
+
+        var dictFilterOperations = {}; // { AttributeDataType.Name: ComparisonOperations }
+        for (var i = 0; i < attributeDataTypes.length; i++) {
+            var operations = [];
+            for (var j = 0; j < attributeDataTypes[i].ComparisonOperations.length; j++) {
+                operations.push(attributeDataTypes[i].ComparisonOperations[j].Key);
+            }
+            dictFilterOperations[attributeDataTypes[i].Name] = operations;
+        }
+
+        // create filter builder fields from the attribute types
+        var fbFields = [];
+        for (var i = 0; i < attributeTypes.length; i++) {
+            var item = {
+                caption: attributeTypes[i].NameDisplay,
+                dataField: attributeTypes[i].Name,
+                dataType: attributeTypes[i].DataType.Name,
+                filterOperations: dictFilterOperations[attributeTypes[i].DataType.Name],
+            }
+            if (useAttributeTypeValues || enforceAttributeTypeValues) {
+                item.editorOptions = {
+                    dataSource: dictAttributeTypeValues[attributeTypes[i].Id],
+                    valueExpr: "Value",
+                    displayExpr: "ValueDisplay",
+                };
+                if (enforceAttributeTypeValues) {
+                    item.lookup = {
+                        dataSource: dictAttributeTypeValues[attributeTypes[i].Id],
+                        valueExpr: "Value",
+                        displayExpr: "ValueDisplay",
+                    };
+                }
+            }
+            fbFields.push(item);
+        };
+
+        fbBuildCriteria = $("#fbBuildCriteria").dxFilterBuilder({
+            fields: fbFields,
+            maxGroupLevel: 0,
+            groupOperations: ["and"],
+            customOperations: [
+                {
+                    name: "contains",
+                    caption: "Contains",
+                    icon: "contains",
+                    editorTemplate: fbEditorTemplateAutocomplete,
+                },
+                {
+                    name: "notcontains",
+                    caption: "Does not contain",
+                    icon: "doesnotcontain",
+                    editorTemplate: fbEditorTemplateAutocomplete,
+                },
+                {
+                    name: "in",
+                    caption: "Is in",
+                    icon: "check",
+                    editorTemplate: fbEditorTemplateTagBox,
+                    calculateFilterExpression: function (filterValue, field) {
+                        return filterValue && filterValue.length
+                            && Array.prototype.concat.apply([], filterValue.map(function (value) {
+                                return [[field.dataField, "=", value], "or"];
+                            })).slice(0, -1);
+                    }
+                },
+                {
+                    name: "notin",
+                    caption: "Is not in",
+                    icon: "close",
+                    editorTemplate: fbEditorTemplateTagBox,
+                    calculateFilterExpression: function (filterValue, field) {
+                        return filterValue && filterValue.length
+                            && Array.prototype.concat.apply([], filterValue.map(function (value) {
+                                return [[field.dataField, "<>", value], "and"];
+                            })).slice(0, -1);
+                    }
+                },
+            ],
+            onEditorPreparing: function (e) {
+                if (enforceAttributeTypeValues) {
+                    return; // use defaults
+                }
+                else if (useAttributeTypeValues) {
+                    e.editorName = "dxAutocomplete";
+                    e.editorOptions.maxItemCount = 100;
+                    e.editorOptions.minSearchLength = 0;
+                    e.editorOptions.openOnFieldClick = true;
+                }
+            },
+        }).dxFilterBuilder("instance");
+
+        txtComment = $("#txtComment");
+
+        updateUiFromDesign(designId);
+        updateFilterFrom(buildCriteria);
+
+        $("#btnCancel").dxButton({
+            text: "Cancel",
+            onClick: function (e) {
+                cancel();
+            },
+        });
+
+        $("#btnCreate").dxButton({
+            text: "Save",
+            onClick: function (e) {
+                var result = e.validationGroup.validate();
+                if (result.isValid) {
+                    create();
+                }
+            },
+        });
+
+        initialized = true;
+
+    });
+
+</script>
+
+<div>
+    <div class="formwrapper fixed centered" style="width:960px;">
+        <div class="bluebox padeightpixel marginfourpixel">
+            <div>
+                <div class="rightalign">
+                    <div class="padeightpixel">
+                        <span><a title="Click here to manage attribute types" id="lnkManageAttributeTypes" href="/AutoChecker/AttributeTypes/"><span class="imagelinkbutton bordered"><span class="fa fa-list-alt "></span><span class="margintwopixel">Manage Attribute Types</span> </span></a></span>
+                        <span><a title="Click here to view all PRQ build criteria" id="lnkAllPOR" href="/AutoChecker/ListBuildCriteriaPOR/"><span class="imagelinkbutton bordered"><span class="fa fa-list-alt "></span><span class="margintwopixel">All PRQ</span> </span></a></span>
+                        <span><a title="Click here to view all non-PRQ build criteria" id="lnkAllNonPOR" href="/AutoChecker/ListBuildCriteriaNonPOR/"><span class="imagelinkbutton bordered"><span class="fa fa-list-alt "></span><span class="margintwopixel">All Non-PRQ</span> </span></a></span>
+                    </div>
+                </div>
+                <div class="bluebox bglightblue padeightpixel">
+                    <div class="" style="width:940px;display:inline;">
+                        <div class="infotext">
+                            <span class="infotext italic">Items marked as <span class="mandatory">*</span> are required inputs</span>
+                        </div>
+                        <div>
+                            <div id="divValidationSummary" style="margin-left: 150px;"></div>
+                        </div>
+                        <!-- restrict to existing combinations -->
+                        <div class="display formrow" style=" display: none;">
+                            <div class="showinline" style="margin-top:8px;width:100%;">
+                                <div class="dx-field-label" style="width:185px;">Restrict To Existing Combinations</div>
+                                <div class="colon floatleft" style="margin-top: 8px;"></div>
+                                <div style="display:inline-block;" class="forminput">
+                                    <div id="chkRestrictToCombinations"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="display formrow">
+                            <!-- designs -->
+                            <div class="showinline" style="margin-top:8px;width:225px;">
+                                <div class="dx-field-label required">Design</div>
+                                <div class="colon floatleft" style="margin-top: 8px;"></div>
+                                <div class="">
+                                    <div id="ddlDesigns" style="display:inline-block;"></div>
+                                </div>
+                            </div>
+                            <!-- fabrication facilities -->
+                            <div class="showinline" style="margin-top:8px;width:35%;">
+                                <div class="dx-field-label required" style="width:125px;">Fabrication Facility</div>
+                                <div class="colon floatleft" style="margin-top: 8px;"></div>
+                                <div class="">
+                                    <div id="ddlFabricationFacilities" style="display:inline-block;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- dependent fields based on the selected design -->
+                        <div class="display formrow">
+                            <!-- test flows; display only if the design is of type NAND -->
+                            <div id="divTestFlows" class="showinline" style="margin-top:8px;width:100%;">
+                                <!-- display: none; -->
+                                <div class="dx-field-label required" style="width:185px;">Test Flow Type</div>
+                                <div class="colon floatleft" style="margin-top: 8px;"></div>
+                                <div class="">
+                                    <div id="ddlTestFlows" style="display:inline-block;"></div>
+                                </div>
+                            </div>
+                            <!-- probe conversions; display only if the design is of type  -->
+                            <div id="divProbeConversions" class="showinline" style="margin-top:8px;width:100%;">
+                                <!-- display: none; -->
+                                <div class="dx-field-label required" style="width:185px;">Probe Conversion Id</div>
+                                <div class="colon floatleft" style="margin-top: 8px;"></div>
+                                <div style="display:inline-block;" class="forminput">
+                                    <div id="ddlProbeConversions"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- start from -->
+                        <div class="display formrow">
+                            <div class="showinline" style="margin-top:8px;width:100%;">
+                                <div class="dx-field-label" style="width:185px;">Start From</div>
+                                <div class="colon floatleft" style="margin-top: 8px;"></div>
+                                <div style="display:inline-block;" class="forminput">
+                                    <div id="ddlStartFrom"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- versions; display only if start from = Existing Version -->
+                        <div id="divVersions" class="display formrow">
+                            <div class="showinline" style="margin-top:8px;width:100%;">
+                                <div class="dx-field-label" style="width:185px;">Existing Versions</div>
+                                <div class="colon floatleft" style="margin-top: 8px;"></div>
+                                <div style="display:inline-block;" class="forminput">
+                                    <div id="ddlVersions"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- conditions -->
+                        <div class="display formrow">
+                            <div class="showinline" style="margin-top:8px;width:100%;">
+                                <div class="dx-field-label required" style="width:185px;">Criteria</div>
+                                <div class="colon floatleft" style="margin-top: 8px;"></div>
+                                <div style="display:inline-block;" class="forminput">
+                                    <div id="fbBuildCriteria"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- comment -->
+                        <div class="display formrow">
+                            <div class="showinline" style="margin-top:8px;width:100%;">
+                                <div class="dx-field-label" style="width:185px;">Comment</div>
+                                <div class="colon floatleft" style="margin-top: 8px;"></div>
+                                <div style="display:inline-block;" class="forminput">
+                                    <textarea id="txtComment" name="txtComment" rows="5" cols="100"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div>
+            <!-- A section for all the actions, show it only to the criteria authors -->
+            @if (Intel.NsgAuto.Web.Mvc.Core.Functions.IsAutoCheckerCriteriaAuthor())
+            {
+                    <div class="bluebox padeightpixel bglightblue marginfourpixel" style="margin-top:8px;">
+                        <div class=" padeightpixel">
+                            <div class="rightalign">
+                                <div id="btnCancel"></div>
+                                <div id="btnCreate" class="submitbutton"></div>
+                            </div>
+                        </div>
+                    </div>
+            }
+
+        </div>
+    </div>
+</div>

@@ -1,0 +1,74 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MATs.Workflows.MATReviewStep" Collapsed="true">
+    <Position X="2.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\MATs\Workflows\MATReviewStep.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MATs.Workflows.MATReview" Collapsed="true">
+    <Position X="0.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\MATs\Workflows\MATReview.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MATs.Workflows.MATReviewDecision" Collapsed="true">
+    <Position X="2.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\MATs\Workflows\MATReviewDecision.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MATs.Workflows.MATReviewGroup" Collapsed="true">
+    <Position X="4" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\MATs\Workflows\MATReviewGroup.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MATs.Workflows.MATReviewGroupReviewer" Collapsed="true">
+    <Position X="5.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\MATs\Workflows\MATReviewGroupReviewer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MATs.Workflows.MATReviewMessage" Collapsed="true">
+    <Position X="0.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\MATs\Workflows\MATReviewMessage.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MATs.Workflows.MATReviewMessages" Collapsed="true">
+    <Position X="2.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\MATs\Workflows\MATReviewMessages.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MATs.Workflows.MATReviewResponse" Collapsed="true">
+    <Position X="4" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\MATs\Workflows\MATReviewResponse.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MATs.Workflows.MATReviewReviewer" Collapsed="true">
+    <Position X="5.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\MATs\Workflows\MATReviewReviewer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MATs.Workflows.MATReviewStage" Collapsed="true">
+    <Position X="0.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\MATs\Workflows\MATReviewStage.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

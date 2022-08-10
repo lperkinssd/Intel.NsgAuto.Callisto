@@ -1,0 +1,233 @@
+﻿
+@{
+    ViewBag.Title = "ListBuildCriterias";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    int Id = (int)ViewData["Id"];
+}
+
+<script>
+
+    var matDetails = null;
+    var matId = @(Id);
+
+    var source = [
+        { "Id": 8, "SSD_Id": "BEAR COVE QUANTUM 15TB 2.5 SAS RI SSD", "Capacity": "15TB", "Design_Id": { "Id": 3, "Name": "B27A", "DesignFamily": { "Id": 1, "Name": "NAND" } }, "Scode": "999HAR", "Media_IPN": "J76533-004", "Device_Name": "29F04T2AOCTJ1", "Fab_Facility": "FAB 68A/FAB68A" },
+        { "Id": 9, "SSD_Id": "BEAR COVE QUANTUM 15TB 2.5 SAS RI SSD", "Capacity": "15TB", "Design_Id": { "Id": 3, "Name": "B27A", "DesignFamily": { "Id": 1, "Name": "NAND" } }, "Scode": "999HAR", "Media_IPN": "J76534-004", "Device_Name": "29F08T2AWCTJ1", "Fab_Facility": "FAB 68A/FAB68A" },
+        { "Id": 10, "SSD_Id": "BEAR COVE QUANTUM 1600GB  2.5 SAS RI SSD", "Capacity": "1600GB", "Design_Id": { "Id": 3, "Name": "B27A", "DesignFamily": { "Id": 1, "Name": "NAND" } }, "Scode": "999HAF", "Media_IPN": "J76530-004", "Device_Name": "29F64B2ALCTJ1", "Fab_Facility": "FAB 68A/FAB68A" },
+        { "Id": 11, "SSD_Id": "BEAR COVE QUANTUM 1600GB  2.5 SAS RI SSD", "Capacity": "1600GB", "Design_Id": { "Id": 3, "Name": "B27A", "DesignFamily": { "Id": 1, "Name": "NAND" } }, "Scode": "999HAF", "Media_IPN": "J76532-004", "Device_Name": "29F02T2ANCTJ1", "Fab_Facility": "FAB 68A/FAB68A" },
+        { "Id": 12, "SSD_Id": "BEAR COVE QUANTUM 1920GB  2.5 SAS RI SSD", "Capacity": "1920GB", "Design_Id": { "Id": 3, "Name": "B27A", "DesignFamily": { "Id": 1, "Name": "NAND" } }, "Scode": "999HAL", "Media_IPN": "J76530-004 ", "Device_Name": "29F64B2ALCTJ1", "Fab_Facility": "FAB 68A/FAB68A" },
+        { "Id": 13, "SSD_Id": "BEAR COVE QUANTUM 1920GB  2.5 SAS RI SSD", "Capacity": "1920GB", "Design_Id": { "Id": 3, "Name": "B27A", "DesignFamily": { "Id": 1, "Name": "NAND" } }, "Scode": "999HAL", "Media_IPN": "J76532-004", "Device_Name": "29F02T2ANCTJ1", "Fab_Facility": "FAB 68A/FAB68A" },
+        { "Id": 14, "SSD_Id": "BEAR COVE QUANTUM 3200GB  2.5 SAS RI SSD", "Capacity": "3200GB", "Design_Id": { "Id": 3, "Name": "B27A", "DesignFamily": { "Id": 1, "Name": "NAND" } }, "Scode": "999HAG", "Media_IPN": "J76531-004", "Device_Name": "29F01T2AMCTJ1", "Fab_Facility": "FAB 68A/FAB68A" },
+        { "Id": 15, "SSD_Id": "BEAR COVE QUANTUM 3200GB  2.5 SAS RI SSD", "Capacity": "3200GB", "Design_Id": { "Id": 3, "Name": "B27A", "DesignFamily": { "Id": 1, "Name": "NAND" } }, "Scode": "999HAG", "Media_IPN": "J76532-004", "Device_Name": "29F02T2ANCTJ1", "Fab_Facility": "FAB 68A/FAB68A" },
+        { "Id": 16, "SSD_Id": "BEAR COVE QUANTUM 3200GB  2.5 SAS RI SSD", "Capacity": "3200GB", "Design_Id": { "Id": 3, "Name": "B27A", "DesignFamily": { "Id": 1, "Name": "NAND" } }, "Scode": "999HAG", "Media_IPN": "J76533-004", "Device_Name": "29F04T2AOCTJ1", "Fab_Facility": "FAB 68A/FAB68A" },
+        { "Id": 17, "SSD_Id": "BEAR COVE QUANTUM 3840GB  2.5 SAS RI SSD", "Capacity": "3840GB", "Design_Id": { "Id": 3, "Name": "B27A", "DesignFamily": { "Id": 1, "Name": "NAND" } }, "Scode": "999HAN", "Media_IPN": "J76530-004 ", "Device_Name": "29F64B2ALCTJ1", "Fab_Facility": "FAB 68A/FAB68A" },
+        { "Id": 18, "SSD_Id": "BEAR COVE QUANTUM 3840GB  2.5 SAS RI SSD", "Capacity": "3840GB", "Design_Id": { "Id": 3, "Name": "B27A", "DesignFamily": { "Id": 1, "Name": "NAND" } }, "Scode": "999HAN", "Media_IPN": "J76532-004", "Device_Name": "29F02T2ANCTJ1", "Fab_Facility": "FAB 68A/FAB68A" },
+        { "Id": 19, "SSD_Id": "BEAR COVE QUANTUM 6400GB  2.5 SAS RI SSD", "Capacity": "6400GB", "Design_Id": { "Id": 3, "Name": "B27A", "DesignFamily": { "Id": 1, "Name": "NAND" } }, "Scode": "999HAH", "Media_IPN": "J76532-004", "Device_Name": "29F02T2ANCTJ1", "Fab_Facility": "FAB 68A/FAB68A" },
+        { "Id": 20, "SSD_Id": "BEAR COVE QUANTUM 6400GB  2.5 SAS RI SSD", "Capacity": "6400GB", "Design_Id": { "Id": 3, "Name": "B27A", "DesignFamily": { "Id": 1, "Name": "NAND" } }, "Scode": "999HAH", "Media_IPN": "J76533-004", "Device_Name": "29F04T2AOCTJ1", "Fab_Facility": "FAB 68A/FAB68A" },
+        { "Id": 21, "SSD_Id": "BEAR COVE QUANTUM 7680GB  2.5 SAS RI SSD", "Capacity": "7680GB", "Design_Id": { "Id": 3, "Name": "B27A", "DesignFamily": { "Id": 1, "Name": "NAND" } }, "Scode": "999HAP", "Media_IPN": "J76532-004", "Device_Name": "29F02T2ANCTJ1", "Fab_Facility": "FAB 68A/FAB68A" },
+        { "Id": 22, "SSD_Id": "BEAR COVE QUANTUM 7680GB  2.5 SAS RI SSD", "Capacity": "7680GB", "Design_Id": { "Id": 3, "Name": "B27A", "DesignFamily": { "Id": 1, "Name": "NAND" } }, "Scode": "999HAP", "Media_IPN": "J76533-004", "Device_Name": "29F04T2AOCTJ1", "Fab_Facility": "FAB 68A/FAB68A" },
+        { "Id": 23, "SSD_Id": "BEAR COVE QUANTUM 800GB  2.5 SAS RI SSD", "Capacity": "800GB", "Design_Id": { "Id": 3, "Name": "B27A", "DesignFamily": { "Id": 1, "Name": "NAND" } }, "Scode": "999HAD", "Media_IPN": "J76531-004", "Device_Name": "29F01T2AMCTJ1", "Fab_Facility": "FAB 68A/FAB68A" },
+        { "Id": 24, "SSD_Id": "BEAR COVE QUANTUM 960GB  2.5 SAS RI SSD", "Capacity": "960GB", "Design_Id": { "Id": 3, "Name": "B27A", "DesignFamily": { "Id": 1, "Name": "NAND" } }, "Scode": "999HAJ", "Media_IPN": "J76531-004", "Device_Name": "29F01T2AMCTJ1", "Fab_Facility": "FAB 68A/FAB68A" },
+        { "Id": 25, "SSD_Id": "CLIFFDALE REFRESH VE 15.36TB 2.5 PCIE SSD", "Capacity": "15.36TB", "Design_Id": { "Id": 4, "Name": "N18A", "DesignFamily": { "Id": 1, "Name": "NAND" } }, "Scode": "979183", "Media_IPN": "K36458-002", "Device_Name": "29F08T2AOCQH2", "Fab_Facility": "FAB 68/FAB 68A/FAB68A" },
+        { "Id": 26, "SSD_Id": "CLIFFDALE REFRESH VE 15.36TB 2.5 PCIE SSD", "Capacity": "15.36TB", "Design_Id": { "Id": 4, "Name": "N18A", "DesignFamily": { "Id": 1, "Name": "NAND" } }, "Scode": "979183", "Media_IPN": "J63678-002", "Device_Name": "29F08T2AOCQH1", "Fab_Facility": "FAB 68/FAB 68A/FAB68A/FAB 10" },
+        { "Id": 27, "SSD_Id": "CLIFFDALE REFRESH VE 15.36TB 2.5 PCIE SSD", "Capacity": "15.36TB", "Design_Id": { "Id": 4, "Name": "N18A", "DesignFamily": { "Id": 1, "Name": "NAND" } }, "Scode": "979183", "Media_IPN": "K36451-002", "Device_Name": "29F02T2AMCQH2", "Fab_Facility": "FAB 68/FAB 68A/FAB68A" },
+        { "Id": 28, "SSD_Id": "CLIFFDALE REFRESH VE 15.36TB 2.5 PCIE SSD", "Capacity": "15.36TB", "Design_Id": { "Id": 4, "Name": "N18A", "DesignFamily": { "Id": 1, "Name": "NAND" } }, "Scode": "979183", "Media_IPN": "J63669-002", "Device_Name": "29F02T2AMCQH1", "Fab_Facility": "FAB 68/FAB 68A/FAB68A/FAB 10" },
+        { "Id": 29, "SSD_Id": "CLIFFDALE REFRESH VE 15.36TB 2.5 PCIE SSD", "Capacity": "15.36TB", "Design_Id": { "Id": 4, "Name": "N18A", "DesignFamily": { "Id": 1, "Name": "NAND" } }, "Scode": "979183", "Media_IPN": "K36455-002", "Device_Name": "29F04T2ANCQH2", "Fab_Facility": "FAB 68/FAB 68A/FAB68A" },
+        { "Id": 30, "SSD_Id": "CLIFFDALE REFRESH VE 15.36TB 2.5 PCIE SSD", "Capacity": "15.36TB", "Design_Id": { "Id": 4, "Name": "N18A", "DesignFamily": { "Id": 1, "Name": "NAND" } }, "Scode": "979183", "Media_IPN": "J63675-002 ", "Device_Name": "29F04T2ANCQH1", "Fab_Facility": "FAB 68/FAB 68A/FAB68A/FAB 10" },
+        { "Id": 31, "SSD_Id": "CLIFFDALE REFRESH VE 15.36TB EDSFF18 PCIE SSD", "Capacity": "15.36TB", "Design_Id": { "Id": 4, "Name": "N18A", "DesignFamily": { "Id": 1, "Name": "NAND" } }, "Scode": "980942", "Media_IPN": "J63678-002", "Device_Name": "29F08T2AOCQH1", "Fab_Facility": "FAB 68/FAB 68A/FAB68A/FAB 10" },
+        { "Id": 32, "SSD_Id": "CLIFFDALE REFRESH VE 15.36TB EDSFF18 PCIE SSD", "Capacity": "15.36TB", "Design_Id": { "Id": 4, "Name": "N18A", "DesignFamily": { "Id": 1, "Name": "NAND" } }, "Scode": "980942", "Media_IPN": "J63669-002", "Device_Name": "29F02T2AMCQH1", "Fab_Facility": "FAB 68/FAB 68A/FAB68A/FAB 10" },
+        { "Id": 33, "SSD_Id": "CLIFFDALE REFRESH VE 15.36TB EDSFF18 PCIE SSD", "Capacity": "15.36TB", "Design_Id": { "Id": 4, "Name": "N18A", "DesignFamily": { "Id": 1, "Name": "NAND" } }, "Scode": "980942", "Media_IPN": "J63675-002", "Device_Name": "29F04T2ANCQH1", "Fab_Facility": "FAB 68/FAB 68A/FAB68A/FAB 10" },
+        { "Id": 34, "SSD_Id": "CLIFFDALE REFRESH VE 15.36TB EDSFF9 PCIE SSD", "Capacity": "15.36TB", "Design_Id": { "Id": 4, "Name": "N18A", "DesignFamily": { "Id": 1, "Name": "NAND" } }, "Scode": "980941", "Media_IPN": "J63678-002", "Device_Name": "29F08T2AOCQH1", "Fab_Facility": "FAB 68/FAB 68A/FAB68A/FAB 10" },
+        { "Id": 35, "SSD_Id": "CLIFFDALE REFRESH VE 15.36TB EDSFF9 PCIE SSD", "Capacity": "15.36TB", "Design_Id": { "Id": 4, "Name": "N18A", "DesignFamily": { "Id": 1, "Name": "NAND" } }, "Scode": "980941", "Media_IPN": "J63669-002", "Device_Name": "29F02T2AMCQH1", "Fab_Facility": "FAB 68/FAB 68A/FAB68A/FAB 10" },
+        { "Id": 36, "SSD_Id": "CLIFFDALE REFRESH VE 15.36TB EDSFF9 PCIE SSD", "Capacity": "15.36TB", "Design_Id": { "Id": 4, "Name": "N18A", "DesignFamily": { "Id": 1, "Name": "NAND" } }, "Scode": "980941", "Media_IPN": "J63675-002", "Device_Name": "29F04T2ANCQH1", "Fab_Facility": "FAB 68/FAB 68A/FAB68A/FAB 10" },
+        { "Id": 37, "SSD_Id": "CLIFFDALE REFRESH VE 7.68TB 2.5 PCIE SSD", "Capacity": "7.68TB", "Design_Id": { "Id": 4, "Name": "N18A", "DesignFamily": { "Id": 1, "Name": "NAND" } }, "Scode": "979156", "Media_IPN": "K36455-002", "Device_Name": "29F04T2ANCQH2", "Fab_Facility": "FAB 68/FAB 68A/FAB68A" },
+        { "Id": 38, "SSD_Id": "CLIFFDALE REFRESH VE 7.68TB 2.5 PCIE SSD", "Capacity": "7.68TB", "Design_Id": { "Id": 4, "Name": "N18A", "DesignFamily": { "Id": 1, "Name": "NAND" } }, "Scode": "979156", "Media_IPN": "J63675-002", "Device_Name": "29F04T2ANCQH1", "Fab_Facility": "FAB 68/FAB 68A/FAB68A/FAB 10" },
+        { "Id": 39, "SSD_Id": "CLIFFDALE REFRESH VE 7.68TB 2.5 PCIE SSD", "Capacity": "7.68TB", "Design_Id": { "Id": 4, "Name": "N18A", "DesignFamily": { "Id": 1, "Name": "NAND" } }, "Scode": "979156", "Media_IPN": "K36451-002 ", "Device_Name": "29F02T2AMCQH2", "Fab_Facility": "FAB 68/FAB 68A/FAB68A" },
+        { "Id": 40, "SSD_Id": "CLIFFDALE REFRESH VE 7.68TB 2.5 PCIE SSD", "Capacity": "7.68TB", "Design_Id": { "Id": 4, "Name": "N18A", "DesignFamily": { "Id": 1, "Name": "NAND" } }, "Scode": "979156", "Media_IPN": "J63669-002", "Device_Name": "29F02T2AMCQH1", "Fab_Facility": "FAB 68/FAB 68A/FAB68A/FAB 10" },
+        { "Id": 41, "SSD_Id": "NEPTUNE HARBOR 1024GB M.2 80MM PCIE CLIENT SSD", "Capacity": "1024GB", "Design_Id": { "Id": 4, "Name": "N18A", "DesignFamily": { "Id": 1, "Name": "NAND" } }, "Scode": "976806", "Media_IPN": "J63675-002 ", "Device_Name": "29F04T2ANCQH1", "Fab_Facility": "FAB 68/FAB 68A/FAB68A/FAB 10" },
+        { "Id": 42, "SSD_Id": "NEPTUNE HARBOR 2048GB M.2 80MM PCIE CLIENT SSD", "Capacity": "2048GB", "Design_Id": { "Id": 4, "Name": "N18A", "DesignFamily": { "Id": 1, "Name": "NAND" } }, "Scode": "976807", "Media_IPN": "J63675-002", "Device_Name": "29F04T2ANCQH1", "Fab_Facility": "FAB 68/FAB 68A/FAB68A/FAB 10" },
+        { "Id": 43, "SSD_Id": "NEPTUNE HARBOR 256GB M.2 80MM PCIE CLIENT SSD", "Capacity": "256GB", "Design_Id": { "Id": 4, "Name": "N18A", "DesignFamily": { "Id": 1, "Name": "NAND" } }, "Scode": "980904", "Media_IPN": "J63669-002", "Device_Name": "29F02T2AMCQH1", "Fab_Facility": "FAB 68/FAB 68A/FAB68A/FAB 10" },
+        { "Id": 44, "SSD_Id": "NEPTUNE HARBOR 512GB M.2 80MM PCIE CLIENT SSD", "Capacity": "512GB", "Design_Id": { "Id": 4, "Name": "N18A", "DesignFamily": { "Id": 1, "Name": "NAND" } }, "Scode": "976805", "Media_IPN": "J63669-002", "Device_Name": "29F02T2AMCQH1", "Fab_Facility": "FAB 68/FAB 68A/FAB68A/FAB 10" },
+
+    ];
+    var buildCriterias = [
+       ];
+
+    var getMatDetails = function () {
+        var values = source.filter(mat => mat.Id == matId);
+        if (values && values.length > 0) {
+            matDetails = values;
+        }
+    }
+
+    var displayMatDetails = function () {
+        // grdBuildCriteria
+        var config = Nsga.Callisto.Dx.dataGridDefaultConfig();
+        config.dataSource = matDetails;
+        config.filterRow = { visible: false };
+        config.keyExpr = "Id";
+        config.headerFilter = { visible: false };
+        config.columns = [
+            {
+                dataField: "Design_Id.Name",
+                caption: "Design Id",
+            },
+            {
+                dataField: "Fab_Facility",
+                caption: "Fabrication Facility",
+            },
+            {
+                dataField: "Device_Name",
+                caption: "Device",
+            },
+            {
+                dataField: "SSD_Id",
+                caption: "Product Family",
+            },
+            //{
+            //    dataField: "Version",
+            //    caption: "Version",
+            //},
+            {
+                dataField: "Capacity",
+                caption: "Capacity"
+            },
+            {
+                dataField: "Scode",
+                caption: "Scode"
+            },
+            {
+                dataField: "Media_IPN",
+                caption: "MediaIPN"
+            },
+        ];
+        $("#grdBuildCriteria").dxDataGrid(config);
+    }
+
+
+    $("document").ready(function () {
+        //// grdBuildCriteria
+        //var config = Nsga.Callisto.Dx.dataGridDefaultConfig();
+        //config.dataSource = matDetails;
+        //config.filterRow = { visible: false };
+        //config.keyExpr = "Id";
+        //config.headerFilter = { visible: false };
+        //config.columns = [
+        //    {
+        //        dataField: "Design_Id.Name",
+        //        caption: "Design Id",
+        //    },
+        //    {
+        //        dataField: "Fab_Facility",
+        //        caption: "Fabrication Facility",
+        //    },
+        //    {
+        //        dataField: "Device_Name",
+        //        caption: "Device",
+        //    },
+        //    {
+        //        dataField: "SSD_Id",
+        //        caption: "Product Family",
+        //    },
+        //    //{
+        //    //    dataField: "Version",
+        //    //    caption: "Version",
+        //    //},
+        //    {
+        //        dataField: "Capacity",
+        //        caption: "Capacity"
+        //    },
+        //    {
+        //        dataField: "Scode",
+        //        caption: "Scode"
+        //    },
+        //    {
+        //        dataField: "Media_IPN",
+        //        caption: "MediaIPN"
+        //    },
+        //];
+        //$("#grdBuildCriteria").dxDataGrid(config);
+
+        // grdRecords
+        config = Nsga.Callisto.Dx.dataGridDefaultConfig();
+        config.columns = [
+            {
+                dataField: "Version",
+                caption: "Version",
+            },
+            {
+                dataField: "IsPOR",
+                caption: "Is PRQ",
+                falseText: "N",
+                trueText: "Y",
+                alignment: "center",
+                showEditorAlways: false,
+            },
+            {
+                dataField: "Status.Name",
+                caption: "Status",
+            },
+            {
+                dataField: "CreatedByUserName",
+                caption: "Created By",
+                cellTemplate: function (container, options) {
+                    var cellValue = options.text ? options.text : options.data.CreatedBy;
+                    container.append("<div>" + cellValue + "</div>");
+                }
+            },
+            {
+                dataField: "CreatedOn",
+                caption: "Created On",
+                dataType: "datetime",
+                format: "MM/dd/yyyy hh:mm:ss a",
+            },
+            {
+                caption: "",
+                cellTemplate: function (container, options) {
+                    $("<a>Details</a>").attr({ "href": "/Mat/BuildCriteriaDetails/" + options.data["Id"], "target": "_blank" }).appendTo(container);
+                },
+                allowFiltering: false,
+            },
+        ];
+        config.hoverStateEnabled = true;
+        config.onRowClick = function (e) {
+            if (e.rowType == "data") {
+                window.open('/OSAT/BuildCriteriaDetails/' + e.data.Id, "_blank");
+            }
+        };
+        // using the row tooltip technique given by the devexpress support team
+        // https://supportcenter.devexpress.com/ticket/details/t383731/dxdatagrid-tooltip-on-row
+        config.onRowPrepared = function (e) {
+            if (e.rowType == "data") {
+                e.rowElement.mousemove(function () {
+                    //$("#tooltip").dxTooltip("instance").show(e.rowElement);
+                });
+            }
+        };
+        config.keyExpr = "Id";
+        config.dataSource = buildCriterias;
+        $("#grdRecords").dxDataGrid(config);
+
+        getMatDetails();
+        displayMatDetails();
+    });
+
+</script>
+
+
+<div class="padeightpixel">
+    <div id="accPartDetails" class="accordion-label open">MAT Details</div>
+    <div id="divPartDetails" class="accordion-panel">
+        <div id="grdBuildCriteria"></div>
+    </div>
+    <div id="accCriterias" class="accordion-label open">Build Criteria Versions</div>
+    <div id="divCriterias" class="accordion-panel">
+        <div class="centeralign">
+            <div id="indicator"></div>
+        </div>
+        <div>
+            <div id="tooltip">Click to view the details for this item</div>
+            <div id="grdRecords"></div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,346 @@
+﻿@model Intel.NsgAuto.Callisto.UI.Models.ODMModel
+
+@{
+    ViewBag.Title = "ODM QF - PRF";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style scoped>
+    .verticaltext { transform: rotate(90deg); /*transform-origin: left top 0;*/ -webkit-transform: rotate(90deg); -moz-transform: rotate(90deg); -o-transform: rotate(90deg); -ms-transform: rotate(90deg); /*white-space: nowrap;*/ }
+    .pianddr { background-color: #00b050 !important; }
+    .photo { background-color: #ffd966 !important; }
+    .opcandphoto { background-color: #9f4eb3 !important; text-align: center !important; }
+    .photoabsminsls { background-color: #2f75b5 !important; text-align: center !important; }
+    .grayish { background-color: #8497b0 !important; text-align: center !important; }
+    .lightblueish { background-color: #ddebf7 !important; color: #2f75b5 !important; }
+    .rightblackborder { border-right-color: #000 !important; }
+    .modal {display: none; position: fixed; z-index: 1; /* Sit on top */ left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgb(0,0,0); /* Fallback color */ background-color: rgba(0,0,0,0.4); /* Black w/ opacity */ }
+    .modal-content { background-color: #fefefe; margin: 15% auto; /* 15% from the top and centered */ padding: 20px; border: 1px solid #888; width: 80%; /* Could be more or less, depending on screen size */ }
+    .modal-close { color: #aaa; float: right; font-size: 28px; font-weight: bold; }
+    .modal-close:hover, .modal-close:focus { color: black; text-decoration: none; cursor: pointer; }
+</style>
+
+<script>
+    var ddlVersions = null;
+    var versionIdInitial = 1;
+    var prfVersions = null;
+    var records = null;
+
+    function reset() {
+        $("#ddlVersions").dxSelectBox("instance").option('value', versionIdInitial); 
+        submit1();
+    };
+
+    function refreshUi() {
+        Nsga.Callisto.Odm.getPrfVersions(loadVersions, onError);
+        setTimeout(submit1, 2000);
+    };
+
+    function showVersions(show) {
+        if (show) {
+            $(".infotext").show();
+            $("#divVersions").show();
+        } else {
+            $(".infotext").hide();
+            $("#divVersions").hide();
+        }
+    };
+
+    function loadVersions(records) {
+        var version = null;
+        showVersions(false);
+
+        if (records && records.length > 0) {
+            version = records[0].Version;
+            var element = $("#ddlVersions");
+            element.dxSelectBox("instance").option("dataSource", records);
+            element.dxSelectBox("instance").option("value", version);
+            versionIdInitial = version;
+            showVersions(true);
+        }
+    };
+
+    function submit1() {
+        var id = ddlVersions.option("value");
+        Nsga.Callisto.Odm.getPrfVersionDetails(id, refreshRecordsDataSource, onError);
+    };
+
+    function refreshRecordsDataSource(records) {
+        $("#grdRecords").dxDataGrid("instance").option("dataSource", records);
+    };
+
+    function btnInstructionsClick() {
+        //$("#modalInstructions").style.display = "block";
+        var element = $("#modalInstructions");
+        element.show();
+    };
+
+    function closeInstructionsClick() {
+        //$("#modalInstructions").style.display = "none";
+        var element = $("#modalInstructions");
+        element.hide();
+    };
+
+    function onError(xhr, status) {
+        Nsga.Callisto.Messages.showError("An unexpected error occurred. If the problem persists, contact support.");
+    };
+
+    function beforeSendHandler() {
+        $("#importIndicator").dxLoadIndicator("instance").option("visible", true);
+    };
+
+    function onUploadSuccess(response) {
+        $("#importIndicator").dxLoadIndicator("instance").option("visible", false);
+        $("#uploadFile").val(null);
+
+        var versionMessage = "The file was imported creating a new version which should now be listed.";
+
+        Nsga.Callisto.Messages.showSuccess(versionMessage);
+        refreshUi();
+    };
+
+    function onUploadError(xhr, status, errorThrown) {
+        var message = "An unexpected error occurred. If the problem persists, contact support.";
+        if (xhr && xhr.responseJSON) {
+            if (xhr.responseJSON.ExceptionMessage) message = xhr.responseJSON.ExceptionMessage;
+            else if (xhr.responseJSON.Message) message = xhr.responseJSON.Message;
+        }
+        Nsga.Callisto.Messages.showError(message);
+        $("#importIndicator").dxLoadIndicator("instance").option("visible", false);
+    };
+
+    function validateFile() {
+        var fileName = $("#uploadFile").val();
+        if (!fileName) {
+            Nsga.Callisto.Messages.showError("Please select a file to upload.");
+            return false;
+        }
+        var dotIndex = fileName.lastIndexOf(".") + 1;
+        var extension = fileName.substr(dotIndex, (fileName.length - dotIndex));
+        if (extension.toUpperCase() === "XLS" || extension.toUpperCase() === "XLSX")
+            return true;
+        else {
+            Nsga.Callisto.Messages.showError("File with " + extension + " is invalid. Upload a valid file with xls/xlsx extension.");
+            return false;
+        }
+        return true;
+    };
+
+    function uploadFile(e) {
+        var loadIndicator = $("#importIndicator").dxLoadIndicator("instance");
+        loadIndicator.option("visible", false);
+        if (validateFile()) {
+            loadIndicator.option("visible", true);
+            var formData = new FormData();
+            var file = $("#uploadFile")[0];
+            formData.append("uploadFile", file.files[0]);
+            $.ajax({
+                url: Nsga.Callisto.Constants.URL_IMPORTPRFRECORDS,
+                type: "POST",
+                beforeSend: beforeSendHandler,
+                success: onUploadSuccess,
+                error: onUploadError,
+                data: formData,
+                cache: false,
+                contentType: false,
+                processData: false
+            });
+        }
+    };
+
+    $("document").ready(function () {
+
+        // this is included so that the instructions modal will close if the user clicks anywhere outside the modal
+        var modalInstructions = document.getElementById("modalInstructions");
+        window.onclick = function (e) {
+            if (e.target == modalInstructions) {
+                modalInstructions.style.display = "none";
+            }
+        }
+
+        $("#importIndicator").dxLoadIndicator({ visible: false });
+
+        ddlVersions = $("#ddlVersions").dxSelectBox({
+            items: prfVersions,
+            value: versionIdInitial,
+            displayExpr: "Version",
+            valueExpr: "Version",
+            searchEnabled: true,
+            width: "150px",
+            placeholder: "Select"
+        }).dxSelectBox("instance");
+
+        $("#lnkImport").bind("click", function (e) {
+            e.preventDefault();
+            uploadFile(e);
+        });
+
+        $("#btnReset").bind("click", function (e) {
+            e.preventDefault();
+            reset();
+        });
+
+        var config = Nsga.Callisto.Dx.dataGridDefaultConfig();
+        config.columns = [
+            //{
+            //    dataField: "Id",
+            //    //fixed: true,
+            //    width: "60px",
+            //    fixedPosition: "left",
+            //},
+            {
+                dataField: "ODMDescription",
+                caption: "ODM",
+            },
+            {
+                dataField: "SSDFamilyName",
+                caption: "Family Name",
+            },
+            {
+                dataField: "MMNumber",
+                caption: "MM Number",
+            },
+            {
+                dataField: "ProductCode",
+                caption: "Product Code",
+            },
+            {
+                dataField: "SSDName",
+                caption: "SSD Name",
+            },
+            {
+                dataField: "CreatedOn",
+                caption: "Created Date",
+                format: "MM/dd/yyyy hh:mm:ss a",
+            },
+            {
+                dataField: "CreatedBy",
+                caption: "Created By",
+            },
+           
+        ];
+        config.scrolling = { columnRenderingMode: "virtual" };
+        config.columnFixing = { enabled: true };
+        config.width = window.screen.availWidth - 60;
+        //config.keyExpr = "Id";
+        //config.dataSource = records;
+        $("#grdRecords").dxDataGrid(config);
+
+        refreshUi();
+    });
+
+</script>
+<!-- This is the work area. We put all HTML content in here. we will come back and change stuff here. :) -->
+<div id="popupContainer" />
+<div>
+    <!-- This will create a 960 pixels fixed centered section. Let us make it a blue box as well :) -->
+    <div class="fixed centered bluebox">
+        <div class="rightalign padfourpixel">
+            <div class="padfourpixel">
+                <span><a title="Click here to manage Media Attributes" id="lnkMAT" href="/ODM/MAT/"><span class="imagelinkbutton bordered"><span class="fa fa-list-alt "></span><span class="margintwopixel">Manage Media Attributes</span> </span></a></span>
+                <span><a title="Qual Filters Scenarios & Results" id="lnkPRF" href="/ODM/QFScenarios/"><span class="imagelinkbutton bordered"><span class="fa fa-list-alt "></span><span class="margintwopixel">Qual Filters Scenarios & Results</span> </span></a></span>
+                <span><a title="Click here to go to Manual Lot Dispositioning" id="lnkManualDisposition" href="/ODM/Dispositions/"><span class="imagelinkbutton bordered"><span class="fa fa-list-alt "></span><span class="margintwopixel">Manual Dispositioning</span> </span></a></span>
+                <span><a title="Qual Filters Historical Scenarios" id="lnkPRF" href="/ODM/QFHistoricalScenarios/"><span class="imagelinkbutton bordered"><span class="fa fa-list-alt "></span><span class="margintwopixel">Qual Filters Historical Scenarios</span> </span></a></span>
+            </div>
+        </div>
+        @{
+            if (Intel.NsgAuto.Web.Mvc.Core.Functions.IsOdmPrfAuthor())
+            {
+                <div style="margin:5px; vertical-align: top; padding-left:10px" class="bluebox padfourpixel ">
+                    <div style="width: 45%; display: inline-block; margin-right: 30px; margin-top:6px;">
+                        <div class="subheading" style="margin-bottom: 6px;">Step 1. Download the Template &amp; Fill Details</div>
+                        <div class="">
+                            <div style="margin-bottom: 6px;">
+                                <span class="help annotate">
+                                    <span>
+                                        <a id="lnkDownlad" class="imagelinkbutton bordered" href="~/Templates/Imports/OdmPrf.xlsx" target="_blank" title="Click here to download the spreadsheet template">
+                                            <span>
+                                                <span class="fas fa-file-download"></span>
+                                                <span style="padding-top: 1px; padding-bottom: 1px;">Download</span>
+                                            </span>
+                                        </a>
+                                    </span>the excel file template &amp; fill up.<br /><br>
+                                </span>
+                                <div>
+                                    <span class="help annotate">
+                                        You may export existing data, make changes and upload for editing existing data. Each import will be a new version of entire data.
+                                        <span class="warningtext"><span class="fas fa-exclamation-triangle warningtext" style="margin-right:4px; font-size:14px;"></span>Note: The data in the spreadsheet will override existing data when you import.</span>
+
+                                    </span>
+                                </div>
+                                <div>
+                                    <button id="btnInstructions" onclick="btnInstructionsClick()">Instructions</button>
+                                    <div id="modalInstructions" class="modal">
+                                        <div class="modal-content">
+                                            <span id="closeInstructions" class="modal-close" onclick="closeInstructionsClick()">&times;</span>
+                                            @Html.Partial("_ImportInstructions")
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="width:49%;display:inline-block;vertical-align: top; margin-top: 2px; " class="bluebox bglightblue padfourpixel">
+                        <div class="subheading" style="margin-left: 6px">Step 2. Upload the data</div>
+                        <div class="showinline">
+                            <div class="padeightpixel" style="vertical-align:top;">
+                                <div class="">
+                                    <input type="file" class="fileimport" id="uploadFile" name="uploadFile" style="width: 330px; height: 28px;" />
+                                    <a id="lnkImport" class="imagelinkbutton bordered padfourpixel" href="javascript:void(0);" style="vertical-align:top;" title="Click here to browse and upload the spreadsheet with PRF data">
+                                        <span style="padding-top: 1px; padding-bottom: 1px;padding-left:1px;padding-right:1px;">
+                                            <span class="fas fa-file-upload"></span>
+                                            <span>Import</span>
+                                        </span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        <div style="margin:5px;vertical-align: top;" class="bluebox bglightblue padeightpixel">
+            <div class="">
+                <div class="infotext">
+                    <span class="fas fa-exclamation-circle" style="font-size:14px;"></span>To view existing PRF data for any version, select version &amp; click submit.
+                    <span class="infotext italic">Items marked as <span class="mandatory">*</span> are required inputs</span>
+                </div>
+                <div id="divVersions" class="showinline" style="width: 100%;">
+                    <!-- version -->
+                    <div class="showinline" style="width: 30%; margin-top:8px;">
+                        <div class="dx-field-label">Version</div>
+                        <div class="colon floatleft" style="margin-top: 8px;"></div>
+                        <div class="inlineblock">
+                            <div id="ddlVersions" style="display:inline-block;"></div>
+                        </div>
+                    </div>
+                    <!--actions-->
+                    <div class="showinline" style="margin-top: 10px; vertical-align: top;">
+                        <span class="marginfourpixel"><input id="btnSubmit" type="button" value="Submit" onclick="submit1()" style="" /></span>
+                        <span class="marginfourpixel"><input id="btnReset" class="cancel" type="button" value="Reset" /></span>
+                    </div>
+                </div>
+                <div class="infotext">
+                    <span id="spnVersion" style="margin-left:480px;"></span>
+                </div>
+                <div>
+                    <div id="divValidationSummary" style="margin-left: 120px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="importIndicator"></div>
+<div class="scrollmessage" style="margin-right:20px;margin-left:10px;"></div>
+<div id="divResults" class="centeralign">
+    <div class="grid-wrapper" style="margin-top:4px;">
+        <div>
+            <div class="marginfourpixel">
+                <div class="gridcontainer">
+                    <div id="grdRecords" style="margin-right:20px;margin-left:10px;"></div>
+                    <div style="height: 20px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

@@ -1,0 +1,67 @@
+﻿@model Intel.NsgAuto.Callisto.UI.Models.AutoChecker.ListBuildCriteriaExportModel
+
+@{
+    ViewBag.Title = "Auto Checker - All PRQ Build Criteria";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script type="text/javascript">
+
+    var conditions = @(JsonHelper.Serialize(Model.Conditions));
+
+    $(document).ready(function () {
+
+        // grdRecords
+        var config = Nsga.Callisto.Dx.dataGridDefaultConfig();
+        config.columns = [
+            {
+                caption: "Design",
+                dataField: "Design.Name",
+            },
+            {
+                caption: "Fabrication Facility",
+                dataField: "FabricationFacility.Name",
+            },
+            {
+                caption: "Test Flow",
+                dataField: "TestFlow.Name",
+            },
+            {
+                caption: "Probe Conversion",
+                dataField: "ProbeConversion.Name",
+            },
+            {
+                caption: "Attribute",
+                dataField: "AttributeType.Name",
+            },
+            {
+                caption: "Logical Operation",
+                dataField: "LogicalOperation.Name",
+            },
+            {
+                caption: "Comparison Operation",
+                dataField: "ComparisonOperation.KeyTreadstone",
+            },
+            {
+                caption: "Value",
+                dataField: "Value",
+                minWidth: 500,
+            },
+        ];
+        config.export = {
+            enabled: true,
+            fileName: "PRQ Build Criteria",
+        };
+        config.keyExpr = "Id";
+        config.dataSource = conditions;
+        $("#grdRecords").dxDataGrid(config);
+
+    });
+
+</script>
+
+<div class="padeightpixel">
+    <div>
+        <div id="grdRecords"></div>
+    </div>
+</div>

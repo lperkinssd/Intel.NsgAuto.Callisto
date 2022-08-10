@@ -1,0 +1,134 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Intel.NsgAuto.Callisto.Business.Services.AutoCheckerService" Collapsed="true">
+    <Position X="0.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEABAACAAAAABAAAEAAAAAAAgIQCIAAARAJABAAEiAA=</HashCode>
+      <FileName>Services\AutoCheckerService.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Services.CustomersService" Collapsed="true">
+    <Position X="2.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAgAAAAAAAAA=</HashCode>
+      <FileName>Services\CustomersService.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Services.EmailTemplatesService" Collapsed="true">
+    <Position X="4" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAABAAEAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Services\EmailTemplatesService.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Services.FormFactorsService" Collapsed="true">
+    <Position X="5.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAgAAAAAAAAA=</HashCode>
+      <FileName>Services\FormFactorsService.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Services.FrameworkService" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="0.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Services\FrameworkService.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Services.MATVersionsService" Collapsed="true">
+    <Position X="2.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAgAAAIAQAAIAABAICAAAAAAAABAAAgAAgABAQAAAIA=</HashCode>
+      <FileName>Services\MATVersionsService.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Services.MMRecipesService" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="4" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEwAEAAAQAEAAARAAAAAAAAAAAAAAAAAAgAAAQAAAIA=</HashCode>
+      <FileName>Services\MMRecipesService.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Services.PartsService" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="5.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAgAAAAAAAAA=</HashCode>
+      <FileName>Services\PartsService.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Services.ProductFamiliesService" Collapsed="true">
+    <Position X="0.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAgAAAAAAAAA=</HashCode>
+      <FileName>Services\ProductFamiliesService.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Services.ProductLabelSetVersionsService" Collapsed="true">
+    <Position X="2.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAgAAgAAQAAAAABAIAAAAAAAAABAAAgAAgABAQAAAIA=</HashCode>
+      <FileName>Services\ProductLabelSetVersionsService.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Services.ProductsService" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="4" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAgAAAAAABAA=</HashCode>
+      <FileName>Services\ProductsService.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Services.SpeedApiService" Collapsed="true">
+    <Position X="5.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAQAoAAAAACAAAAAAAAAAAAAAAAAAAAgAIAABAABAA=</HashCode>
+      <FileName>Services\SpeedApiService.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Services.SpeedItemsService" Collapsed="true">
+    <Position X="0.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAEABAAAAABAACAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Services\SpeedItemsService.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Services.TasksService" Collapsed="true">
+    <Position X="2.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAACAAARAAAIAAAIAAAAAEAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Services\TasksService.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Interface Name="Intel.NsgAuto.Callisto.Business.Services.IFrameworkService" Collapsed="true">
+    <Position X="0.5" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Services\IFrameworkService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Intel.NsgAuto.Callisto.Business.Services.IMMRecipeService" Collapsed="true">
+    <Position X="2.25" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAgAAAAAAAAA=</HashCode>
+      <FileName>Services\IMMRecipeService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Intel.NsgAuto.Callisto.Business.Services.IPartsService" Collapsed="true">
+    <Position X="4" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAgAAAAAAAAA=</HashCode>
+      <FileName>Services\IPartsService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Intel.NsgAuto.Callisto.Business.Services.IProductsService" Collapsed="true">
+    <Position X="5.75" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAgAAAAAABAA=</HashCode>
+      <FileName>Services\IProductsService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

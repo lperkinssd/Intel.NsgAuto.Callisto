@@ -1,0 +1,900 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <Name>Intel.NsgAuto.Callisto.Db.Callisto</Name>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectVersion>4.1</ProjectVersion>
+    <ProjectGuid>{4905fcf4-f193-4df1-8b7b-85a36af3e408}</ProjectGuid>
+    <DSP>Microsoft.Data.Tools.Schema.Sql.Sql140DatabaseSchemaProvider</DSP>
+    <OutputType>Database</OutputType>
+    <RootPath>
+    </RootPath>
+    <RootNamespace>Intel.NsgAuto.Callisto.Db.Callisto</RootNamespace>
+    <AssemblyName>Intel.NsgAuto.Callisto.Db.Callisto</AssemblyName>
+    <ModelCollation>1033,CS</ModelCollation>
+    <DefaultFileStructure>BySchemaAndSchemaType</DefaultFileStructure>
+    <DeployToDatabase>True</DeployToDatabase>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetLanguage>CS</TargetLanguage>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <SqlServerVerification>False</SqlServerVerification>
+    <IncludeCompositeObjects>True</IncludeCompositeObjects>
+    <TargetDatabaseSet>True</TargetDatabaseSet>
+    <SccProjectName>SAK</SccProjectName>
+    <SccProvider>SAK</SccProvider>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccLocalPath>SAK</SccLocalPath>
+    <DefaultCollation>Latin1_General_BIN</DefaultCollation>
+    <DefaultFilegroup>PRIMARY</DefaultFilegroup>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>bin\Release\</OutputPath>
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
+    <!-- Default to the v11.0 targets path if the targets file for the current VS version is not found -->
+    <SSDTExists Condition="Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets')">True</SSDTExists>
+    <VisualStudioVersion Condition="'$(SSDTExists)' == ''">11.0</VisualStudioVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Integration|AnyCPU' ">
+    <OutputPath>bin\Debug\</OutputPath>
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <Import Condition="'$(SQLDBExtensionsRefPath)' != ''" Project="$(SQLDBExtensionsRefPath)\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <Import Condition="'$(SQLDBExtensionsRefPath)' == ''" Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <ItemGroup>
+    <Folder Include="Properties" />
+    <Folder Include="Security\" />
+    <Folder Include="ref\" />
+    <Folder Include="ref\Tables\" />
+    <Folder Include="qan\" />
+    <Folder Include="qan\Tables\" />
+    <Folder Include="qan\Stored Procedures\" />
+    <Folder Include="qan\User Defined Types\" />
+    <Folder Include="setup\" />
+    <Folder Include="setup\Stored Procedures\" />
+    <Folder Include="ref\Stored Procedures\" />
+    <Folder Include="qan\Functions\" />
+    <Folder Include="ref\Functions" />
+    <Folder Include="npsg\" />
+    <Folder Include="npsg\User Defined Types\" />
+    <Folder Include="npsg\Functions\" />
+    <Folder Include="npsg\Tables\" />
+    <Folder Include="npsg\Stored Procedures\" />
+    <Folder Include="dbo\" />
+    <Folder Include="dbo\Tables\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Build Include="ref\Tables\Processes.sql" />
+    <Build Include="qan\Tables\ProcessRoles.sql" />
+    <Build Include="qan\Tables\UserSessions.sql" />
+    <Build Include="qan\Tables\Users.sql" />
+    <Build Include="qan\Tables\UserRoles.sql" />
+    <Build Include="qan\Tables\UserProcessRoles.sql" />
+    <Build Include="qan\Stored Procedures\InitializeSession.sql" />
+    <Build Include="qan\User Defined Types\IUsers.sql" />
+    <Build Include="qan\User Defined Types\IUserRoles.sql" />
+    <Build Include="qan\User Defined Types\IUserProcessRoles.sql" />
+    <Build Include="Security\ref.sql" />
+    <Build Include="Security\qan.sql" />
+    <Build Include="ref\Tables\DesignFamilies.sql" />
+    <Build Include="qan\Tables\Products.sql" />
+    <Build Include="qan\Tables\ProductCompatibleParts.sql" />
+    <Build Include="setup\Stored Procedures\CreateDesignFamilies.sql" />
+    <Build Include="Security\setup.sql" />
+    <Build Include="ref\Tables\OpalTypes.sql" />
+    <Build Include="qan\Tables\ProductLabelSetVersions.sql" />
+    <Build Include="qan\Tables\ProductLabels.sql" />
+    <Build Include="qan\Tables\ProductFamilyNameSeries.sql" />
+    <Build Include="qan\Stored Procedures\GetProductLabels.sql" />
+    <Build Include="qan\User Defined Types\IProductLabelsImport.sql" />
+    <Build Include="setup\Stored Procedures\CreateOpalTypes.sql" />
+    <Build Include="qan\User Defined Types\IImportMessages.sql" />
+    <Build Include="qan\Tables\ProductLabelAttributes.sql" />
+    <Build Include="qan\Stored Procedures\GetProductLabelAttributes.sql" />
+    <Build Include="qan\Stored Procedures\CreateProductLabelAttribute.sql" />
+    <Build Include="qan\Tables\MMRecipes.sql" />
+    <Build Include="qan\Tables\SpeedAccessTokens.sql" />
+    <Build Include="qan\Stored Procedures\GetUnexpiredSpeedAccessToken.sql" />
+    <Build Include="qan\Stored Procedures\CreateSpeedAccessToken.sql" />
+    <Build Include="qan\Stored Procedures\DeleteExpiredSpeedAccessTokens.sql" />
+    <Build Include="ref\Tables\EmailTemplates.sql" />
+    <Build Include="ref\Stored Procedures\GetEmailTemplates.sql" />
+    <Build Include="setup\Stored Procedures\CreateEmailTemplates.sql" />
+    <Build Include="qan\Tables\MATVersions.sql" />
+    <Build Include="qan\Tables\MATSSDNames.sql" />
+    <Build Include="qan\Tables\MATs.sql" />
+    <Build Include="qan\Tables\MATAttributeValues.sql" />
+    <Build Include="qan\Functions\GetMATDataTypeFromValue.sql" />
+    <Build Include="qan\Stored Procedures\ImportMATs.sql" />
+    <Build Include="qan\Stored Procedures\GetMATVersions.sql" />
+    <Build Include="qan\Stored Procedures\GetMATs.sql" />
+    <Build Include="qan\Stored Procedures\GetMATAttributes.sql" />
+    <Build Include="qan\Stored Procedures\CreateMATAttributeValues.sql" />
+    <Build Include="qan\Stored Procedures\CreateMATAttribute.sql" />
+    <Build Include="qan\User Defined Types\IMATImport.sql" />
+    <Build Include="setup\Stored Procedures\CreateProductLabelAttributeTypes.sql" />
+    <Build Include="qan\Stored Procedures\UpdateProductLabelSetVersionSubmitted.sql" />
+    <Build Include="qan\Stored Procedures\UpdateProductLabelSetVersionRejected.sql" />
+    <Build Include="qan\Stored Procedures\UpdateProductLabelSetVersionCanceled.sql" />
+    <Build Include="qan\Stored Procedures\UpdateProductLabelSetVersionApproved.sql" />
+    <Build Include="qan\Stored Procedures\ImportProductLabels.sql" />
+    <Build Include="qan\Stored Procedures\GetProducts.sql" />
+    <Build Include="qan\Stored Procedures\GetProductLabelSetVersions.sql" />
+    <Build Include="qan\Stored Procedures\GetMMRecipes.sql" />
+    <Build Include="setup\Stored Procedures\CreateStatuses.sql" />
+    <Build Include="ref\Tables\Statuses.sql" />
+    <Build Include="setup\Stored Procedures\CreateAll.sql" />
+    <Build Include="qan\Tables\Customers.sql" />
+    <Build Include="qan\Tables\ProductFamilies.sql" />
+    <Build Include="ref\Tables\ProductLabelAttributeTypes.sql" />
+    <Build Include="ref\Functions\GetProductLabelAttributeTypeIdByName.sql" />
+    <Build Include="ref\Tables\MATAttributeTypes.sql" />
+    <Build Include="ref\Functions\GetMATAttributeTypeIdByName.sql" />
+    <Build Include="setup\Stored Procedures\CreateMATAttributeTypes.sql" />
+    <Build Include="ref\Tables\PLCStages.sql" />
+    <Build Include="setup\Stored Procedures\CreatePLCStages.sql" />
+    <Build Include="setup\Stored Procedures\CreateCustomerQualStatuses.sql" />
+    <Build Include="ref\Tables\CustomerQualStatuses.sql" />
+    <Build Include="qan\Stored Procedures\GetMMRecipeReferenceTables.sql" />
+    <Build Include="qan\Stored Procedures\GetCustomers.sql" />
+    <Build Include="qan\Stored Procedures\GetProductFamilies.sql" />
+    <Build Include="qan\Stored Procedures\CreateNewSpeedCustomers.sql" />
+    <Build Include="qan\Stored Procedures\CreateNewSpeedProductFamilies.sql" />
+    <Build Include="qan\Functions\TranslateSpeedCustomer.sql" />
+    <Build Include="qan\Functions\CreatedBySpeed.sql" />
+    <Build Include="qan\Stored Procedures\GetMMRecipeNew.sql" />
+    <Build Include="ref\Tables\ReviewStatuses.sql" />
+    <Build Include="qan\Tables\Reviewers.sql" />
+    <Build Include="setup\Stored Procedures\CreateReviewStatuses.sql" />
+    <Build Include="qan\Stored Procedures\UpdateReviewer.sql" />
+    <Build Include="qan\Stored Procedures\UpdateReview.sql" />
+    <Build Include="qan\Stored Procedures\GetReviewStatusReport_Stub.sql" />
+    <Build Include="qan\Stored Procedures\GetReviewers.sql" />
+    <Build Include="qan\Stored Procedures\GetRequestStatusReport_Stub.sql" />
+    <Build Include="qan\Stored Procedures\GetRequestsReport_Stub.sql" />
+    <Build Include="qan\Stored Procedures\CreateReviewer.sql" />
+    <Build Include="qan\Functions\FMMRecipeNewCore.sql" />
+    <Build Include="qan\Functions\FMMRecipeAssociatedItemsNewCore.sql" />
+    <Build Include="qan\Tables\FormFactors.sql" />
+    <Build Include="qan\Stored Procedures\CreateNewSpeedFormFactors.sql" />
+    <Build Include="qan\Stored Procedures\CreateMMRecipe.sql" />
+    <Build Include="qan\Tables\MMRecipeAssociatedItems.sql" />
+    <Build Include="qan\Stored Procedures\GetFormFactors.sql" />
+    <Build Include="qan\Tables\SpeedBomAssociationTypes.sql" />
+    <Build Include="qan\Stored Procedures\CreateNewSpeedBomAssociationTypes.sql" />
+    <Build Include="qan\Stored Procedures\TaskSpeedImport.sql" />
+    <Build Include="ref\Tables\SpeedItemCategories.sql" />
+    <Build Include="setup\Stored Procedures\CreateSpeedItemCategories.sql" />
+    <Build Include="qan\Functions\FProductLabels.sql" />
+    <Build Include="qan\Functions\FProductLabelAttributes.sql" />
+    <Build Include="qan\Functions\FMATAttributeValues2.sql" />
+    <Build Include="qan\User Defined Types\IInts.sql" />
+    <Build Include="qan\Functions\FMATAttributeValues.sql" />
+    <Build Include="ref\Tables\ReviewTypes.sql" />
+    <Build Include="setup\Stored Procedures\CreateMATReviewStagesTable.sql" />
+    <Build Include="setup\Stored Procedures\CreateMATReviewGroupsTable.sql" />
+    <Build Include="setup\Stored Procedures\CreateMATReviewersTable.sql" />
+    <Build Include="qan\Stored Procedures\GetStatuses.sql" />
+    <Build Include="qan\Stored Procedures\GetMATCurrentStage.sql" />
+    <Build Include="qan\Stored Procedures\CreateMATSnapshots.sql" />
+    <Build Include="setup\Stored Procedures\CreateReviewTypes.sql" />
+    <Build Include="qan\Functions\FMMRecipeAssociatedItems.sql" />
+    <Build Include="qan\Functions\FMMRecipes.sql" />
+    <Build Include="qan\Tables\MATReviewDecisions.sql" />
+    <Build Include="qan\Tables\MATReviewers.sql" />
+    <Build Include="qan\Tables\MATReviewGroups.sql" />
+    <Build Include="qan\Tables\MATReviewStages.sql" />
+    <Build Include="qan\Tables\ReviewGroupReviewers.sql" />
+    <Build Include="qan\Tables\ReviewStageReviewGroups.sql" />
+    <Build Include="qan\Tables\ReviewTypeReviewStages.sql" />
+    <Build Include="qan\Stored Procedures\UpdateMMRecipe.sql" />
+    <Build Include="qan\Stored Procedures\UpdateMMRecipeApproved.sql" />
+    <Build Include="qan\Stored Procedures\UpdateMMRecipeCanceled.sql" />
+    <Build Include="qan\Stored Procedures\UpdateMMRecipeRejected.sql" />
+    <Build Include="qan\Stored Procedures\UpdateMMRecipeSubmitted.sql" />
+    <Build Include="qan\Functions\FCompareMMRecipeFields.sql" />
+    <Build Include="qan\User Defined Types\IMMRecipesCompare.sql" />
+    <Build Include="qan\Functions\FCompareMMRecipesByIds.sql" />
+    <Build Include="qan\Functions\FCompareProductLabelFieldsByIds.sql" />
+    <Build Include="qan\User Defined Types\IMMRecipeProductLabelsCompare.sql" />
+    <Build Include="qan\Functions\FCompareMMRecipeProductLabelFields.sql" />
+    <Build Include="qan\User Defined Types\IMMRecipeProductLabelAttributesCompare.sql" />
+    <Build Include="qan\Functions\FCompareMMRecipeProductLabelAttributeFields.sql" />
+    <Build Include="qan\User Defined Types\IMMRecipeAssociatedItemsCompare.sql" />
+    <Build Include="qan\Functions\FCompareMMRecipeAssociatedItemFields.sql" />
+    <Build Include="qan\User Defined Types\IMMRecipeMATAttributeValuesCompare.sql" />
+    <Build Include="qan\Functions\FCompareMMRecipeMATAttributeValues.sql" />
+    <Build Include="qan\Tables\MATReviewStageStates.sql" />
+    <Build Include="qan\Stored Procedures\GetMATReviewersWithWork.sql" />
+    <Build Include="qan\Stored Procedures\GetMATCurrentStagesForEmailing.sql" />
+    <Build Include="qan\Stored Procedures\CreateMATReviewDecision.sql" />
+    <Build Include="qan\Functions\FCompareMMRecipesToNew.sql" />
+    <Build Include="qan\Stored Procedures\GetProductLabelVersionDetails.sql" />
+    <Build Include="qan\Stored Procedures\GetMATVersionDetails.sql" />
+    <Build Include="qan\Stored Procedures\GetMATStagesAndReviewers.sql" />
+    <Build Include="qan\User Defined Types\IPCodes.sql" />
+    <Build Include="qan\Functions\FMMRecipesNewCore.sql" />
+    <Build Include="qan\Functions\FMMRecipesAssociatedItemsNewCore.sql" />
+    <Build Include="qan\User Defined Types\IMMRecipes.sql" />
+    <Build Include="qan\User Defined Types\IMMRecipeAssociatedItems.sql" />
+    <Build Include="qan\Functions\FCompareMMRecipes.sql" />
+    <Build Include="qan\Functions\FCompareMMRecipeToNew.sql" />
+    <Build Include="qan\Stored Procedures\TaskCreateMMRecipes.sql" />
+    <Build Include="qan\Tables\ProductLabelReviewStageStates.sql" />
+    <Build Include="qan\Tables\ProductLabelReviewStages.sql" />
+    <Build Include="qan\Tables\ProductLabelReviewGroups.sql" />
+    <Build Include="qan\Tables\ProductLabelReviewers.sql" />
+    <Build Include="qan\Tables\ProductLabelReviewDecisions.sql" />
+    <Build Include="qan\Tables\ProductLabelReviewChangeHistory.sql" />
+    <Build Include="qan\Tables\MATReviewChangeHistory.sql" />
+    <Build Include="qan\Stored Procedures\GetProductLabelReviewersWithWork.sql" />
+    <Build Include="qan\Stored Procedures\GetProductLabelCurrentStagesForEmailing.sql" />
+    <Build Include="qan\Stored Procedures\GetProductLabelCurrentStage.sql" />
+    <Build Include="qan\Stored Procedures\CreateProductLabelSnapshots.sql" />
+    <Build Include="qan\Stored Procedures\CreateProductLabelChangeHistory.sql" />
+    <Build Include="qan\Stored Procedures\CreateMATChangeHistory.sql" />
+    <Build Include="qan\Stored Procedures\GetMMRecipesReviewable.sql" />
+    <Build Include="qan\Stored Procedures\SubmitMATVersion.sql" />
+    <Build Include="qan\Stored Procedures\CreateNewSpeedDesigns.sql" />
+    <Build Include="qan\Tables\AcBuildCriterias.sql" />
+    <Build Include="ref\Tables\AcComparisonOperations.sql" />
+    <Build Include="ref\Tables\AcAttributeDataTypes.sql" />
+    <Build Include="ref\Tables\AcAttributeDataTypeOperations.sql" />
+    <Build Include="setup\Stored Procedures\CreateAcAttributeDataTypes.sql" />
+    <Build Include="setup\Stored Procedures\CreateAcComparisonOperations.sql" />
+    <Build Include="setup\Stored Procedures\CreateAcAttributeDataTypeOperations.sql" />
+    <Build Include="qan\Tables\AcAttributeTypes.sql" />
+    <Build Include="qan\Functions\CreatedByTask.sql" />
+    <Build Include="qan\Functions\CreatedBySystem.sql" />
+    <Build Include="qan\Tables\FabricationFacilities.sql" />
+    <Build Include="qan\Tables\TestFlows.sql" />
+    <Build Include="qan\Tables\ProbeConversions.sql" />
+    <Build Include="qan\Tables\AcBuildCriteriaConditions.sql" />
+    <Build Include="qan\Functions\FAcAttributeTypes.sql" />
+    <Build Include="qan\Functions\FAcComparisonOperations.sql" />
+    <Build Include="qan\Functions\FAcAttributeDataTypes.sql" />
+    <Build Include="qan\Stored Procedures\GetAcAttributeTypesMetadata.sql" />
+    <Build Include="qan\Stored Procedures\CreateAcAttributeTypeAndReturnAll.sql" />
+    <Build Include="qan\Stored Procedures\CreateAcAttributeType.sql" />
+    <Build Include="qan\User Defined Types\IAcBuildCriteriaConditionsCreate.sql" />
+    <Build Include="qan\Stored Procedures\CreateAcBuildCriteria.sql" />
+    <Build Include="qan\Stored Procedures\GetAcBuildCriterias.sql" />
+    <Build Include="qan\Stored Procedures\GetAcBuildCriteria.sql" />
+    <Build Include="qan\Functions\FAcBuildCriteriaConditions.sql" />
+    <Build Include="qan\Stored Procedures\GetAcBuildCriteriaAndVersions.sql" />
+    <Build Include="qan\Stored Procedures\GetAcAttributeTypes.sql" />
+    <Build Include="qan\Stored Procedures\GetAcBuildCriteriaCreate.sql" />
+    <Build Include="qan\Stored Procedures\UpdateAcAttributeType.sql" />
+    <Build Include="qan\Stored Procedures\UpdateAcBuildCriteriaCanceled.sql" />
+    <Build Include="qan\Stored Procedures\UpdateAcBuildCriteriaRejected.sql" />
+    <Build Include="qan\Stored Procedures\UpdateAcBuildCriteriaSubmitted.sql" />
+    <Build Include="qan\Stored Procedures\UpdateAcAttributeTypeAndReturnAll.sql" />
+    <Build Include="qan\Functions\FAcBuildCriteriaTemplateConditions.sql" />
+    <Build Include="qan\Functions\FAcBuildCriteriaTemplates.sql" />
+    <Build Include="setup\Stored Procedures\CreateInitialAcBuildCriteriaTemplates.sql" />
+    <Build Include="qan\Tables\AcBuildCriteriaTemplateConditions.sql" />
+    <Build Include="qan\Tables\AcBuildCriteriaTemplates.sql" />
+    <Build Include="setup\Stored Procedures\CreateAllInitial.sql" />
+    <Build Include="qan\Tables\QualifiedLots.sql" />
+    <Build Include="qan\Tables\QualFilterRaw.sql" />
+    <Build Include="qan\Tables\PRFDCR.sql" />
+    <Build Include="qan\Tables\OrphanODMLots.sql" />
+    <Build Include="qan\Tables\ODMQUALFILTER.sql" />
+    <Build Include="qan\Tables\MAT.sql" />
+    <Build Include="qan\Stored Procedures\PARSEATTRIBUTES.sql" />
+    <Build Include="qan\Stored Procedures\ImportPrfRecords.sql" />
+    <Build Include="qan\Stored Procedures\ImportMatRecords.sql" />
+    <Build Include="qan\Stored Procedures\GetCanUseLot.sql" />
+    <Build Include="qan\User Defined Types\IPrfRecords.sql" />
+    <Build Include="qan\User Defined Types\IMatRecords.sql" />
+    <Build Include="qan\Tables\AcBuildCombinations.sql" />
+    <Build Include="qan\Stored Procedures\ApproveMATVersion.sql" />
+    <Build Include="qan\Stored Procedures\RejectMATVersion.sql" />
+    <Build Include="qan\Stored Procedures\CancelMATVersion.sql" />
+    <Build Include="qan\Functions\FAcBuildCombinations.sql" />
+    <Build Include="qan\Stored Procedures\GetAcBuildCombinations.sql" />
+    <Build Include="qan\Functions\FAcBuildCriteriaExportConditions.sql" />
+    <Build Include="qan\Stored Procedures\GetAcBuildCriteriaExportConditions.sql" />
+    <Build Include="qan\Functions\AcBuildCombinationId.sql" />
+    <Build Include="qan\Tables\ReviewGroups.sql" />
+    <Build Include="qan\Tables\ReviewStages.sql" />
+    <Build Include="setup\Stored Procedures\CreateInitialReviewStages.sql" />
+    <Build Include="setup\Stored Procedures\CreateInitialReviewers.sql" />
+    <Build Include="setup\Stored Procedures\CreateInitialReviewGroups.sql" />
+    <Build Include="setup\Stored Procedures\CreateInitialReviewTableAssociations.sql" />
+    <Build Include="qan\Tables\AcBuildCriteriaReviewChangeHistory.sql" />
+    <Build Include="qan\Tables\AcBuildCriteriaReviewDecisions.sql" />
+    <Build Include="qan\Tables\AcBuildCriteriaReviewers.sql" />
+    <Build Include="qan\Tables\AcBuildCriteriaReviewGroups.sql" />
+    <Build Include="qan\Tables\AcBuildCriteriaReviewStages.sql" />
+    <Build Include="qan\Stored Procedures\CreateAcBuildCriteriaReviewChangeHistory.sql" />
+    <Build Include="setup\Stored Procedures\CreateAllInitialReview.sql" />
+    <Build Include="qan\Stored Procedures\CreateAcBuildCriteriaReviewDecision.sql" />
+    <Build Include="qan\Functions\FAcBuildCriteriaReviewDecisions.sql" />
+    <Build Include="qan\Functions\FAcBuildCriteriaReviewers.sql" />
+    <Build Include="qan\Functions\FAcBuildCriteriaReviewGroups.sql" />
+    <Build Include="qan\Functions\FAcBuildCriteriaReviewStages.sql" />
+    <Build Include="qan\Stored Procedures\CleanAcBuildCriteriaReview.sql" />
+    <Build Include="qan\Stored Procedures\CreateUserAction.sql" />
+    <Build Include="qan\Stored Procedures\GetAcBuildCriteriaDetails.sql" />
+    <Build Include="qan\Stored Procedures\UpdateAcBuildCriteriaCanceledReturnDetails.sql" />
+    <Build Include="qan\Stored Procedures\UpdateAcBuildCriteriaSubmittedReturnDetails.sql" />
+    <Build Include="qan\Tables\UserActions.sql" />
+    <Build Include="qan\Stored Procedures\UpdateAcBuildCriteriaApprovedReturnDetails.sql" />
+    <Build Include="qan\Stored Procedures\UpdateAcBuildCriteriaRejectedReturnDetails.sql" />
+    <Build Include="qan\Tables\AcBuildCriteriaReviewEmails.sql" />
+    <Build Include="qan\Functions\FGetAcBuildCriteriaReviewCurrentSnapshotStageId.sql" />
+    <Build Include="qan\Functions\FMMRecipeReviewDecisions.sql" />
+    <Build Include="qan\Functions\FMMRecipeReviewers.sql" />
+    <Build Include="qan\Functions\FMMRecipeReviewGroups.sql" />
+    <Build Include="qan\Functions\FMMRecipeReviewStages.sql" />
+    <Build Include="qan\Tables\MMRecipeReviewChangeHistory.sql" />
+    <Build Include="qan\Tables\MMRecipeReviewDecisions.sql" />
+    <Build Include="qan\Tables\MMRecipeReviewEmails.sql" />
+    <Build Include="qan\Tables\MMRecipeReviewers.sql" />
+    <Build Include="qan\Tables\MMRecipeReviewGroups.sql" />
+    <Build Include="qan\Tables\MMRecipeReviewStages.sql" />
+    <Build Include="qan\Stored Procedures\GetODMQualFilterExplanations.sql" />
+    <Build Include="qan\Stored Procedures\CleanMMRecipeReview.sql" />
+    <Build Include="qan\Stored Procedures\CreateMMRecipeReviewChangeHistory.sql" />
+    <Build Include="qan\Functions\FGetMMRecipeReviewCurrentSnapshotStageId.sql" />
+    <Build Include="qan\Stored Procedures\UpdateMMRecipeApprovedReturnDetails.sql" />
+    <Build Include="qan\Stored Procedures\UpdateMMRecipeCanceledReturnDetails.sql" />
+    <Build Include="qan\Stored Procedures\UpdateMMRecipeRejectedReturnDetails.sql" />
+    <Build Include="qan\Stored Procedures\UpdateMMRecipeSubmittedReturnDetails.sql" />
+    <Build Include="qan\Stored Procedures\GetMMRecipeDetails.sql" />
+    <Build Include="qan\User Defined Types\IAcBuildCriteriaConditionsCompare.sql" />
+    <Build Include="qan\Functions\FCompareAcBuildCriteriaConditionFields.sql" />
+    <Build Include="qan\Functions\CreatedByTreadstone.sql" />
+    <Build Include="qan\Stored Procedures\CreateNewTreadstoneAcBuildCombinations.sql" />
+    <Build Include="qan\Stored Procedures\CreateNewTreadstoneDesigns.sql" />
+    <Build Include="qan\Stored Procedures\CreateNewTreadstoneProbeConversions.sql" />
+    <Build Include="qan\Stored Procedures\CreateNewTreadstoneFabricationFacilities.sql" />
+    <Build Include="qan\Stored Procedures\CreateNewTreadstoneTestFlows.sql" />
+    <Build Include="qan\Stored Procedures\TaskSyncTreadstoneAcBuildCriterias.sql" />
+    <Build Include="qan\User Defined Types\IAcBuildCriteriasCompare.sql" />
+    <Build Include="qan\Functions\FCompareAcBuildCriteriasByIds.sql" />
+    <Build Include="qan\Functions\FCompareAcBuildCriterias.sql" />
+    <Build Include="qan\Functions\FCompareAcBuildCriteriaFields.sql" />
+    <Build Include="qan\Stored Procedures\CreateNewTreadstoneAttributeTypes.sql" />
+    <Build Include="qan\Functions\TranslateTreadstoneAttributeTypeNameDisplay.sql" />
+    <Build Include="ref\Tables\EmailTemplateBodyXsls.sql" />
+    <Build Include="setup\Stored Procedures\CreateEmailTemplateBodyXsls.sql" />
+    <Build Include="ref\Functions\FEmailTemplates.sql" />
+    <Build Include="qan\Functions\FCreateAcBuildCombinationName.sql" />
+    <Build Include="qan\Functions\FAcBuildCriteriaReviewGroupsNoDecision.sql" />
+    <Build Include="ref\Tables\AcOperandTypes.sql" />
+    <Build Include="setup\Stored Procedures\CreateAcOperandTypes.sql" />
+    <Build Include="qan\Tables\BadDataList.sql" />
+    <Build Include="qan\Tables\AcAttributeTypeValues.sql" />
+    <Build Include="qan\Stored Procedures\GetAcAttributeTypeValues.sql" />
+    <Build Include="qan\Functions\FAcAttributeTypeValues.sql" />
+    <Build Include="qan\Tables\OsatPasVersionRecords.sql" />
+    <Build Include="qan\Tables\OsatPasVersions.sql" />
+    <Build Include="qan\Stored Procedures\ImportOsatPasVersion.sql" />
+    <Build Include="qan\User Defined Types\IOsatPasVersionRecordsImport.sql" />
+    <Build Include="qan\Stored Procedures\GetOsatPasVersions.sql" />
+    <Build Include="qan\Tables\OsatPasVersionImportMessages.sql" />
+    <Build Include="qan\Functions\FOsatPasVersions.sql" />
+    <Build Include="qan\Stored Procedures\GetOsatPasVersionDetails.sql" />
+    <Build Include="qan\Functions\FOsatPasVersionRecords.sql" />
+    <Build Include="qan\Stored Procedures\UpdateOsatPasVersionCanceledReturnDetails.sql" />
+    <Build Include="qan\Stored Procedures\UpdateOsatPasVersionSubmitted.sql" />
+    <Build Include="qan\Stored Procedures\UpdateOsatPasVersionSubmittedReturnDetails.sql" />
+    <Build Include="qan\Stored Procedures\UpdateOsatPasVersionCanceled.sql" />
+    <Build Include="qan\Functions\FOsatPasVersionImportMessages.sql" />
+    <Build Include="qan\Tables\AcBuildCriteriaComments.sql" />
+    <Build Include="qan\Functions\FAcBuildCriteriaComments.sql" />
+    <Build Include="qan\Stored Procedures\CreateAcBuildCriteriaCommentReturnAll.sql" />
+    <Build Include="qan\Stored Procedures\CreateAcBuildCriteriaComment.sql" />
+    <Build Include="qan\Stored Procedures\GetOdmPrfVersions.sql" />
+    <Build Include="qan\Stored Procedures\GetOdmPrfVersionDetails.sql" />
+    <Build Include="qan\Stored Procedures\GetOdmMatVersions.sql" />
+    <Build Include="qan\Stored Procedures\GetOdmMatVersionDetails.sql" />
+    <Build Include="qan\Functions\FOsatAttributeDataTypes.sql" />
+    <Build Include="qan\Functions\FOsatAttributeTypes.sql" />
+    <Build Include="qan\Functions\FOsatBuildCriteriaSetComments.sql" />
+    <Build Include="qan\Functions\FOsatBuildCriteriaConditions.sql" />
+    <Build Include="qan\Functions\FOsatBuildCriteriaSetReviewDecisions.sql" />
+    <Build Include="qan\Functions\FOsatBuildCriteriaSetReviewers.sql" />
+    <Build Include="qan\Functions\FOsatBuildCriteriaSetReviewGroups.sql" />
+    <Build Include="qan\Functions\FOsatBuildCriteriaSetReviewGroupsNoDecision.sql" />
+    <Build Include="qan\Functions\FOsatBuildCriteriaSetReviewStages.sql" />
+    <Build Include="qan\Functions\FOsatBuildCriteriaTemplateConditions.sql" />
+    <Build Include="qan\Functions\FOsatBuildCriteriaSetTemplates.sql" />
+    <Build Include="qan\Functions\FOsatComparisonOperations.sql" />
+    <Build Include="qan\Functions\FCompareOsatBuildCriteriaConditionFields.sql" />
+    <Build Include="qan\Tables\OsatAttributeTypes.sql" />
+    <Build Include="qan\Tables\OsatBuildCriteriaSetComments.sql" />
+    <Build Include="qan\Tables\OsatBuildCriteriaConditions.sql" />
+    <Build Include="qan\Tables\OsatBuildCriteriaSetReviewChangeHistory.sql" />
+    <Build Include="qan\Tables\OsatBuildCriteriaSetReviewDecisions.sql" />
+    <Build Include="qan\Tables\OsatBuildCriteriaSetReviewers.sql" />
+    <Build Include="qan\Tables\OsatBuildCriteriaSetReviewGroups.sql" />
+    <Build Include="qan\Tables\OsatBuildCriteriaSetReviewStages.sql" />
+    <Build Include="qan\Tables\OsatBuildCriteriaTemplateConditions.sql" />
+    <Build Include="qan\Tables\OsatBuildCriteriaSetTemplates.sql" />
+    <Build Include="qan\User Defined Types\IOsatBuildCriteriaConditionsCompare.sql" />
+    <Build Include="qan\User Defined Types\IOsatBuildCriteriaConditionsCreate.sql" />
+    <Build Include="qan\User Defined Types\IOsatBuildCriteriaSetsCompare.sql" />
+    <Build Include="ref\Tables\OsatAttributeDataTypeOperations.sql" />
+    <Build Include="ref\Tables\OsatAttributeDataTypes.sql" />
+    <Build Include="ref\Tables\OsatComparisonOperations.sql" />
+    <Build Include="ref\Tables\OsatOperandTypes.sql" />
+    <Build Include="qan\Tables\OsatBuildCriteriaSetReviewEmails.sql" />
+    <Build Include="setup\Stored Procedures\CreateOsatOperandTypes.sql" />
+    <Build Include="setup\Stored Procedures\CreateOsatComparisonOperations.sql" />
+    <Build Include="setup\Stored Procedures\CreateOsatAttributeDataTypes.sql" />
+    <Build Include="setup\Stored Procedures\CreateOsatAttributeDataTypeOperations.sql" />
+    <Build Include="qan\Tables\OsatBuildCombinations.sql" />
+    <Build Include="qan\Tables\Osats.sql" />
+    <Build Include="qan\Stored Procedures\GetOsatPasVersionsListAndImport.sql" />
+    <Build Include="qan\Tables\OsatPasCombinations.sql" />
+    <Build Include="qan\Functions\FOsatPasCombinations.sql" />
+    <Build Include="qan\Functions\FOsatBuildCombinations.sql" />
+    <Build Include="qan\Stored Procedures\CreateOsatAttributeType.sql" />
+    <Build Include="qan\Stored Procedures\CreateOsatAttributeTypeAndReturnAll.sql" />
+    <Build Include="qan\Stored Procedures\GetOsatAttributeTypes.sql" />
+    <Build Include="qan\Stored Procedures\GetOsatAttributeTypesMetadata.sql" />
+    <Build Include="qan\Stored Procedures\UpdateOsatAttributeType.sql" />
+    <Build Include="qan\Stored Procedures\UpdateOsatAttributeTypeAndReturnAll.sql" />
+    <Build Include="setup\Stored Procedures\CreateInitialOsatAttributeTypes.sql" />
+    <Build Include="qan\Stored Procedures\TaskSyncTreadstoneAcAttributeData.sql" />
+    <Build Include="qan\Tables\OdmWipSnapshots.sql" />
+    <Build Include="qan\Tables\Odms.sql" />
+    <Build Include="qan\Tables\OdmQualFilterScenarios.sql" />
+    <Build Include="qan\Tables\OdmQualFilterNonQualifiedMediaReport.sql" />
+    <Build Include="qan\Tables\OdmQualFilterNonQualifiedMediaExceptions.sql" />
+    <Build Include="qan\Tables\OdmQualFilterNonQualifiedMedia.sql" />
+    <Build Include="qan\Tables\OdmQualFilterLotDispositionSnapshot.sql" />
+    <Build Include="qan\Tables\OdmQualFilterLotDispositions.sql" />
+    <Build Include="qan\Tables\OdmComparisonLotDisposition.sql" />
+    <Build Include="qan\Tables\odm_wip_attributes_daily_load_staging.sql" />
+    <Build Include="qan\Tables\odm_wip_attributes_daily_load.sql" />
+    <Build Include="qan\Tables\LotShipSnapshots.sql" />
+    <Build Include="qan\Tables\lot_ship_staging.sql" />
+    <Build Include="qan\Tables\lot_ship.sql" />
+    <Build Include="qan\Stored Procedures\GetLatestOdmQualFilter.sql" />
+    <Build Include="qan\Stored Procedures\CreateLotShipSnapshot.sql" />
+    <Build Include="qan\Stored Procedures\GetOdmQualFilterScenarioVersions.sql" />
+    <Build Include="qan\Stored Procedures\GetOsatDesignSummary.sql" />
+    <Build Include="qan\Stored Procedures\MergeOsatBuildCombinations.sql" />
+    <Build Include="ref\Tables\PartUseTypes.sql" />
+    <Build Include="setup\Stored Procedures\CreatePartUseTypes.sql" />
+    <Build Include="qan\Stored Procedures\GetOsatBuildCombinations.sql" />
+    <Build Include="qan\Stored Procedures\GetOdmQualFilterScenario.sql" />
+    <Build Include="qan\Stored Procedures\CreateOdmWipSnapshot.sql" />
+    <Build Include="qan\Stored Procedures\CreateOsatBuildCriteriaSet.sql" />
+    <Build Include="qan\Stored Procedures\CreateOsatBuildCriteriaSetComment.sql" />
+    <Build Include="qan\Stored Procedures\CreateOsatBuildCriteriaSetCommentReturnAll.sql" />
+    <Build Include="qan\Stored Procedures\CreateOsatBuildCriteriaSetReviewChangeHistory.sql" />
+    <Build Include="qan\Stored Procedures\CreateOsatBuildCriteriaSetReviewDecision.sql" />
+    <Build Include="qan\Stored Procedures\GetOsatBuildCriteriaSet.sql" />
+    <Build Include="qan\Functions\FOsatBuildCriteriaSets.sql" />
+    <Build Include="qan\Stored Procedures\GetOsatBuildCriteriaSetAndVersions.sql" />
+    <Build Include="qan\Stored Procedures\GetOsatBuildCriteriaSetCreate.sql" />
+    <Build Include="qan\Stored Procedures\GetOsatBuildCriteriaSetDetails.sql" />
+    <Build Include="qan\Stored Procedures\GetOsatBuildCriteriaSets.sql" />
+    <Build Include="setup\Stored Procedures\CreateInitialOsats.sql" />
+    <Build Include="qan\Tables\OrphanODMLotsStaging.sql" />
+    <Build Include="qan\Tables\OdmQualFilterStaging.sql" />
+    <Build Include="qan\Stored Procedures\GetOdmQualFilterScenarioDetails.sql" />
+    <Build Include="qan\Stored Procedures\GetOdmQualFilterNonQualifiedMediaReport.sql" />
+    <Build Include="qan\Stored Procedures\GetOdmQualFilterData.sql" />
+    <Build Include="qan\Stored Procedures\GetOdmComparisonLotDisposition.sql" />
+    <Build Include="qan\Tables\OsatAttributeTypeValues.sql" />
+    <Build Include="qan\Functions\FOsatAttributeTypeValues.sql" />
+    <Build Include="qan\Functions\FCompareOsatBuildCriteriaSetFields.sql" />
+    <Build Include="qan\Functions\FCompareOsatBuildCriteriaSets.sql" />
+    <Build Include="qan\Functions\FCompareOsatBuildCriteriaSetsByIds.sql" />
+    <Build Include="qan\Stored Procedures\UpdateOsatBuildCriteriaSetSubmitted.sql" />
+    <Build Include="qan\Stored Procedures\CleanOsatBuildCriteriaSetReview.sql" />
+    <Build Include="qan\Stored Procedures\UpdateOsatBuildCriteriaSetSubmittedReturnDetails.sql" />
+    <Build Include="qan\Stored Procedures\UpdateOsatBuildCriteriaSetRejected.sql" />
+    <Build Include="qan\Stored Procedures\UpdateOsatBuildCriteriaSetRejectedReturnDetails.sql" />
+    <Build Include="qan\Stored Procedures\UpdateOsatBuildCriteriaSetCanceled.sql" />
+    <Build Include="qan\Stored Procedures\UpdateOsatBuildCriteriaSetCanceledReturnDetails.sql" />
+    <Build Include="qan\Stored Procedures\UpdateOsatBuildCriteriaSetApproved.sql" />
+    <Build Include="qan\Stored Procedures\UpdateOsatBuildCriteriaSetApprovedReturnDetails.sql" />
+    <Build Include="qan\User Defined Types\IStrings.sql" />
+    <Build Include="qan\Functions\ToDelimitedString.sql" />
+    <Build Include="qan\Functions\AcBuildCriteriaReviewerEmailsAsDelimitedString.sql" />
+    <Build Include="qan\Functions\OsatBuildCriteriaSetReviewerEmailsAsDelimitedString.sql" />
+    <Build Include="qan\Stored Procedures\CreateOdmQualFilterDaily.sql" />
+    <Build Include="qan\Stored Procedures\CreateLotShipSnapshotDaily.sql" />
+    <Build Include="qan\Stored Procedures\ImportOsatPasVersionReturnVersion.sql" />
+    <Build Include="qan\Stored Procedures\GetOdmWipSnapshot.sql" />
+    <Build Include="qan\Stored Procedures\GetLotShipSnapshot.sql" />
+    <Build Include="qan\Tables\OdmQualFilterBadSlots.sql" />
+    <Build Include="qan\Stored Procedures\GetOdmQualFilterBadSlots.sql" />
+    <Build Include="qan\Stored Procedures\GetOsatBuildCombinationAndBuildCriteriaSets.sql" />
+    <Build Include="qan\Stored Procedures\CreateOdmQualFilterLotDisposition.sql" />
+    <Build Include="qan\Tables\OsatBuildCriteriaSets.sql" />
+    <Build Include="qan\Tables\OsatBuildCriterias.sql" />
+    <Build Include="qan\Stored Procedures\GetOdmQualFilterNonQualifiedMediaExceptions.sql" />
+    <Build Include="qan\Stored Procedures\GetOdmQualFilterNonQualifiedMedia.sql" />
+    <Build Include="qan\Stored Procedures\CreateOdmQualFilterExceptions.sql" />
+    <Build Include="qan\Stored Procedures\CreateOdmQualFilterLotDispositionsNewScenario.sql" />
+    <Build Include="qan\Functions\FOsatBuildCriterias.sql" />
+    <Build Include="qan\User Defined Types\IOsatBuildCriteriasCreate.sql" />
+    <Build Include="qan\Functions\FGetOsatBuildCriteriaSetReviewCurrentSnapshotStageId.sql" />
+    <Build Include="qan\Tables\OsatBuildCriteriaTemplates.sql" />
+    <Build Include="qan\Functions\FOsatBuildCriteriaTemplates.sql" />
+    <Build Include="setup\Stored Procedures\CreateInitialOsatBuildCriteriaSetTemplates.sql" />
+    <Build Include="qan\Stored Procedures\GetOdmQualFilterScenarioVersionsDaily.sql" />
+    <Build Include="qan\User Defined Types\IOsatBuildCriteriasCompare.sql" />
+    <Build Include="qan\Functions\FCompareOsatBuildCriteriaFields.sql" />
+    <Build Include="ref\Tables\Odms.sql" />
+    <Build Include="ref\Tables\OdmQualFilterCategories.sql" />
+    <Build Include="ref\Tables\OdmLotDispositionReasons.sql" />
+    <Build Include="ref\Tables\OdmLotDispositionActions.sql" />
+    <Build Include="qan\Tables\OdmQualFilters.sql" />
+    <Build Include="qan\Tables\OdmQualFilterQueryLogs.sql" />
+    <Build Include="qan\Tables\OdmNameMappings.sql" />
+    <Build Include="qan\Functions\OdmParseReticleWaveId.sql" />
+    <Build Include="qan\Functions\OdmParseProductGrade.sql" />
+    <Build Include="qan\Functions\OdmParseMajorProbeProgRev.sql" />
+    <Build Include="qan\Functions\OdmParseFabExcrId.sql" />
+    <Build Include="qan\Functions\OdmParseFabConvId.sql" />
+    <Build Include="qan\Functions\OdmParseCustomTestingReqd.sql" />
+    <Build Include="qan\Functions\OdmParseCellRevision.sql" />
+    <Build Include="qan\Functions\OdmParseBurnTapeRevision.sql" />
+    <Build Include="qan\Functions\FParseMATAttributes.sql" />
+    <Build Include="setup\Stored Procedures\CreateOdmQualFilterCategories.sql" />
+    <Build Include="setup\Stored Procedures\CreateOdmNames.sql" />
+    <Build Include="setup\Stored Procedures\CreateOdmLotDispositionReasons.sql" />
+    <Build Include="setup\Stored Procedures\CreateOdmLotDispositionActions.sql" />
+    <Build Include="qan\Stored Procedures\GetOdmLotDispositionReasons.sql" />
+    <Build Include="qan\Stored Procedures\CreateOdmQualFilters.sql" />
+    <Build Include="qan\Functions\OdmCleanMediaAttributeValue.sql" />
+    <Build Include="qan\Stored Procedures\CreateOdmNameMapping.sql" />
+    <Build Include="qan\Functions\FOsatQualFilterRecords.sql" />
+    <Build Include="qan\Stored Procedures\GetOsatQualFilterRecords.sql" />
+    <Build Include="ref\Tables\OdmQualFilterStatuses.sql" />
+    <Build Include="setup\Stored Procedures\CreateOdmQualFilterStatuses.sql" />
+    <Build Include="qan\Stored Procedures\GetOdmLotDispositionActions.sql" />
+    <Build Include="qan\Stored Procedures\GetOsatQualFilter.sql" />
+    <Build Include="qan\Stored Procedures\UpdateOdmQualFilterLotDispositions.sql" />
+    <Build Include="qan\Stored Procedures\CreateOdmQualFilterSlotAggregation.sql" />
+    <Build Include="qan\Stored Procedures\GetOdms.sql" />
+    <Build Include="qan\Stored Procedures\GetOdmQualFilterScenarioPublished.sql" />
+    <Build Include="qan\Stored Procedures\UpdateFromPorOsatPasVersions.sql" />
+    <Build Include="ref\Tables\MixTypes.sql" />
+    <Build Include="setup\Stored Procedures\CreateMixTypes.sql" />
+    <Build Include="setup\Stored Procedures\CreateProcessAndSecurity.sql" />
+    <Build Include="qan\Functions\FDesignFamilies.sql" />
+    <Build Include="qan\Stored Procedures\CreateOdmQualFilterScenarioReturnResultSets.sql" />
+    <Build Include="qan\Tables\OsatPackageDieTypes.sql" />
+    <Build Include="setup\Stored Procedures\CreateInitialOsatPackageDieTypes.sql" />
+    <Build Include="qan\Functions\FParseOsatPackageDieTypeFromIntelProdName.sql" />
+    <Build Include="qan\Tables\OsatBuildCombinationOsats.sql" />
+    <Build Include="qan\Stored Procedures\GetOsatQualFilterPublish.sql" />
+    <Build Include="qan\Tables\OsatQualFilterExports.sql" />
+    <Build Include="qan\Stored Procedures\CreateOsatQualFilterExport.sql" />
+    <Build Include="qan\Stored Procedures\CreateOsatQualFilterExportAndReturn.sql" />
+    <Build Include="qan\Stored Procedures\GetOsatQualFilterExports.sql" />
+    <Build Include="qan\Functions\FOsatQualFilterExports.sql" />
+    <Build Include="qan\Stored Procedures\UpdateOsatQualFilterExportGenerated.sql" />
+    <Build Include="qan\Stored Procedures\UpdateOsatQualFilterExportDelivered.sql" />
+    <Build Include="qan\Tables\OdmLotShipSnapshots.sql" />
+    <Build Include="qan\Stored Procedures\RunOdmQualFilterScenario.sql" />
+    <Build Include="qan\Stored Procedures\PublishOdmQualFilter.sql" />
+    <Build Include="qan\Stored Procedures\TaskCreateOdmQualFilterSnapshotsAndScenario.sql" />
+    <Build Include="qan\Stored Procedures\TaskCreateOdmQualFilterWipSnapshot.sql" />
+    <Build Include="qan\Stored Procedures\TaskCreateOdmQualFilterLotShipSnapshot.sql" />
+    <Build Include="qan\Stored Procedures\TaskCreateOdmQualFilterScenario.sql" />
+    <Build Include="qan\Tables\OsatQualFilterExportFiles.sql" />
+    <Build Include="qan\Functions\FOsatQualFilterExportFiles.sql" />
+    <Build Include="qan\Tables\OsatQualFilterExportFileRecords.sql" />
+    <Build Include="qan\Stored Procedures\GetOsatQualFilterExport.sql" />
+    <Build Include="qan\User Defined Types\IOsatQfImportAttributes.sql" />
+    <Build Include="qan\User Defined Types\IOsatQfImportCriterias.sql" />
+    <Build Include="qan\User Defined Types\IOsatQfImportGroups.sql" />
+    <Build Include="qan\User Defined Types\IOsatQfImportGroupFields.sql" />
+    <Build Include="qan\Stored Procedures\CreateOsatQualFilterImport.sql" />
+    <Build Include="qan\Tables\OsatQualFilterImports.sql" />
+    <Build Include="qan\Stored Procedures\CreateOsatQualFilterImportAndReturn.sql" />
+    <Build Include="qan\Functions\FOsatQualFilterImports.sql" />
+    <Build Include="qan\Stored Procedures\GetOsatQualFilterImports.sql" />
+    <Build Include="qan\Tables\OsatQualFilterImportMessages.sql" />
+    <Build Include="qan\Stored Procedures\GetOsatQualFilterImportDetails.sql" />
+    <Build Include="qan\Functions\FOsatQualFilterImportMessages.sql" />
+    <Build Include="qan\Tables\OsatQualFilterImportBuildCriterias.sql" />
+    <Build Include="qan\Functions\FOsatQualFilterImportBuildCriterias.sql" />
+    <Build Include="qan\Functions\FOsatQfDeviceAvToDeviceName.sql" />
+    <Build Include="qan\Functions\FOsatQfDeviceAvToMpp.sql" />
+    <Build Include="qan\Functions\FOsatQfDesignIdAvAndGroupNameToDesignName.sql" />
+    <Build Include="qan\Functions\FOsatQfDeviceNameToIntelLevel1PartNumber.sql" />
+    <Build Include="qan\Functions\FOsatQfEsToPartUseTypeId.sql" />
+    <Build Include="qan\Functions\FOsatQfValuesToDeviceName.sql" />
+    <Build Include="qan\Functions\FOsatQfValuesToIntelProdName.sql" />
+    <Build Include="qan\Stored Procedures\UpdateOsatQualFilterImportPor.sql" />
+    <Build Include="qan\Stored Procedures\UpdateOsatQualFilterImportPorReturnDetails.sql" />
+    <Build Include="qan\Stored Procedures\UpdateOsatQualFilterImporCanceled.sql" />
+    <Build Include="qan\Stored Procedures\UpdateOsatQualFilterImportCanceledReturnDetails.sql" />
+    <Build Include="qan\Functions\ToNumeric.sql" />
+    <Build Include="qan\Stored Procedures\GetOdmLotWipDetails.sql" />
+    <Build Include="qan\Stored Procedures\UpdateOsatBuildCombinationPublishDisabled.sql" />
+    <Build Include="qan\Stored Procedures\UpdateOsatBuildCombinationPublishEnabled.sql" />
+    <Build Include="qan\Stored Procedures\UpdateOsatBuildCombinationPublishDisabledReturnAll.sql" />
+    <Build Include="qan\Stored Procedures\UpdateOsatBuildCombinationPublishEnabledReturnAll.sql" />
+    <Build Include="qan\Stored Procedures\SaveLotDispositions.sql" />
+    <Build Include="qan\Tables\OdmManualDispositions.sql" />
+    <Build Include="qan\Stored Procedures\ImportOdmManualDispositions.sql" />
+    <Build Include="qan\Stored Procedures\GetOdmManualDispositionsVersions.sql" />
+    <Build Include="qan\Stored Procedures\GetOdmManualDispositionsByVersion.sql" />
+    <Build Include="qan\User Defined Types\IOdmManualDispositions.sql" />
+    <Build Include="qan\Functions\FixSystemUserId.sql" />
+    <Build Include="qan\User Defined Types\IOdmLotDispositions.sql" />
+    <Build Include="qan\Tables\OdmWipBohSnapshots.sql" />
+    <Build Include="qan\Stored Procedures\TaskCreateOdmQualFilterHistoricalWipBohSnapshot.sql" />
+    <Build Include="Security\npsg.sql" />
+    <Build Include="npsg\User Defined Types\IPrfRecords.sql" />
+    <Build Include="npsg\User Defined Types\IOdmManualDispositions.sql" />
+    <Build Include="npsg\User Defined Types\IOdmLotDispositions.sql" />
+    <Build Include="npsg\User Defined Types\IMatRecords.sql" />
+    <Build Include="npsg\User Defined Types\IMATImport.sql" />
+    <Build Include="npsg\User Defined Types\IImportMessages.sql" />
+    <Build Include="npsg\Functions\OdmParseReticleWaveId.sql" />
+    <Build Include="npsg\Functions\OdmParseProductGrade.sql" />
+    <Build Include="npsg\Functions\OdmParseMajorProbeProgRev.sql" />
+    <Build Include="npsg\Functions\OdmParseFabExcrId.sql" />
+    <Build Include="npsg\Functions\OdmParseFabConvId.sql" />
+    <Build Include="npsg\Functions\OdmParseCustomTestingReqd.sql" />
+    <Build Include="npsg\Functions\OdmParseCellRevision.sql" />
+    <Build Include="npsg\Functions\OdmParseBurnTapeRevision.sql" />
+    <Build Include="npsg\Functions\GetMATDataTypeFromValue.sql" />
+    <Build Include="npsg\Functions\FParseMATAttributes.sql" />
+    <Build Include="npsg\Functions\CreatedByTask.sql" />
+    <Build Include="qan\Tables\PreferredRole.sql" />
+    <Build Include="npsg\Tables\PRFDCR.sql" />
+    <Build Include="npsg\Tables\OdmWipSnapshots.sql" />
+    <Build Include="npsg\Tables\OdmWipBohSnapshots.sql" />
+    <Build Include="npsg\Tables\OdmQualFilterScenarios.sql" />
+    <Build Include="npsg\Tables\OdmQualFilters.sql" />
+    <Build Include="npsg\Tables\OdmQualFilterNonQualifiedMediaReport.sql" />
+    <Build Include="npsg\Tables\OdmQualFilterNonQualifiedMediaExceptions.sql" />
+    <Build Include="npsg\Tables\OdmQualFilterNonQualifiedMedia.sql" />
+    <Build Include="npsg\Tables\OdmQualFilterLotDispositions.sql" />
+    <Build Include="npsg\Tables\ODMQUALFILTER.sql" />
+    <Build Include="npsg\Tables\OdmNameMappings.sql" />
+    <Build Include="npsg\Tables\OdmManualDispositions.sql" />
+    <Build Include="npsg\Tables\OdmLotShipSnapshots.sql" />
+    <Build Include="npsg\Tables\OdmComparisonLotDisposition.sql" />
+    <Build Include="npsg\Tables\MATVersions.sql" />
+    <Build Include="npsg\Tables\MATSSDNames.sql" />
+    <Build Include="npsg\Tables\MATReviewStageStates.sql" />
+    <Build Include="npsg\Tables\MATReviewStages.sql" />
+    <Build Include="npsg\Tables\MATReviewGroups.sql" />
+    <Build Include="npsg\Tables\MATReviewers.sql" />
+    <Build Include="npsg\Tables\MATReviewDecisions.sql" />
+    <Build Include="npsg\Tables\MATReviewChangeHistory.sql" />
+    <Build Include="npsg\Tables\MATAttributeValues.sql" />
+    <Build Include="npsg\Tables\MAT.sql" />
+    <Build Include="qan\Stored Procedures\SavePreferredRole.sql" />
+    <Build Include="qan\Stored Procedures\GetPreferredRole.sql" />
+    <Build Include="npsg\Stored Procedures\TaskCreateOdmQualFilterWipSnapshot.sql" />
+    <Build Include="npsg\Stored Procedures\TaskCreateOdmQualFilterSnapshotsAndScenario.sql" />
+    <Build Include="npsg\Stored Procedures\TaskCreateOdmQualFilterScenario.sql" />
+    <Build Include="npsg\Stored Procedures\TaskCreateOdmQualFilterLotShipSnapshot.sql" />
+    <Build Include="npsg\Stored Procedures\TaskCreateOdmQualFilterHistoricalWipBohSnapshot.sql" />
+    <Build Include="npsg\Stored Procedures\SubmitMATVersion.sql" />
+    <Build Include="npsg\Stored Procedures\SaveLotDispositions.sql" />
+    <Build Include="npsg\Stored Procedures\RunOdmQualFilterScenario.sql" />
+    <Build Include="npsg\Stored Procedures\ImportPrfRecords.sql" />
+    <Build Include="npsg\Stored Procedures\ImportOdmManualDispositions.sql" />
+    <Build Include="npsg\Stored Procedures\ImportMatRecords.sql" />
+    <Build Include="npsg\Stored Procedures\GetOdms.sql" />
+    <Build Include="npsg\Stored Procedures\GetOdmQualFilterScenarioVersionsDaily.sql" />
+    <Build Include="npsg\Stored Procedures\GetOdmQualFilterScenarioVersions.sql" />
+    <Build Include="npsg\Stored Procedures\GetOdmQualFilterScenarioPublished.sql" />
+    <Build Include="npsg\Stored Procedures\GetOdmQualFilterScenario.sql" />
+    <Build Include="npsg\Stored Procedures\GetOdmQualFilterNonQualifiedMediaReport.sql" />
+    <Build Include="npsg\Stored Procedures\GetOdmQualFilterNonQualifiedMediaExceptions.sql" />
+    <Build Include="npsg\Stored Procedures\GetOdmQualFilterNonQualifiedMedia.sql" />
+    <Build Include="npsg\Stored Procedures\GetOdmPrfVersions.sql" />
+    <Build Include="npsg\Stored Procedures\GetOdmPrfVersionDetails.sql" />
+    <Build Include="npsg\Stored Procedures\GetOdmMatVersions.sql" />
+    <Build Include="npsg\Stored Procedures\GetOdmMatVersionDetails.sql" />
+    <Build Include="npsg\Stored Procedures\GetOdmManualDispositionsVersions.sql" />
+    <Build Include="npsg\Stored Procedures\GetOdmManualDispositionsByVersion.sql" />
+    <Build Include="npsg\Stored Procedures\GetOdmLotWipDetails.sql" />
+    <Build Include="npsg\Stored Procedures\GetOdmLotDispositionReasons.sql" />
+    <Build Include="npsg\Stored Procedures\GetOdmLotDispositionActions.sql" />
+    <Build Include="npsg\Stored Procedures\GetOdmComparisonLotDisposition.sql" />
+    <Build Include="npsg\Stored Procedures\GetMATVersions.sql" />
+    <Build Include="npsg\Stored Procedures\GetMATVersionDetails.sql" />
+    <Build Include="npsg\Stored Procedures\GetMATStagesAndReviewers.sql" />
+    <Build Include="npsg\Stored Procedures\GetMATs.sql" />
+    <Build Include="npsg\Stored Procedures\GetMATReviewersWithWork.sql" />
+    <Build Include="npsg\Stored Procedures\GetMATCurrentStagesForEmailing.sql" />
+    <Build Include="npsg\Stored Procedures\GetMATCurrentStage.sql" />
+    <Build Include="npsg\Stored Procedures\GetMATAttributes.sql" />
+    <Build Include="npsg\Stored Procedures\CreateOdmQualFilters.sql" />
+    <Build Include="npsg\Stored Procedures\CreateOdmQualFilterLotDisposition.sql" />
+    <Build Include="npsg\Stored Procedures\CreateOdmQualFilterExceptions.sql" />
+    <Build Include="npsg\Stored Procedures\CreateMATChangeHistory.sql" />
+    <Build Include="npsg\Stored Procedures\CreateMATAttributeValues.sql" />
+    <Build Include="npsg\Stored Procedures\CreateMATAttribute.sql" />
+    <Build Include="npsg\Stored Procedures\CancelMATVersion.sql" />
+    <Build Include="npsg\Stored Procedures\ApproveMATVersion.sql" />
+    <Build Include="qan\Stored Procedures\UpdateAcBuildCriteriaApproved.sql" />
+    <Build Include="npsg\Stored Procedures\PublishAcBuildCriteriaApproved.sql" />
+    <Build Include="npsg\Stored Procedures\PublishOdmQualFilter.sql" />
+    <Build Include="qan\Stored Procedures\TaskSyncTreadstoneAcBuildCriterias.sql" />
+    <Build Include="qan\Stored Procedures\CreateNewTreadstoneAttributeTypes.sql" />
+    <Build Include="qan\Stored Procedures\CreateNewTreadstoneAcBuildCombinations.sql" />
+    <Build Include="qan\Stored Procedures\PublishAcBuildCriteriaApproved_2.sql" />
+    <Build Include="qan\Functions\FProducts_1.sql" />
+    <Build Include="qan\Tables\build_rule_Test.sql" />
+    <Build Include="qan\Tables\build_rule_condition_Test.sql" />
+    <Build Include="npsg\Tables\build_rule_Test.sql" />
+    <Build Include="npsg\Tables\build_rule_condition_Test.sql" />
+    <Build Include="qan\Functions\FAcBuildCriterias_2.sql" />
+    <Build Include="qan\Tables\OdmWipSnapshotsHistory.sql" />
+    <Build Include="qan\Tables\OdmQualFiltersHistory.sql" />
+    <Build Include="qan\Tables\OdmQualFilterLotDispositionsHistory.sql" />
+    <Build Include="qan\Tables\OdmLotShipSnapshotsHistory.sql" />
+    <Build Include="npsg\Tables\OdmWipSnapshotsHistory.sql" />
+    <Build Include="npsg\Tables\OdmQualFiltersHistory.sql" />
+    <Build Include="npsg\Tables\OdmQualFilterLotDispositionsHistory.sql" />
+    <Build Include="npsg\Tables\OdmLotShipSnapshotsHistory.sql" />
+    <Build Include="qan\Stored Procedures\TaskArchiveOdmQualFilterScenario.sql" />
+    <Build Include="npsg\Stored Procedures\TaskArchiveOdmQualFilterScenario.sql" />
+    <Build Include="qan\Stored Procedures\GetOdmQualFilterScenarioHistoricalVersions.sql" />
+    <Build Include="qan\Stored Procedures\GetOdmQualFilterHistoricalScenario.sql" />
+    <Build Include="qan\Stored Procedures\GetOdmHistoricalQualFilterNonQualifiedMediaExceptions.sql" />
+    <Build Include="qan\Stored Procedures\GetOdmHistoricalQualFilterNonQualifiedMedia.sql" />
+    <Build Include="qan\Stored Procedures\GetOdmHistoricalComparisonLotDisposition.sql" />
+    <Build Include="npsg\Stored Procedures\GetOdmQualFilterScenarioHistoricalVersions.sql" />
+    <Build Include="npsg\Stored Procedures\GetOdmQualFilterHistoricalScenario.sql" />
+    <Build Include="npsg\Stored Procedures\GetOdmHistoricalQualFilterNonQualifiedMediaExceptions.sql" />
+    <Build Include="npsg\Stored Procedures\GetOdmHistoricalQualFilterNonQualifiedMedia.sql" />
+    <Build Include="npsg\Stored Procedures\GetOdmHistoricalComparisonLotDisposition.sql" />
+    <Build Include="ref\Tables\ProductTypes.sql" />
+    <Build Include="ref\Tables\ProductRoles.sql" />
+    <Build Include="ref\Tables\ProductPlatforms.sql" />
+    <Build Include="ref\Tables\ProductLifeCycleStatuses.sql" />
+    <Build Include="qan\Tables\ProductOwnerships.sql" />
+    <Build Include="qan\Tables\ProductContactRoles.sql" />
+    <Build Include="qan\Tables\ProductCodeNames.sql" />
+    <Build Include="qan\Tables\ProductBrandNames.sql" />
+    <Build Include="qan\Stored Procedures\GetProductOwnerships.sql" />
+    <Build Include="qan\Stored Procedures\GetProductOwnershipMetadata.sql" />
+    <Build Include="qan\Stored Procedures\GetProductOwnershipLookups.sql" />
+    <Build Include="qan\Stored Procedures\DeleteProductOwnership.sql" />
+    <Build Include="qan\Stored Procedures\CreateProductOwership.sql" />
+    <Build Include="qan\Stored Procedures\CreateProductContactRole.sql" />
+    <Build Include="qan\Stored Procedures\CreateProductCodeName.sql" />
+    <Build Include="qan\Stored Procedures\CreateProductBrandName.sql" />
+    <Build Include="qan\Tables\ProductContacts.sql" />
+    <Build Include="setup\Stored Procedures\CreateProductTypes.sql" />
+    <Build Include="setup\Stored Procedures\CreateProductRoles.sql" />
+    <Build Include="setup\Stored Procedures\CreateProductPlatforms.sql" />
+    <Build Include="setup\Stored Procedures\CreateProductOwnerships.sql" />
+    <Build Include="setup\Stored Procedures\CreateProductLifeCycleStatuses.sql" />
+    <Build Include="setup\Stored Procedures\CreateProductContacts.sql" />
+    <Build Include="setup\Stored Procedures\CreateProductCodeNames.sql" />
+    <Build Include="setup\Stored Procedures\CreateProductBrandNames.sql" />
+    <Build Include="qan\Stored Procedures\UpdateProductOwership.sql" />
+    <Build Include="qan\Stored Procedures\CreateProductContact.sql" />
+    <Build Include="setup\Stored Procedures\CreateProductContactRoles.sql" />
+    <Build Include="qan\Tables\AcAttributeDesignFamilies_1.sql" />
+    <Build Include="ref\Tables\AccountSubsidiaries.sql" />
+    <Build Include="ref\Tables\AccountRoles.sql" />
+    <Build Include="ref\Tables\AccountProducts.sql" />
+    <Build Include="ref\Tables\AccountCustomers.sql" />
+    <Build Include="ref\Tables\AccountClients.sql" />
+    <Build Include="qan\Tables\AccountOwnershipsContacts.sql" />
+    <Build Include="qan\Tables\AccountOwnerships.sql" />
+    <Build Include="qan\Tables\AccountContacts.sql" />
+    <Build Include="qan\Tables\AccountContactRoles.sql" />
+    <Build Include="qan\Functions\FGetOwnershipAccounts.sql" />
+    <Build Include="qan\Stored Procedures\GetAccountOwnerships.sql" />
+    <Build Include="qan\Stored Procedures\GetAccountOwnershipMetadata.sql" />
+    <Build Include="qan\Stored Procedures\GetAccountOwnershipLookups.sql" />
+    <Build Include="qan\Stored Procedures\GetAccountOwnershipContacts.sql" />
+    <Build Include="qan\Stored Procedures\CreateAccountContactRoles.sql" />
+    <Build Include="setup\Stored Procedures\CreateAccountSubsidiaries.sql" />
+    <Build Include="setup\Stored Procedures\CreateAccountRoles.sql" />
+    <Build Include="setup\Stored Procedures\CreateAccountProducts.sql" />
+    <Build Include="setup\Stored Procedures\CreateAccountOwnerships.sql" />
+    <Build Include="setup\Stored Procedures\CreateAccountCustomers.sql" />
+    <Build Include="setup\Stored Procedures\CreateAccountClients.sql" />
+    <Build Include="qan\Stored Procedures\GetProductOwnershipContacts.sql" />
+    <Build Include="qan\Stored Procedures\CreateAccountOwership.sql" />
+    <Build Include="qan\Tables\OdmQualFilterRemovableMedia.sql" />
+    <Build Include="npsg\Tables\OdmQualFilterRemovableMedia.sql" />
+    <Build Include="qan\Stored Procedures\UpdateAccountOwership.sql" />
+    <Build Include="qan\Stored Procedures\DeleteAccountOwnership.sql" />
+    <Build Include="qan\User Defined Types\IAccountOwnershipContactCreate.sql" />
+    <Build Include="qan\Stored Procedures\GetPCNApproverMetadata.sql" />
+    <Build Include="qan\Stored Procedures\GetPCNApproverLookups.sql" />
+    <Build Include="qan\Stored Procedures\GetPCNApproverList.sql" />
+    <Build Include="qan\Stored Procedures\CreateNewTreadstoneAttributeTypeValues.sql" />
+    <Build Include="qan\Stored Procedures\CreateNewTreadstoneAttributeTypeValues.sql" />
+    <Build Include="qan\Tables\ProductOwnershipsContacts.sql" />
+    <Build Include="qan\User Defined Types\IProductOwnershipContactsCreate.sql" />
+    <Build Include="qan\Stored Procedures\GetPCNManagerMetadata.sql" />
+    <Build Include="qan\Stored Procedures\GetPCNManagerLookups.sql" />
+    <Build Include="qan\Stored Procedures\GetPCNManagerList.sql" />
+    <Build Include="setup\Stored Procedures\CreateProductOwnershipsContacts.sql" />
+    <Build Include="setup\Stored Procedures\CreateAccountOwnershipsContacts.sql" />
+    <Build Include="setup\Stored Procedures\CreateAccountContacts.sql" />
+    <Build Include="setup\Stored Procedures\MMRceceipeProdData.sql" />
+    <Build Include="setup\Stored Procedures\AccountContactRoles.sql" />
+    <Build Include="qan\Stored Procedures\UpdateOsatBuildCriteriaSetForBulkUpdate.sql" />
+    <Build Include="qan\User Defined Types\IOsatBuildCriteriaConditionsUpdate.sql" />
+    <Build Include="qan\Stored Procedures\GetOsatBuildCriteriaConditions.sql" />
+    <Build Include="npsg\Functions\OdmParseBurnTapeRevisionWithDesignId.sql" />
+    <Build Include="qan\Tables\OdmQualFilterAttemptedScenarios.sql" />
+    <Build Include="npsg\Tables\OdmQualFilterAttemptedScenarios.sql" />
+    <Build Include="qan\Stored Procedures\GetOsatBuildCriteriaSetBulkUpdateChanges.sql" />
+    <Build Include="qan\Stored Procedures\GetOsatBulkUpdateMetaData.sql" />
+    <Build Include="qan\Stored Procedures\GetOdmScenarioInfo.sql" />
+    <Build Include="npsg\Stored Procedures\GetOdmScenarioInfo.sql" />
+    <Build Include="ref\Tables\OdmProhibitedScenarioRunTime.sql" />
+    <Build Include="ref\Stored Procedures\GetOdmProhibitedScenarioRunTime.sql" />
+    <Build Include="qan\Tables\OsatBuildCriteriaSetBulkUpdateImportRecords.sql" />
+    <Build Include="qan\Tables\OsatBuildCriteriaSetBulkUpdateImports.sql" />
+    <Build Include="qan\Stored Procedures\CreateOsatBuildCriteriaSetBulkUpdateImport.sql" />
+    <Build Include="qan\Stored Procedures\GetOsatBuildCriteriaSetBulkImportDesignAndVersion.sql" />
+    <Build Include="qan\Stored Procedures\GetOsatBuildCriteriaSetStatusForBulkUpdateImport.sql" />
+    <Build Include="qan\Tables\OdmManualDispositionsHistory.sql" />
+    <Build Include="npsg\Tables\OdmManualDispositionsHistory.sql" />
+    <Build Include="qan\Stored Procedures\TaskCreateOdmQualFilterSnapshotsAndScenarioDownloadOnly.sql" />
+    <Build Include="npsg\Stored Procedures\TaskCreateOdmQualFilterSnapshotsAndScenarioDownloadOnly.sql" />
+    <Build Include="qan\Stored Procedures\ClearArchiveOdmManualDisposition.sql" />
+    <Build Include="npsg\Stored Procedures\ClearArchiveOdmManualDisposition.sql" />
+    <Build Include="setup\Stored Procedures\CreateOdmProhibitedScenarioRunTimes.sql" />
+    <Build Include="qan\Functions\FParseMATCTRAttributes.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="SchemaCompare_DEV.scmp" />
+    <None Include="SchemaCompare_INT.scmp" />
+    <None Include="SchemaCompare_PROD.scmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Intel.NsgAuto.Callisto.Db.CallistoCommon\Intel.NsgAuto.Callisto.Db.CallistoCommon.sqlproj">
+      <Name>Intel.NsgAuto.Callisto.Db.CallistoCommon</Name>
+      <Project>{439b648a-45e0-44e3-bf1b-1fd5f79c2602}</Project>
+      <Private>True</Private>
+      <SuppressMissingDependenciesErrors>False</SuppressMissingDependenciesErrors>
+      <DatabaseVariableLiteralValue>CallistoCommon</DatabaseVariableLiteralValue>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <RefactorLog Include="Intel.NsgAuto.Callisto.Db.Callisto.refactorlog" />
+  </ItemGroup>
+</Project>

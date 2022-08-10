@@ -1,0 +1,127 @@
+﻿@{
+    ViewBag.Title = "List PRF Versions";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style scoped>
+
+    ul.instructions > li {
+        list-style: initial;
+    }
+</style>
+
+<script type="text/javascript">
+
+    var prfVersions = [
+        { "Id": 1, "Version": 1, "IsActive": true, "IsPOR": false, "Status": { "Id": 1, "Name": "Draft" }, "CreatedByUserName": "jakemurx", "CreatedOn": "2021/02/02 15:15:32", "OriginalFileName" : "Prf20210202.xlsx"}
+    ];
+
+    function refreshData() {
+        //Nsga.Callisto.Osat.getPrfVersions(function (result) { updateGridDataSource(result); }, onError);
+        updateGridDataSource(prfVersions);
+    }
+
+    function updateGridDataSource(records) {
+        var element = $("#grdRecords");
+        element.hide();
+        if (records) {
+            element.dxDataGrid("instance").option("dataSource", records);
+            element.show();
+        }
+    };
+
+    $(document).ready(function () {
+
+        $("#importIndicator").dxLoadIndicator({ visible: false });
+
+        // grdRecords
+        config = Nsga.Callisto.Dx.dataGridDefaultConfig();
+        config.columns = [
+            {
+                dataField: "Version",
+            },
+            {
+                dataField: "IsActive",
+                caption: "Is Active?",
+                falseText: "N",
+                trueText: "Y",
+                alignment: "center",
+                showEditorAlways: false
+            },
+            {
+                dataField: "IsPOR",
+                caption: "Is POR?",
+                falseText: "N",
+                trueText: "Y",
+                alignment: "center",
+                showEditorAlways: false
+            },
+            {
+                dataField: "Status.Name",
+                caption: "Status",
+            },
+            {
+                dataField: "CreatedByUserName",
+                caption: "Created By",
+                cellTemplate: function (container, options) {
+                    var cellValue = options.text ? options.text : options.data.CreatedBy;
+                    container.append("<div>" + cellValue + "</div>");
+                }
+            },
+            {
+                dataField: "CreatedOn",
+                caption: "Created On",
+                dataType: "datetime",
+                format: "MM/dd/yyyy hh:mm:ss a",
+            },
+            {
+                caption: "Details",
+                allowFiltering: false,
+                cellTemplate: function (container, options) {
+                    $("<a> View Details </a>")
+                        .attr("href", "/Mat/PrfVersionDetails2/" + options.data["Id"])
+                        .appendTo(container);
+                }
+            },
+            //{
+            //    dataField: "OriginalFileName",
+            //    caption: "Download",
+            //    allowFiltering: false,
+            //    cellTemplate: function (container, options) {
+            //        $("<a>" + options.text + "</a>")
+            //            //.attr("href", "/api/Odm/DownloadPrfVersion/" + options.data["Id"])
+            //            .attr("href", "#")
+            //            .appendTo(container);
+            //    }
+            //},
+        ];
+        config.hoverStateEnabled = true;
+        config.onRowClick = function (e) {
+            if (e.rowType == "data") {
+                window.location.href = "/Mat/PrfVersionDetails/" + @MvcHtmlString.Create("e.data.Id");
+            }
+        };
+        $("#grdRecords").dxDataGrid(config);
+
+        $("#lnkImport").bind("click", function (e) {
+            e.preventDefault();
+            uploadFile(e);
+        });
+
+        refreshData();
+
+    });
+
+</script>
+
+
+<div class="centeralign">
+    <div class="grid-wrapper" style="margin-top:4px;">
+        <div class="marginfourpixel">
+            <div class="gridcontainer">
+                <div id="grdRecords" style="margin-right:20px;margin-left:10px;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+

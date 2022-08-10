@@ -1,0 +1,129 @@
+﻿@model Intel.NsgAuto.Callisto.UI.Models.OSAT.ListDesignsModel
+
+@{
+    ViewBag.Title = "OSAT - Design Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var color = new { Prod = "#92d050", Es = "#ffc000", Both = "#fe7676" };
+}
+
+<style scoped>
+
+    .table-legend {
+        width: 100%;
+    }
+
+        .table-legend th, .table-legend td {
+            padding: 5px;
+        }
+
+</style>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        var records = @(JsonHelper.Serialize(Model.Products));
+        displayProducts(records);
+    });
+
+    var displayProducts = function (records){
+        // Product details grid
+        $("#grdProducts").dxDataGrid({
+            dataSource: records,
+            columnAutoWidth: true,
+            showColumnLines: true,
+            showRowLines: true,
+            rowAlternationEnabled: true,
+            showBorders: true,
+            headerFilter: { visible: true },
+            loadPanel: {
+                enabled: true
+            },
+            paging: { enabled: false },
+            editing: {
+                mode: "row",
+                allowUpdating: false,
+                allowDeleting: false,
+                allowAdding: false,
+                useIcons: true
+            },
+            columns: [
+                {
+                    dataField: "Name",
+                    caption: "Design Id",
+                    cellTemplate: function (container, options) {
+                        var color;
+                        if (options.data.MixType.Id === 1) color = "@color.Prod";
+                        else if (options.data.MixType.Id === 2) color = "@color.Es";
+                        else if (options.data.MixType.Id === 3) color = "@color.Both";
+                        container.attr("style", "background-color: " + color);
+                        $("<div class=' ' ><span class='margintwopixels'  >" + options.data['Name'] + "</span></div>")
+                                                   .appendTo(container);
+                    }
+                },
+                {
+                    dataField: "DesignFamily.Name",
+                    caption: "Family"
+                },
+                {
+                    dataField: "IsActive",
+                    caption: "Is Active?",
+                    falseText: 'N',
+                    trueText: 'Y',
+                    alignment: "center",
+                    showEditorAlways: false
+                },
+                {
+                    dataField: "CreatedBy",
+                    caption: "Created By"
+                },
+                {
+                    dataField: "UpdatedBy",
+                    caption: "Updated By"
+                },
+                {
+                    dataField: "Id",
+                    caption: "",
+                    allowFiltering: false,
+                    cellTemplate: function (container, options) {
+                        $('<a>View Component Parts</a>')
+                            .attr('href', "/OSAT/DesignSummary/" + options.data['Id'])
+                            .appendTo(container);
+                    }
+                },
+                {
+                    dataField: "Id",
+                    caption: "",
+                    allowFiltering: false,
+                    cellTemplate: function (container, options) {
+                        $('<a>View Qual Filter</a>')
+                            .attr('href', "/OSAT/QualFilter/" + options.data['Id'])
+                            .appendTo(container);
+                    }
+                },
+            ],
+        });
+    };
+</script>
+
+<div id="divContent" class="content  centered">
+    <div id="divResults" class="fixed centeralign">
+        <div class="fixed centered padsixpixel">
+            <div class="showinline">
+                <table class="table-legend">
+                    <tr>
+                        <td><span style="background-color: @color.Prod">Green:</span> Only production parts</td>
+                        <td><span style="background-color: @color.Es">Orange:</span> Only engineering samples (ES)</td>
+                        <td><span style="background-color: @color.Both">Red:</span> Mix of production and engineering samples</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div class="products-wrapper" style="margin-top:4px;">
+            <div>
+                <div class="marginfourpixel">
+                    <div id="grdProducts"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

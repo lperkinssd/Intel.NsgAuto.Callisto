@@ -1,0 +1,161 @@
+﻿@model Intel.NsgAuto.Callisto.UI.Models.MMRecipesModel
+
+@{
+    ViewBag.Title = "MM Recipes";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style scoped>
+    .widgetrow {
+        margin-top: 25px;
+        display: block;
+        padding: 4px;
+    }
+
+    .widgetbox { /*display:inline-block;height:250px; */
+        float: left;
+        width: 250px;
+        margin: 4px;
+    }
+
+    .widgetboxheader {
+        margin: 0px;
+        padding: 10px;
+        border-bottom: 1px solid #dcdcdc;
+    }
+
+    .widgetbox li {
+        margin: 4px;
+    }
+
+    .gridbox {
+        width: 540px;
+    }
+</style>
+
+<script type="text/javascript">
+
+    function onError(xhr, status) {
+        $("#indicator").dxLoadIndicator("instance").option("visible", false);
+        Nsga.Callisto.Messages.showError("An unexpected error occurred. If the problem persists, contact support.");
+    };
+
+    function refresh() {
+        $("#indicator").dxLoadIndicator({ visible: true });
+        Nsga.Callisto.MMRecipes.getReviewables(function (result) { updateGridDataSource(result); }, onError);
+    }
+
+    function updateGridDataSource(records) {
+        var element = $("#grdRecords");
+        element.hide();
+        if (records) {
+            element.dxDataGrid("instance").option("dataSource", records);
+            element.show();
+        }
+        $("#indicator").dxLoadIndicator("instance").option("visible", false);
+    };
+
+    $(document).ready(function () {
+
+        // grdRecords
+        var config = Nsga.Callisto.Dx.dataGridDefaultConfig();
+        config.width = "500px";
+        config.columns = [
+            {
+                dataField: "PCode",
+                caption: "PCode MM Number",
+            },
+            {
+                dataField: "ProductFamily.Name",
+                caption: "Product Family",
+            },
+            {
+                dataField: "Version",
+                caption: "Version",
+                width: "100px",
+            },
+            {
+                caption: "",
+                cellTemplate: function (container, options) {
+                    $("<a>Details</a>").attr("href", "/MMRecipes/Details/" + options.data["Id"]).appendTo(container);
+                },
+                allowFiltering: false,
+            },
+        ];
+        $("#grdRecords").dxDataGrid(config);
+
+        refresh();
+
+    });
+
+</script>
+
+<div id="indicator"></div>
+<div class="fixed">
+    <div class="widgetrow">
+        <div class="widgetbox graybox">
+            <div>
+                <div class="widgetboxheader bglightblue heading">MM Recipe</div>
+            </div>
+            <div class="padeightpixel">
+                <ul>
+                    <li><a href="/MMRecipes/Index" target="_self">MM Recipe Home</a> </li>
+                    <li><a href="/MATVersions" target="_self">MAT Versions</a> </li>
+                    <li><a href="/ProductLabelSetVersions" target="_self">Product Labels</a> </li>
+                    <li><a href="/MMRecipes/List" target="_self">View MM Recipes</a> </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="widgetrow" style="clear:left;">
+        <div class="widgetbox graybox">
+            <div>
+                <div class="widgetboxheader bglightblue heading">Help Center</div>
+            </div>
+            <div class="padeightpixel">
+                <div class="subheading">Help &amp; Support</div>
+                <ul>
+                    <li><a href="/Help/Help.html" target="_blank">Browse Help</a> </li>
+                    <li><a href="/Help/Faq.html" target="_blank">Frequently Asked Questions</a> </li>
+                    <li><a href="/Help/Trainings.html" target="_blank">Training Content</a> </li>
+                    <li><a href="#" target="_blank">Get Support</a> </li>
+                </ul>
+            </div>
+        </div>
+
+        @if (true) //(Intel.NsgAuto.Web.Mvc.Core.Functions.IsSuperUser())
+        {
+            <div class="widgetbox graybox">
+                <div>
+                    <div class="widgetboxheader bglightblue heading">Administration</div>
+                </div>
+                <div class="padeightpixel">
+                    <div class="subheading">Speed</div>
+                    <ul>
+                        <li><a href="/Speed/Api" target="_self">API Lookup</a></li>
+                        <li><a href="/SpeedItems/List" target="_self">Items (Local)</a></li>
+                    </ul>
+                </div>
+                <div class="padeightpixel">
+                    <div class="subheading">System Tasks</div>
+                    <ul>
+                        <li><a href="/Tasks" target="_self">View Tasks</a> </li>
+                    </ul>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="widgetrow" style="clear:left;">
+        <div class="gridbox graybox">
+            <div>
+                <div class="widgetboxheader bglightblue heading">MM Recipe - In Review</div>
+            </div>
+            <div class="padeightpixel">
+                <div id="grdRecords" style="margin-right:20px;margin-left:10px;"></div>
+            </div>
+        </div>
+    </div>
+
+</div>

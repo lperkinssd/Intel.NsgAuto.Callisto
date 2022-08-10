@@ -1,0 +1,194 @@
+﻿@model Intel.NsgAuto.Callisto.UI.Models.OSAT.AttributeTypesModel
+@{
+    ViewBag.Title = "OSAT - Attribute Types";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script type="text/javascript">
+
+    var entity = @(JsonHelper.Serialize(Model.Entity));
+    var attributeTypes = entity.AttributeTypes;
+    var dataTypes = entity.AttributeDataTypes;
+
+    function onError(xhr, status) {
+        var result = null;
+        var message = "An unexpected error occurred. If the problem persists, contact support.";
+        if (xhr && xhr.responseJSON) {
+            result = xhr.responseJSON;
+            if (result.ExceptionMessage) message = result.ExceptionMessage;
+            else if (result.Message) message = result.Message;
+            if (result.Entity) {
+                updateAttributeTypesGridDataSource(result.Entity);
+            }
+        }
+        Nsga.Callisto.Messages.showError(message);
+        return result;
+    };
+
+    function onSuccess(result) {
+        updateAttributeTypesGridDataSource(result.Entity);
+    };
+
+    function updateAttributeTypesGridDataSource(records) {
+        if (records) {
+            $("#grdAttributeTypes").dxDataGrid("instance").option("dataSource", records);
+        }
+    };
+
+    function create(item) {
+        Nsga.Callisto.Osat.createAttributeType(item, onSuccess, onError);
+    }
+
+    function update(item) {
+        Nsga.Callisto.Osat.updateAttributeType(item, onSuccess, onError);
+    }
+
+    $(document).ready(function () {
+
+        // grdAttributeTypes
+        var config = Nsga.Callisto.Dx.dataGridDefaultConfig();
+        config.columns = [
+            {
+                dataField: "Name",
+                validationRules: [{ type: "required" }],
+            },
+            {
+                dataField: "NameDisplay",
+                caption: "Display Name",
+                validationRules: [{ type: "required" }],
+            },
+            {
+                dataField: "DataType.Id",
+                caption: "Data Type",
+                width: 125,
+                lookup: {
+                    dataSource: dataTypes,
+                    displayExpr: "NameDisplay",
+                    valueExpr: "Id"
+                },
+                validationRules: [{ type: "required" }],
+            },
+        ];
+        config.keyExpr = "Id";
+        config.editing = {
+            mode: "popup",
+            allowUpdating: true,
+            allowAdding: true,
+            popup: {
+                title: "Attribute Type Details",
+                showTitle: true,
+                width: 700,
+                height: 300,
+            },
+            form: {
+                items: ["Name", "NameDisplay", "DataType.Id"]
+            },
+            texts: {
+                addRow: "Add Attribute Type"
+            },
+        };
+        config.onRowInserted = function (e) {
+            var item = {};
+            if (e.data) {
+                item.Name = e.data.Name;
+                item.NameDisplay = e.data.NameDisplay;
+                if (e.data.DataType) {
+                    item.DataTypeId = e.data.DataType.Id;
+                }
+            }
+            create(item);
+        };
+        config.onRowUpdated = function (e) {
+            var item = {};
+            if (e.data) {
+                item.Id = e.data.Id;
+                item.Name = e.data.Name;
+                item.NameDisplay = e.data.NameDisplay;
+                if (e.data.DataType) {
+                    item.DataTypeId = e.data.DataType.Id;
+                }
+            }
+            update(item);
+        };
+        config.dataSource = attributeTypes;
+        $("#grdAttributeTypes").dxDataGrid(config);
+
+        // grdDataTypes
+        config = Nsga.Callisto.Dx.dataGridDefaultConfig();
+        config.columns = [
+            {
+                dataField: "NameDisplay",
+                caption: "Name",
+                validationRules: [{ type: "required" }],
+            },
+        ];
+        config.filterRow = { visible: false };
+        config.headerFilter = { visible: false };
+        config.masterDetail = {
+            enabled: true,
+            template: function (container, options) {
+                if (options.data.ComparisonOperations === null || options.data.ComparisonOperations.length == 0) { }
+                else {
+                    $("<div>")
+                        .dxDataGrid({
+                            columnAutoWidth: true,
+                            showBorders: true,
+                            columns: [
+                                {
+                                    caption: "Comparison Operation",
+                                    dataField: "Key",
+                                },
+                                {
+                                    caption: "Name",
+                                    dataField: "Name",
+                                },
+                                {
+                                    caption: "Operand Type",
+                                    dataField: "OperandType.Name",
+                                },
+                            ],
+                            dataSource: options.data.ComparisonOperations,
+                            noDataText: "There are no comparison operations",
+                        }).appendTo(container);
+                }
+            }
+        };
+        config.onCellPrepared = function (e) {
+            if (e.rowType === "data" && e.column.command === "expand") {
+                if (e.data.ComparisonOperations === null || e.data.ComparisonOperations.length == 0) {
+                    e.cellElement.removeClass("dx-datagrid-expand");
+                    e.cellElement.empty();
+                }
+            }
+        };
+        config.keyExpr = "Id";
+        config.dataSource = dataTypes;
+        var grdDataTypes = $("#grdDataTypes").dxDataGrid(config).dxDataGrid("instance");
+
+        // expand all master data type grid rows that have comparison operations
+        for (var i = 0; i < dataTypes.length; i++) {
+            var item = dataTypes[i];
+            if (item.ComparisonOperations === null || item.ComparisonOperations.length == 0) { }
+            else {
+                grdDataTypes.expandRow(item.Id);
+            }
+        }
+    });
+
+</script>
+
+
+<div class="padeightpixel">
+    <div>
+        <div class="accordion-label open">Attribute Types</div>
+        <div class="accordion-panel" style="padding: 8px;">
+            <div id="grdAttributeTypes"></div>
+        </div>
+    </div>
+    <div>
+        <div class="accordion-label open">Data Types And Operations</div>
+        <div class="accordion-panel" style="padding: 8px;">
+            <div id="grdDataTypes"></div>
+        </div>
+    </div>
+</div>

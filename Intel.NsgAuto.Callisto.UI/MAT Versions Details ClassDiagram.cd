@@ -1,0 +1,141 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Intel.NsgAuto.Callisto.UI.Controllers.MATVersionsController">
+    <Position X="0.5" Y="2.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAI=</HashCode>
+      <FileName>Controllers\MATVersionsController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Services.MATVersionsService">
+    <Position X="3" Y="0.5" Width="2" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.DataContexts.MATVersionsDataContext">
+    <Position X="5.5" Y="2" Width="2" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MATs.MATs">
+    <Position X="8" Y="0.5" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MATs.MAT">
+    <Position X="8" Y="8.25" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MATs.MATAttribute">
+    <Position X="10" Y="2" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.IdAndName">
+    <Position X="11.75" Y="2" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MATs.MATAttributes">
+    <Position X="10" Y="0.5" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MATs.Workflows.MATReview">
+    <Position X="0.5" Y="7" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MATs.Workflows.MATReviewGroupReviewer">
+    <Position X="2.5" Y="7" Width="2.25" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MATs.Workflows.MATReviewStep">
+    <Position X="3" Y="12" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MATs.Workflows.MATReviewStage">
+    <Position X="0.5" Y="13.5" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.Workflows.ReviewSteps">
+    <Position X="0.5" Y="8.75" Width="1.75" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.Workflows.Review">
+    <Position X="0.5" Y="4.75" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.Workflows.ReviewGroupReviewer">
+    <Position X="2.75" Y="4.75" Width="1.75" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.Workflows.ReviewStep">
+    <Position X="3" Y="8.75" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.Workflows.ReviewStage">
+    <Position X="0.5" Y="10.5" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Intel.NsgAuto.Web.Mvc.Controllers.LayoutController" Collapsed="true">
+    <Position X="0.75" Y="1" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAgAAAAA=</HashCode>
+      <FileName>Controllers\LayoutController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MATs.Workflows.MATReviewGroup">
+    <Position X="5.5" Y="9.75" Width="1.75" />
+    <InheritanceLine Type="Intel.NsgAuto.Callisto.Business.Entities.Workflows.ReviewGroup" FixedToPoint="true">
+      <Path>
+        <Point X="6.25" Y="9.151" />
+        <Point X="6.25" Y="9.75" />
+      </Path>
+    </InheritanceLine>
+    <TypeIdentifier />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.Workflows.ReviewGroup">
+    <Position X="5.5" Y="6.25" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MATs.Workflows.MATReviewReviewer">
+    <Position X="5.5" Y="13" Width="1.75" />
+    <InheritanceLine Type="Intel.NsgAuto.Callisto.Business.Entities.Workflows.ReviewReviewer" FixedToPoint="true">
+      <Path>
+        <Point X="6.25" Y="12.312" />
+        <Point X="6.25" Y="13" />
+      </Path>
+    </InheritanceLine>
+    <TypeIdentifier />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.Workflows.ReviewReviewer" Collapsed="true">
+    <Position X="5.5" Y="11.75" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MATs.Workflows.MATReviewDecision">
+    <Position X="0.5" Y="18.25" Width="1.75" />
+    <InheritanceLine Type="Intel.NsgAuto.Callisto.Business.Entities.Workflows.ReviewDecision" FixedToPoint="true">
+      <Path>
+        <Point X="1.375" Y="17.959" />
+        <Point X="1.375" Y="18.096" />
+        <Point X="1.25" Y="18.096" />
+        <Point X="1.25" Y="18.25" />
+      </Path>
+    </InheritanceLine>
+    <TypeIdentifier />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.Workflows.ReviewDecision">
+    <Position X="0.5" Y="15.25" Width="1.75" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" />
+  </Class>
+  <Interface Name="Intel.NsgAuto.Callisto.Business.DataContexts.IMATVersionsDataContext">
+    <Position X="5.5" Y="0.5" Width="2" />
+    <TypeIdentifier />
+  </Interface>
+  <Interface Name="Intel.NsgAuto.Callisto.Business.Entities.MATs.IMAT">
+    <Position X="8" Y="2.25" Width="1.5" />
+    <TypeIdentifier />
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

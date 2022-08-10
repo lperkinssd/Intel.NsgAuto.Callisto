@@ -1,0 +1,195 @@
+﻿@model Intel.NsgAuto.Callisto.UI.Models.Mat.AttributeTypesModel
+
+@{
+    ViewBag.Title = "Attribute Types";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script type="text/javascript">
+
+    var dataTypes = [
+        {
+            "Id": 1, "Name": "string", "NameDisplay": "String", "ComparisonOperations": [
+                { "Id": 1, "Key": "=", "KeyTreadstone": "=", "Name": "Equals", "OperandType": { "Id": 2, "Name": "Single Value" } },
+                { "Id": 6, "Key": ">=", "KeyTreadstone": ">=", "Name": "Is greater than or equal to", "OperandType": { "Id": 2, "Name": "Single Value" } },
+                { "Id": 7, "Key": "contains", "KeyTreadstone": "contains", "Name": "Contains", "OperandType": { "Id": 2, "Name": "Single Value" } },
+                { "Id": 8, "Key": "does not contain", "KeyTreadstone": "does not contain", "Name": "Does not contain", "OperandType": { "Id": 2, "Name": "Single Value" } },
+                { "Id": 13, "Key": "in", "KeyTreadstone": "in", "Name": "Is in", "OperandType": { "Id": 3, "Name": "List" } },
+                { "Id": 15, "Key": "not in", "KeyTreadstone": "not in", "Name": "Is not in", "OperandType": { "Id": 3, "Name": "List" } },
+            ]
+        },
+        {
+            "Id": 2, "Name": "number", "NameDisplay": "Number", "ComparisonOperations": [
+                { "Id": 1, "Key": "=", "KeyTreadstone": "=", "Name": "Equals", "OperandType": { "Id": 2, "Name": "Single Value" } },
+                { "Id": 6, "Key": ">=", "KeyTreadstone": ">=", "Name": "Is greater than or equal to", "OperandType": { "Id": 2, "Name": "Single Value" } },
+                { "Id": 13, "Key": "in", "KeyTreadstone": "in", "Name": "Is in", "OperandType": { "Id": 3, "Name": "List" } },
+                { "Id": 15, "Key": "not in", "KeyTreadstone": "not in", "Name": "Is not in", "OperandType": { "Id": 3, "Name": "List" } },
+            ]
+        },
+    ];
+
+    var dataTypeString = dataTypes[0];
+    var dataTypeNumber = dataTypes[1];
+
+    var attributeTypes = [
+        { "Id": 1, "Name": "cell_revision", "NameDisplay": "Cell Revision", "DataType": dataTypeNumber },
+        { "Id": 2, "Name": "major_probe_prog_rev", "NameDisplay": "Major Probe Program Revision", "DataType": dataTypeNumber },
+        { "Id": 3, "Name": "probe_revision", "NameDisplay": "Probe Revision", "DataType": dataTypeString },
+        { "Id": 4, "Name": "burn_tape_revision", "NameDisplay": "Burn Tape Revision", "DataType": dataTypeNumber },
+        { "Id": 5, "Name": "custom_testing_required", "NameDisplay": "Custom Testing Required", "DataType": dataTypeString },
+        { "Id": 6, "Name": "custom_testing_required2", "NameDisplay": "Custom Testing Required2", "DataType": dataTypeString },
+        { "Id": 7, "Name": "product_grade", "NameDisplay": "Product Grade", "DataType": dataTypeString },
+        { "Id": 8, "Name": "prb_conv_id", "NameDisplay": "Prb Conv Id", "DataType": dataTypeString },
+        { "Id": 9, "Name": "fab_conv_id", "NameDisplay": "Fab Conv Id", "DataType": dataTypeString },
+        { "Id": 10, "Name": "fab_excr_id", "NameDisplay": "Fab Excr Id", "DataType": dataTypeString },
+        { "Id": 11, "Name": "media_type", "NameDisplay": "Media Type", "DataType": dataTypeString },
+        { "Id": 12, "Name": "reticle_wave_id", "NameDisplay": "Reticle Wave Id", "DataType": dataTypeString },
+    ];
+
+
+    $(document).ready(function () {
+
+        // grdAttributeTypes
+        var config = Nsga.Callisto.Dx.dataGridDefaultConfig();
+        config.columns = [
+            {
+                dataField: "Name",
+                validationRules: [{ type: "required" }],
+            },
+            {
+                dataField: "NameDisplay",
+                caption: "Display Name",
+                validationRules: [{ type: "required" }],
+            },
+            {
+                dataField: "DataType.Id",
+                caption: "Data Type",
+                width: 125,
+                lookup: {
+                    dataSource: dataTypes,
+                    displayExpr: "NameDisplay",
+                    valueExpr: "Id"
+                },
+                validationRules: [{ type: "required" }],
+            },
+        ];
+        config.keyExpr = "Id";
+        config.editing = {
+            mode: "popup",
+            allowUpdating: true,
+            allowAdding: true,
+            popup: {
+                title: "Attribute Type Details",
+                showTitle: true,
+                width: 700,
+                height: 300,
+            },
+            form: {
+                items: ["Name", "NameDisplay", "DataType.Id"]
+            },
+        };
+        config.onRowInserted = function (e) {
+            var item = {};
+            if (e.data) {
+                item.Name = e.data.Name;
+                item.NameDisplay = e.data.NameDisplay;
+                if (e.data.DataType) {
+                    item.DataTypeId = e.data.DataType.Id;
+                }
+            }
+            create(item);
+        };
+        config.onRowUpdated = function (e) {
+            var item = {};
+            if (e.data) {
+                item.Id = e.data.Id;
+                item.Name = e.data.Name;
+                item.NameDisplay = e.data.NameDisplay;
+                if (e.data.DataType) {
+                    item.DataTypeId = e.data.DataType.Id;
+                }
+            }
+            update(item);
+        };
+        config.dataSource = attributeTypes;
+        $("#grdAttributeTypes").dxDataGrid(config);
+
+        // grdDataTypes
+        config = Nsga.Callisto.Dx.dataGridDefaultConfig();
+        config.columns = [
+            {
+                dataField: "NameDisplay",
+                caption: "Name",
+                validationRules: [{ type: "required" }],
+            },
+        ];
+        config.filterRow = { visible: false };
+        config.headerFilter = { visible: false };
+        config.masterDetail = {
+            enabled: true,
+            template: function (container, options) {
+                if (options.data.ComparisonOperations === null || options.data.ComparisonOperations.length == 0) { }
+                else {
+                    $("<div>")
+                        .dxDataGrid({
+                            columnAutoWidth: true,
+                            showBorders: true,
+                            columns: [
+                                {
+                                    caption: "Comparison Operation",
+                                    dataField: "KeyTreadstone",
+                                },
+                                {
+                                    caption: "Name",
+                                    dataField: "Name",
+                                },
+                                {
+                                    caption: "Operand Type",
+                                    dataField: "OperandType.Name",
+                                },
+                            ],
+                            dataSource: options.data.ComparisonOperations,
+                            noDataText: "There are no comparison operations",
+                        }).appendTo(container);
+                }
+            }
+        };
+        config.onCellPrepared = function (e) {
+            if (e.rowType === "data" && e.column.command === "expand") {
+                if (e.data.ComparisonOperations === null || e.data.ComparisonOperations.length == 0) {
+                    e.cellElement.removeClass("dx-datagrid-expand");
+                    e.cellElement.empty();
+                }
+            }
+        };
+        config.keyExpr = "Id";
+        config.dataSource = dataTypes;
+        var grdDataTypes = $("#grdDataTypes").dxDataGrid(config).dxDataGrid("instance");
+
+        // expand all master data type grid rows that have comparison operations
+        for (var i = 0; i < dataTypes.length; i++) {
+            var item = dataTypes[i];
+            if (item.ComparisonOperations === null || item.ComparisonOperations.length == 0) { }
+            else {
+                grdDataTypes.expandRow(item.Id);
+            }
+        }
+    });
+
+</script>
+
+
+<div class="padeightpixel">
+    <div>
+        <div class="accordion-label open">Attribute Types</div>
+        <div class="accordion-panel" style="padding: 8px;">
+            <div id="grdAttributeTypes"></div>
+        </div>
+    </div>
+    <div>
+        <div class="accordion-label open">Data Types And Operations</div>
+        <div class="accordion-panel" style="padding: 8px;">
+            <div id="grdDataTypes"></div>
+        </div>
+    </div>
+</div>

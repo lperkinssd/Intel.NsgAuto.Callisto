@@ -1,0 +1,12 @@
+﻿@{
+    ViewBag.Title = "Support";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var supportEmail = Intel.NsgAuto.Callisto.Business.Core.Settings.SupportEmailAddress;
+}
+<div class="fixed">
+    <div class="bluebox padtenpixel">
+        <div style="margin-top:20px;">
+            <p>For assistance, please contact: <a href="mailto:@supportEmail">@supportEmail</a></p>
+        </div>
+    </div>
+</div>

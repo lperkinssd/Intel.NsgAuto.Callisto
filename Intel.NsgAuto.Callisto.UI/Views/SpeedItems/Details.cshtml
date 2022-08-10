@@ -1,0 +1,255 @@
+﻿@model Intel.NsgAuto.Callisto.UI.Models.SpeedItemModel
+
+@{
+    ViewBag.Title = "Item Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<script type="text/javascript">
+
+    var model = @(JsonHelper.Serialize(Model.Item));
+
+    function populateFields() {
+        $("#spnItemId").text(model.ItemId);
+        $("#spnPullDateTime").text(Nsga.Callisto.Dates.isoToLocaleString(model.PullDateTime));
+        $("#spnItemDsc").text(model.ItemDsc);
+        $("#spnItemFullDsc").text(model.ItemFullDsc);
+        $("#spnCommodityCd").text(model.CommodityCd);
+        $("#spnItemClassNm").text(model.ItemClassNm);
+        $("#spnItemRevisionId").text(model.ItemRevisionId);
+        $("#spnEffectiveRevisionCd").text(model.EffectiveRevisionCd);
+        $("#spnCurrentRevisionCd").text(model.spnCurrentRevisionCd);
+        $("#spnItemOwningSystemNm").text(model.ItemOwningSystemNm);
+        $("#spnMakeBuyNm").text(model.MakeBuyNm);
+        $("#spnNetWeightQty").text(model.NetWeightQty);
+        $("#spnUnitOfMeasureCd").text(model.UnitOfMeasureCd);
+        $("#spnMaterialTypeCd").text(model.MaterialTypeCd);
+        $("#spnGrossWeightQty").text(model.GrossWeightQty);
+        $("#spnUnitOfWeightDim").text(model.UnitOfWeightDim);
+        $("#spnGlobalTradeIdentifierNbr").text(model.GlobalTradeIdentifierNbr);
+        $("#spnBusinessUnitId").text(model.BusinessUnitId);
+        $("#spnBusinessUnitNm").text(model.BusinessUnitNm);
+        $("#spnLastClassChangeDt").text(Nsga.Callisto.Dates.isoToLocaleString(model.LastClassChangeDt));
+        $("#spnOwningSystemLastModificationDtm").text(Nsga.Callisto.Dates.isoToLocaleString(model.OwningSystemLastModificationDtm));
+        $("#spnCreateAgentId").text(model.CreateAgentId);
+        $("#spnCreateDtm").text(Nsga.Callisto.Dates.isoToLocaleString(model.CreateDtm));
+        $("#spnChangeAgentId").text(model.ChangeAgentId);
+        $("#spnChangeDtm").text(Nsga.Callisto.Dates.isoToLocaleString(model.ChangeDtm));
+    }
+
+    function onError(xhr, status) {
+        Nsga.Callisto.Messages.showError("An unexpected error occurred. If the problem persists, contact support.");
+    };
+
+    $("document").ready(function () {
+
+        populateFields();
+
+        var characteristics = null;
+        var parentItems = null;
+        var childItems = null;
+        if (model.Characteristics) {
+            characteristics = model.Characteristics;
+        }
+        if (model.Characteristics) {
+            parentItems = model.ParentItems;
+        }
+        if (model.Characteristics) {
+            childItems = model.ChildItems;
+        }
+
+        // grdCharacteristics
+        var config = Nsga.Callisto.Dx.dataGridDefaultConfig();
+        config.dataSource = characteristics;
+        config.columns = [
+            {
+                dataField: "CharacteristicId",
+            },
+            {
+                dataField: "CharacteristicNm",
+            },
+            {
+                dataField: "CharacteristicDsc",
+            },
+            {
+                dataField: "CharacteristicValueTxt",
+            },
+            {
+                dataField: "CharacteristicSequenceNbr",
+            },
+            {
+                dataField: "CharacteristicLastModifiedDt",
+                dataType: "datetime",
+                format: "MM/dd/yyyy hh:mm:ss a",
+                allowFiltering: false,
+            },
+            {
+                dataField: "CharacteristicLastModifiedUsr",
+            },
+            {
+                dataField: "PullDateTime",
+                dataType: "datetime",
+                format: "MM/dd/yyyy hh:mm:ss a",
+                allowFiltering: false,
+            },
+        ];
+        $("#grdCharacteristics").dxDataGrid(config);
+
+        // grdParentItems
+        config = Nsga.Callisto.Dx.dataGridDefaultConfig();
+        config.dataSource = parentItems;
+        config.columns = [
+            {
+                caption: "PCode",
+                dataField: "RootItemId",
+                cellTemplate: function (container, options) {
+                    $("<a>" + options.data["RootItemId"] + "</a>")
+                        .attr("href", "/SpeedItems/Details/" + options.data["RootItemId"])
+                        .appendTo(container);
+                },
+            },
+            {
+                caption: "Item Id",
+                dataField: "ItemId",
+                cellTemplate: function (container, options) {
+                    $("<a>" + options.data["ItemId"] + "</a>")
+                        .attr("href", "/SpeedItems/Details/" + options.data["ItemId"])
+                        .appendTo(container);
+                },
+            },
+        ];
+        $("#grdParentItems").dxDataGrid(config);
+
+        // grdChildItems
+        config = Nsga.Callisto.Dx.dataGridDefaultConfig();
+        config.dataSource = childItems;
+        config.columns = [
+            {
+                caption: "PCode",
+                dataField: "RootItemId",
+                cellTemplate: function (container, options) {
+                    $("<a>" + options.data["RootItemId"] + "</a>")
+                        .attr("href", "/SpeedItems/Details/" + options.data["RootItemId"])
+                        .appendTo(container);
+                },
+            },
+            {
+                caption: "Item Id",
+                dataField: "ItemId",
+                cellTemplate: function (container, options) {
+                    $("<a>" + options.data["ItemId"] + "</a>")
+                        .attr("href", "/SpeedItems/Details/" + options.data["ItemId"])
+                        .appendTo(container);
+                },
+            },
+        ];
+        $("#grdChildItems").dxDataGrid(config);
+
+    });
+
+</script>
+
+
+<div class="padeightpixel">
+    <div class="rightalign">
+        <div class="padeightpixel">
+            <span><a title="Click here to view all items" id="lnkViewAll" href="/SpeedItems/List/"><span class="imagelinkbutton bordered"><span class="fa fa-list-alt "></span><span class="margintwopixel">All Items</span> </span></a></span>
+        </div>
+    </div>
+    <div id="accDetails" class="accordion-label open">Details</div>
+    <div id="divDetails" class="accordion-panel">
+        <table style="width:96%; padding:2px;margin:2px;">
+            <tr>
+                <td style="width:25%"><label for="spnItemId" class="formlabel">ItemId</label></td>
+                <td style="width:25%"><span type="text" id="spnItemId"></span></td>
+                <td style="width:25%"><label for="spnPullDateTime" class="formlabel">PullDateTime</label></td>
+                <td style="width:25%"><span type="text" id="spnPullDateTime"></span></td>
+            </tr>
+            <tr>
+                <td><label for="spnItemDsc" class="formlabel">ItemDsc</label></td>
+                <td><span type="text" id="spnItemDsc"></span></td>
+                <td><label for="spnItemFullDsc" class="formlabel">ItemFullDsc</label></td>
+                <td><span type="text" id="spnItemFullDsc"></span></td>
+            </tr>
+            <tr>
+                <td><label for="spnCommodityCd" class="formlabel">CommodityCd</label></td>
+                <td><span type="text" id="spnCommodityCd"></span></td>
+                <td><label for="spnItemClassNm" class="formlabel">ItemClassNm</label></td>
+                <td><span type="text" id="spnItemClassNm"></span></td>
+            </tr>
+            <tr>
+                <td><label for="spnItemRevisionId" class="formlabel">ItemRevisionId</label></td>
+                <td><span type="text" id="spnItemRevisionId"></span></td>
+                <td><label for="spnEffectiveRevisionCd" class="formlabel">EffectiveRevisionCd</label></td>
+                <td><span type="text" id="spnEffectiveRevisionCd"></span></td>
+            </tr>
+            <tr>
+                <td><label for="spnCurrentRevisionCd" class="formlabel">CurrentRevisionCd</label></td>
+                <td><span type="text" id="spnCurrentRevisionCd"></span></td>
+                <td><label for="spnItemOwningSystemNm" class="formlabel">ItemOwningSystemNm</label></td>
+                <td><span type="text" id="spnItemOwningSystemNm"></span></td>
+            </tr>
+            <tr>
+                <td><label for="spnMakeBuyNm" class="formlabel">MakeBuyNm</label></td>
+                <td><span type="text" id="spnMakeBuyNm"></span></td>
+                <td><label for="spnNetWeightQty" class="formlabel">NetWeightQty</label></td>
+                <td><span type="text" id="spnNetWeightQty"></span></td>
+            </tr>
+            <tr>
+                <td><label for="spnUnitOfMeasureCd" class="formlabel">UnitOfMeasureCd</label></td>
+                <td><span type="text" id="spnUnitOfMeasureCd"></span></td>
+                <td><label for="spnMaterialTypeCd" class="formlabel">MaterialTypeCd</label></td>
+                <td><span type="text" id="spnMaterialTypeCd"></span></td>
+            </tr>
+            <tr>
+                <td><label for="spnGrossWeightQty" class="formlabel">GrossWeightQty</label></td>
+                <td><span type="text" id="spnGrossWeightQty"></span></td>
+                <td><label for="spnUnitOfWeightDim" class="formlabel">UnitOfWeightDim</label></td>
+                <td><span type="text" id="spnUnitOfWeightDim"></span></td>
+            </tr>
+            <tr>
+                <td><label for="spnGlobalTradeIdentifierNbr" class="formlabel">GlobalTradeIdentifierNbr</label></td>
+                <td><span type="text" id="spnGlobalTradeIdentifierNbr"></span></td>
+                <td><label for="spnBusinessUnitId" class="formlabel">BusinessUnitId</label></td>
+                <td><span type="text" id="spnBusinessUnitId"></span></td>
+            </tr>
+            <tr>
+                <td><label for="spnBusinessUnitNm" class="formlabel">BusinessUnitNm</label></td>
+                <td><span type="text" id="spnBusinessUnitNm"></span></td>
+                <td><label for="spnLastClassChangeDt" class="formlabel">LastClassChangeDt</label></td>
+                <td><span type="text" id="spnLastClassChangeDt"></span></td>
+            </tr>
+            <tr>
+                <td><label for="spnOwningSystemLastModificationDtm" class="formlabel">OwningSystemLastModificationDtm</label></td>
+                <td><span type="text" id="spnOwningSystemLastModificationDtm"></span></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><label for="spnCreateAgentId" class="formlabel">CreateAgentId</label></td>
+                <td><span type="text" id="spnCreateAgentId"></span></td>
+                <td><label for="spnCreateDtm" class="formlabel">CreateDtm</label></td>
+                <td><span type="text" id="spnCreateDtm"></span></td>
+            </tr>
+            <tr>
+                <td><label for="spnChangeAgentId" class="formlabel">ChangeAgentId</label></td>
+                <td><span type="text" id="spnChangeAgentId"></span></td>
+                <td><label for="spnChangeDtm" class="formlabel">ChangeDtm</label></td>
+                <td><span type="text" id="spnChangeDtm"></span></td>
+            </tr>
+        </table>
+    </div>
+    <div id="accCharacteristics" class="accordion-label open">Item Characteristics</div>
+    <div id="divCharacteristics" class="accordion-panel">
+        <div id="grdCharacteristics"></div>
+    </div>
+    <div id="accParentItems" class="accordion-label open">Parent Items</div>
+    <div id="divParentItems" class="accordion-panel">
+        <div id="grdParentItems"></div>
+    </div>
+    <div id="accChildItems" class="accordion-label open">Child Items</div>
+    <div id="divChildItems" class="accordion-panel">
+        <div id="grdChildItems"></div>
+    </div>
+</div>

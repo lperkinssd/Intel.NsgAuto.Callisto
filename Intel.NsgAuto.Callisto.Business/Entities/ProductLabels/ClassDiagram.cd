@@ -1,0 +1,121 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.ProductLabels.ProductLabelsImport" Collapsed="true">
+    <Position X="4.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\ProductLabels\ProductLabelsImport.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.ProductLabels.ProductFamilyNameSeries" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="0.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\ProductLabels\ProductFamilyNameSeries.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.ProductLabels.ProductLabel" Collapsed="true">
+    <Position X="2.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAECEAAACAAAAAAQAAAAECCSAAACRECAIAAAAAAAAAE=</HashCode>
+      <FileName>Entities\ProductLabels\ProductLabel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.ProductLabels.ProductLabelAttribute" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="4.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACEgAAAAAAAAAAIAAAAAAAAAACAAAAIAAgAAAAAAE=</HashCode>
+      <FileName>Entities\ProductLabels\ProductLabelAttribute.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.ProductLabels.ProductLabelAttributes" Collapsed="true">
+    <Position X="6" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\ProductLabels\ProductLabelAttributes.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.ProductLabels.ProductLabelAttributeType" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="0.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACCAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\ProductLabels\ProductLabelAttributeType.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.ProductLabels.ProductLabelImport" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="2.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAmQAA4ACAAAAAAQBAEQECCDEmGARGSAKBCAEAAADAE=</HashCode>
+      <FileName>Entities\ProductLabels\ProductLabelImport.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.ProductLabels.ProductLabels" Collapsed="true">
+    <Position X="4.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\ProductLabels\ProductLabels.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.ProductLabels.ProductLabelSetVersion" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="6" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAACEAAEAAAAAAAAEAAAAAACAAACAAAAIAAAAAAAAAE=</HashCode>
+      <FileName>Entities\ProductLabels\ProductLabelSetVersion.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.ProductLabels.ProductLabelSetVersionImportResult" Collapsed="true">
+    <Position X="0.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAA=</HashCode>
+      <FileName>Entities\ProductLabels\ProductLabelSetVersionImportResult.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.ProductLabels.ProductLabelSetVersions" Collapsed="true">
+    <Position X="2.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\ProductLabels\ProductLabelSetVersions.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Interface Name="Intel.NsgAuto.Callisto.Business.Entities.ProductLabels.IProductFamilyNameSeries" Collapsed="true">
+    <Position X="0.75" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\ProductLabels\IProductFamilyNameSeries.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Intel.NsgAuto.Callisto.Business.Entities.ProductLabels.IProductLabelAttribute" Collapsed="true">
+    <Position X="2.5" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACEgAAAAAAAAAAIAAAAAAAAAACAAAAIAAgAAAAAAE=</HashCode>
+      <FileName>Entities\ProductLabels\IProductLabelAttribute.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Intel.NsgAuto.Callisto.Business.Entities.ProductLabels.IProductLabelAttributeType" Collapsed="true">
+    <Position X="4.25" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACCAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\ProductLabels\IProductLabelAttributeType.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Intel.NsgAuto.Callisto.Business.Entities.ProductLabels.IProductLabelImport" Collapsed="true">
+    <Position X="6" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAmQAA4ACAAAAAAQBAEQECCDEmGARGSAKBCAEAAADAE=</HashCode>
+      <FileName>Entities\ProductLabels\IProductLabelImport.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Intel.NsgAuto.Callisto.Business.Entities.ProductLabels.IProductLabelSetVersion" Collapsed="true">
+    <Position X="0.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAACEAAEAAAAAAAAEAAAAAACAAACAAAAIAAAAAAAAAE=</HashCode>
+      <FileName>Entities\ProductLabels\IProductLabelSetVersion.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

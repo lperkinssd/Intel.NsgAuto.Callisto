@@ -1,0 +1,33 @@
+﻿<?xml-stylesheet type='text/xsl' href='MOAutomation.xsl'?>
+<!--
+	{0} = base url for the site without trailing "/" character (used for images)
+	{1} = url for the item being reviewed
+	{2} = review process at
+	{3} = recipient name
+	{4} = type of item being reviewed
+	{5} = item description
+-->
+<ROOT>
+	<MAIL>
+		<IMGAUTOBLOCKS>
+			<![CDATA[
+				<img src="{0}/Images/autoblocks.png" alt="" border="0" />
+			]]>
+		</IMGAUTOBLOCKS>
+		<IMGINTEL>
+			<![CDATA[
+				<img src="{0}/Images/logo.png" alt="" border="0" />
+			]]>
+		</IMGINTEL>
+		<MESSAGE>
+			<![CDATA[
+				<p>Hello!</p>
+				<p>You are receiving this email notification because the following {4} has been rejected in Callisto.</p>
+				<p>{5}</p>
+				<p>It was rejected at review process: <b><i>{2}</i></b></p>
+				<p><b><span style="color: red;>Action Required!</span></b> {3}: As the submitter for this {4} you should review the rejection comment and submit a new one for review with any necessary updates.</p>
+				<p>Click <a class="nsgalink" href="{1}">here</a> to open the request in Callisto. Alternatively, you may copy and paste the web address {1} in the browser address bar.</p>
+			]]>
+		</MESSAGE>
+	</MAIL>
+</ROOT>

@@ -1,0 +1,298 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MMRecipes.AccountOwnerships.AccountClient" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="0.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\MMRecipes\AccountOwnerships\AccountClient.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MMRecipes.AccountOwnerships.AccountClients" Collapsed="true">
+    <Position X="2.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\MMRecipes\AccountOwnerships\AccountClients.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MMRecipes.AccountOwnerships.AccountContact" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="4" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\MMRecipes\AccountOwnerships\AccountContact.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MMRecipes.AccountOwnerships.AccountContactRole" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="5.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAABAAAAACAAAAAABAAgAAAAAAAAAAEAAAAAEAAAAAA=</HashCode>
+      <FileName>Entities\MMRecipes\AccountOwnerships\AccountContactRole.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MMRecipes.AccountOwnerships.AccountContactRoles" Collapsed="true">
+    <Position X="7.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\MMRecipes\AccountOwnerships\AccountContactRoles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MMRecipes.AccountOwnerships.AccountContacts" Collapsed="true">
+    <Position X="9.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\MMRecipes\AccountOwnerships\AccountContacts.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MMRecipes.AccountOwnerships.AccountCustomer" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="0.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\MMRecipes\AccountOwnerships\AccountCustomer.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MMRecipes.AccountOwnerships.AccountCustomers" Collapsed="true">
+    <Position X="2.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\MMRecipes\AccountOwnerships\AccountCustomers.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MMRecipes.AccountOwnerships.AccountEmailTemplate" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="4" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAEAAAAAAEAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\MMRecipes\AccountOwnerships\AccountEmailTemplate.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MMRecipes.AccountOwnerships.AccountOwnership" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="5.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IEAiEAAAAKBELAAE0AAEAAAAAAgCAAAEIABEAAIEAAE=</HashCode>
+      <FileName>Entities\MMRecipes\AccountOwnerships\AccountOwnership.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MMRecipes.AccountOwnerships.AccountOwnershipContact" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="7.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAABAAAAACAAAEAABAAQAAAAAAAAAAAAAAQAEAAAAAA=</HashCode>
+      <FileName>Entities\MMRecipes\AccountOwnerships\AccountOwnershipContact.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MMRecipes.AccountOwnerships.AccountOwnershipContacts" Collapsed="true">
+    <Position X="9.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\MMRecipes\AccountOwnerships\AccountOwnershipContacts.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MMRecipes.AccountOwnerships.AccountOwnershipLookup" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="0.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAACAAAAAAAAgQAAAAAAAAAAAAAAAAAAAAACAAA=</HashCode>
+      <FileName>Entities\MMRecipes\AccountOwnerships\AccountOwnershipLookup.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MMRecipes.AccountOwnerships.AccountOwnershipLookups" Collapsed="true">
+    <Position X="2.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\MMRecipes\AccountOwnerships\AccountOwnershipLookups.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MMRecipes.AccountOwnerships.AccountOwnershipMetaData" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="4" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAgAAAAAAAAAAAAABAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\MMRecipes\AccountOwnerships\AccountOwnershipMetaData.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MMRecipes.AccountOwnerships.AccountOwnerships" Collapsed="true">
+    <Position X="5.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\MMRecipes\AccountOwnerships\AccountOwnerships.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MMRecipes.AccountOwnerships.AccountProcess" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="7.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\MMRecipes\AccountOwnerships\AccountProcess.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MMRecipes.AccountOwnerships.AccountProcesses" Collapsed="true">
+    <Position X="9.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\MMRecipes\AccountOwnerships\AccountProcesses.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MMRecipes.AccountOwnerships.AccountProduct" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="0.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\MMRecipes\AccountOwnerships\AccountProduct.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MMRecipes.AccountOwnerships.AccountProducts" Collapsed="true">
+    <Position X="2.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\MMRecipes\AccountOwnerships\AccountProducts.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MMRecipes.AccountOwnerships.AccountRole" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="4" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\MMRecipes\AccountOwnerships\AccountRole.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MMRecipes.AccountOwnerships.AccountRoles" Collapsed="true">
+    <Position X="5.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\MMRecipes\AccountOwnerships\AccountRoles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MMRecipes.AccountOwnerships.AccountSubsidiaries" Collapsed="true">
+    <Position X="7.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\MMRecipes\AccountOwnerships\AccountSubsidiaries.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MMRecipes.AccountOwnerships.AccountSubsidiary" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="9.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\MMRecipes\AccountOwnerships\AccountSubsidiary.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MMRecipes.AccountOwnerships.EmailRecord" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="0.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAACAAAAAAAAAAAAAAAAAAAAAAAQQAEAAAAAA=</HashCode>
+      <FileName>Entities\MMRecipes\AccountOwnerships\EmailRecord.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MMRecipes.AccountOwnerships.EmailRecords" Collapsed="true">
+    <Position X="2.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\MMRecipes\AccountOwnerships\EmailRecords.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Interface Name="Intel.NsgAuto.Callisto.Business.Entities.MMRecipes.AccountOwnerships.IAccountClient" Collapsed="true">
+    <Position X="0.5" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\MMRecipes\AccountOwnerships\IAccountClient.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Intel.NsgAuto.Callisto.Business.Entities.MMRecipes.AccountOwnerships.IAccountContact" Collapsed="true">
+    <Position X="2.25" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\MMRecipes\AccountOwnerships\IAccountContact.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Intel.NsgAuto.Callisto.Business.Entities.MMRecipes.AccountOwnerships.IAccountContactRole" Collapsed="true">
+    <Position X="4" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAABAAAAACAAAAAABAAgAAAAAAAAAAEAAAAAEAAAAAA=</HashCode>
+      <FileName>Entities\MMRecipes\AccountOwnerships\IAccountContactRole.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Intel.NsgAuto.Callisto.Business.Entities.MMRecipes.AccountOwnerships.IAccountCustomer" Collapsed="true">
+    <Position X="5.75" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\MMRecipes\AccountOwnerships\IAccountCustomer.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Intel.NsgAuto.Callisto.Business.Entities.MMRecipes.AccountOwnerships.IAccountEmailTemplate" Collapsed="true">
+    <Position X="7.5" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAEAAAAAAEAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\MMRecipes\AccountOwnerships\IAccountEmailTemplate.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Intel.NsgAuto.Callisto.Business.Entities.MMRecipes.AccountOwnerships.IAccountOwnership" Collapsed="true">
+    <Position X="9.25" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IEAiEAAAAKBEDAAE0AAEAAAAAAgCAAAEIABEAAIEAAE=</HashCode>
+      <FileName>Entities\MMRecipes\AccountOwnerships\IAccountOwnership.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Intel.NsgAuto.Callisto.Business.Entities.MMRecipes.AccountOwnerships.IAccountOwnershipContact" Collapsed="true">
+    <Position X="0.5" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAABAAAAACAAAEAABAAQAAAAAAAAAAAAAAQAEAAAAAA=</HashCode>
+      <FileName>Entities\MMRecipes\AccountOwnerships\IAccountOwnershipContact.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Intel.NsgAuto.Callisto.Business.Entities.MMRecipes.AccountOwnerships.IAccountOwnershipLookup" Collapsed="true">
+    <Position X="2.25" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAACAAAAAAAAgQAAAAAAAAAAAAAAAAAAAAACAAA=</HashCode>
+      <FileName>Entities\MMRecipes\AccountOwnerships\IAccountOwnershipLookup.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Intel.NsgAuto.Callisto.Business.Entities.MMRecipes.AccountOwnerships.IAccountOwnershipMetaData" Collapsed="true">
+    <Position X="4" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAgAAAAAAAAAAAAABAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\MMRecipes\AccountOwnerships\IAccountOwnershipMetaData.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Intel.NsgAuto.Callisto.Business.Entities.MMRecipes.AccountOwnerships.IAccountProcess" Collapsed="true">
+    <Position X="5.75" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\MMRecipes\AccountOwnerships\IAccountProcess.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Intel.NsgAuto.Callisto.Business.Entities.MMRecipes.AccountOwnerships.IAccountProduct" Collapsed="true">
+    <Position X="7.5" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\MMRecipes\AccountOwnerships\IAccountProduct.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Intel.NsgAuto.Callisto.Business.Entities.MMRecipes.AccountOwnerships.IAccountRole" Collapsed="true">
+    <Position X="9.25" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\MMRecipes\AccountOwnerships\IAccountRole.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Intel.NsgAuto.Callisto.Business.Entities.MMRecipes.AccountOwnerships.IAccountSubsidiary" Collapsed="true">
+    <Position X="0.5" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\MMRecipes\AccountOwnerships\IAccountSubsidiary.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Intel.NsgAuto.Callisto.Business.Entities.MMRecipes.AccountOwnerships.IEmailRecord" Collapsed="true">
+    <Position X="2.25" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAACAAAAAAAAAAAAAAAAAAAAAAAQQAEAAAAAA=</HashCode>
+      <FileName>Entities\MMRecipes\AccountOwnerships\IEmailRecord.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

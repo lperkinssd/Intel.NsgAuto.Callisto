@@ -1,0 +1,222 @@
+﻿@model Intel.NsgAuto.Callisto.UI.Models.OSAT.ListQualFilterImportsModel
+
+@{
+    ViewBag.Title = "OSAT - Qual Filter Imports";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style scoped>
+
+    ul.instructions > li {
+        list-style: initial;
+    }
+</style>
+
+<script type="text/javascript">
+
+    var entity = @(JsonHelper.Serialize(Model.Entity));
+    var importRecords = entity.Imports
+
+    function btnInstructionsClick() {
+        $("#popInstructions").dxPopup("instance").show();
+    }
+
+    function onError(xhr, status) {
+        Nsga.Callisto.Messages.showError("An unexpected error occurred. If the problem persists, contact support.");
+    };
+
+    function beforeSendHandler() {
+        $("#importIndicator").dxLoadIndicator("instance").option("visible", true);
+    };
+
+    function onUploadSuccess(result) {
+        window.location.href = "/OSAT/QualFilterImportDetails/" + result.Entity.Id;
+    };
+
+    function onUploadError(xhr, status, errorThrown) {
+        var message = "An unexpected error occurred. If the problem persists, contact support.";
+        var result = null;
+        if (xhr && xhr.responseJSON) {
+            result = xhr.responseJSON;
+            if (result.ExceptionMessage) message = result.ExceptionMessage;
+            else if (result.Message) message = result.Message;
+        }
+        Nsga.Callisto.Messages.showError(message);
+        $("#importIndicator").dxLoadIndicator("instance").option("visible", false);
+    };
+
+    function validateFile() {
+        var fileName = $("#uploadFile").val();
+        if (!fileName) {
+            Nsga.Callisto.Messages.showError("Please select a file to upload.");
+            return false;
+        }
+        var dotIndex = fileName.lastIndexOf(".") + 1;
+        var extension = fileName.substr(dotIndex, (fileName.length - dotIndex));
+        if (extension.toUpperCase() === "XLS" || extension.toUpperCase() === "XLSX")
+            return true;
+        else {
+            Nsga.Callisto.Messages.showError("File with " + extension + " is invalid. Upload a valid file with xls/xlsx extension.");
+            return false;
+        }
+        return true;
+    };
+
+    function importFile() {
+        var loadIndicator = $("#importIndicator").dxLoadIndicator("instance");
+        loadIndicator.option("visible", false);
+        if (validateFile()) {
+            loadIndicator.option("visible", true);
+            var formData = new FormData();
+            var file = $("#uploadFile")[0];
+            formData.append("uploadFile", file.files[0]);
+            $.ajax({
+                url: Nsga.Callisto.Constants.URL_IMPORTOSATQUALFILTER,
+                type: "POST",
+                beforeSend: beforeSendHandler,
+                success: onUploadSuccess,
+                error: onUploadError,
+                data: formData,
+                cache: false,
+                contentType: false,
+                processData: false
+            });
+        }
+    };
+
+    function updateGridDataSource(records) {
+        var element = $("#grdRecords");
+        element.hide();
+        if (records) {
+            element.dxDataGrid("instance").option("dataSource", records);
+            element.show();
+        }
+    };
+
+    $(document).ready(function () {
+
+        $("#importIndicator").dxLoadIndicator({ visible: false });
+
+        // popInstructions
+        var config = {
+            width: 700,
+            height: 300,
+            contentTemplate: function () {
+                return $("<div />").append($("<ul class='instructions' />").append(
+                    $("<li>All worksheets named anything other than 'Notes' or 'Update History' are assumed to contain build criteria data that should be imported.</li>"),
+                    $("<li>After a succesful import it will redirect you to the details for the new import.</li>")
+                ));
+            },
+            showTitle: true,
+            title: "Instructions",
+            visible: false,
+            dragEnabled: false,
+            closeOnOutsideClick: true,
+        };
+        $("#popInstructions").dxPopup(config);
+
+        // grdRecords
+        config = Nsga.Callisto.Dx.dataGridDefaultConfig();
+        config.dataSource = importRecords;
+        config.columns = [
+            {
+                caption: "Design",
+                dataField: "Design.Name",
+            },
+            {
+                dataField: "CreatedByUserName",
+                caption: "Created By",
+                cellTemplate: function (container, options) {
+                    var cellValue = options.text ? options.text : options.data.CreatedBy;
+                    container.append("<div>" + cellValue + "</div>");
+                }
+            },
+            {
+                dataField: "CreatedOn",
+                caption: "Created On",
+                dataType: "datetime",
+                format: "MM/dd/yyyy hh:mm:ss a",
+            },
+            {
+                dataField: "MessageErrorsExist",
+                caption: "Errors Exist?",
+                falseText: "N",
+                trueText: "Y",
+                alignment: "center",
+                showEditorAlways: false,
+            },
+            {
+                caption: "Details",
+                allowFiltering: false,
+                cellTemplate: function (container, options) {
+                    $("<a> View Details </a>")
+                        .attr("href", "/OSAT/QualFilterImportDetails/" + options.data["Id"])
+                        .appendTo(container);
+                }
+            },
+            {
+                dataField: "FileName",
+                caption: "Download",
+                allowFiltering: false,
+                cellTemplate: function (container, options) {
+                    $("<a>" + options.text + "</a>")
+                        .attr("href", "/api/Osat/DownloadQualFilterImport/" + options.data["Id"])
+                        .appendTo(container);
+                }
+            },
+        ];
+        config.hoverStateEnabled = true;
+        config.onRowClick = function (e) {
+            if (e.rowType == "data") {
+                window.location.href = "/OSAT/QualFilterImportDetails/" + @MvcHtmlString.Create("e.data.Id");
+            }
+        };
+        $("#grdRecords").dxDataGrid(config);
+
+        $("#btnImport").dxButton({
+            text: "Import",
+            onClick: function (e) {
+                var result = e.validationGroup.validate();
+                if (result.isValid) {
+                    importFile();
+                }
+            },
+        });
+
+    });
+
+</script>
+
+<div id="popupContainer" />
+
+<div class="fixed centered">
+    @{
+        if (true) // TODO: Intel.NsgAuto.Web.Mvc.Core.Functions.XXX()
+        {
+            <div style="margin-top:10px; vertical-align: top; padding-left:10px" class="bluebox padfourpixel">
+                <!--
+                <div style="vertical-align: top; padding-left: 5px; padding-top: 2px;">
+                    <button id="btnInstructions" onclick="btnInstructionsClick()">Instructions</button>
+                    <div id="popInstructions"></div>
+                </div>
+                -->
+                <div class="showinline">
+                    <input type="file" class="fileimport" id="uploadFile" name="uploadFile" style="width: 330px; height: 22px;" />
+                    <div id="btnImport" class="submitbutton"></div>
+                </div>
+            </div>
+        }
+    }
+</div>
+
+<div id="importIndicator"></div>
+
+<div class="centeralign">
+    <div class="grid-wrapper" style="margin-top:4px;">
+        <div class="marginfourpixel">
+            <div class="gridcontainer">
+                <div id="grdRecords" style="margin-right:20px;margin-left:10px;"></div>
+            </div>
+        </div>
+    </div>
+</div>

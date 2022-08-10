@@ -1,0 +1,13 @@
+﻿CREATE TABLE [qan].[Users] (
+    [WWID]  VARCHAR (20)  NOT NULL,
+    [IdSid] VARCHAR (15)  NOT NULL,
+    [Name]  VARCHAR (255) NOT NULL,
+    [Email] VARCHAR (255) NOT NULL,
+    CONSTRAINT [PK_Users] PRIMARY KEY CLUSTERED ([WWID] ASC) WITH (FILLFACTOR = 90),
+    CONSTRAINT [IX_Users] UNIQUE NONCLUSTERED ([IdSid] ASC) WITH (FILLFACTOR = 90)
+);
+
+
+GO
+
+CREATE INDEX [IX_Users_Email] ON [qan].[Users] ([Email])

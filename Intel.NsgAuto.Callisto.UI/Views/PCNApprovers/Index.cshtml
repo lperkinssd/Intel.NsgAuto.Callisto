@@ -1,0 +1,330 @@
+﻿@model Intel.NsgAuto.Callisto.UI.Models.MM.PCNApproversModel
+
+
+@{
+    ViewBag.Title = "PCN Approvers";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style type="text/css">
+    .dx-datagrid-content .dx-datagrid-table .dx-row .dx-command-edit {
+        min-width: 40px;
+    }
+
+    .breakword {
+        white-space: normal;
+        word-wrap: break-word;
+    }
+
+    .vertical-center {
+        margin: 0;
+        position: relative;
+        top: 50%;
+      
+
+</style>
+<script type="text/javascript">
+    var entity = @(JsonHelper.Serialize(Model.PCNApprovers));
+  //   var ProductCodeNames = [{ "Id": 1, "Name": "Apache Pass" }, { "Id": 2, "Name": "Barlow Pass" }, { "Id": 3, "Name": "Bombay Beach" }, { "Id": 4, "Name": "Brighton Beach" }, { "Id": 5, "Name": "Coldstream (Dual Port)" }];
+  //   var AccountCustomers = [{ "Id": 1, "Name": "Amazon" }, { "Id": 2, "Name": "Cisco DC" }, { "Id": 3, "Name": "DELL" }, { "Id": 4, "Name": "Ericsson" }, { "Id": 5, "Name": "Facebook" }];
+    var ProductCodeNames = entity.ProductCodeNames;
+    var AccountCustomers = entity.AccountCustomers;
+    var Email = "";
+  //  var data = [{ "Role": "PMT", "Name": "Jayapal, SureshkumarX", "Email": "sureshkumarx.jayapal@domain.com" }, { "Role": "PME", "Name": "Kurian, Jose", "Email": "jose.kurian@domain.com" }, { "Role": "AE", "Name": "Kondru, Kiran", "Email": "kiran.k.kondru@domain.com" }]
+    $(document).ready(function () {
+
+        $("#lnkManageAttributeTypes").click(function () {
+            
+            if (Email !="")
+                this.href = "mailto:" +  Email ;
+        });
+
+        $("#btnSubmit").dxButton({
+            text: "Submit",
+            onClick: function (e) {
+
+                var result = e.validationGroup.validate();
+                if (!result.isValid) {
+                    var message = "Please enter all required (*) fields, click Search";
+                    Nsga.Callisto.Messages.showError(message);
+                    return;
+                }
+
+                var valProduct = $('#ddlCodeName').dxSelectBox("instance").option("value");
+
+                if (valProduct != null) {
+                    var vCodeName = DevExpress.data.query(ProductCodeNames)
+                        .filter([["Id", valProduct]]).toArray();
+
+                }
+
+                var valCustomer = $('#ddlmainCustomer').dxSelectBox("instance").option("value");
+
+                if (valCustomer != null) {
+                    var vMainCustomer = DevExpress.data.query(AccountCustomers)
+                        .filter([["Id", valCustomer]]).toArray();
+
+                }
+
+                var searchEntity = {
+                    ProductCodeName : { Id: vCodeName[0].Id, Name: vCodeName[0].Name },
+                    AccountCustomer : { Id: vMainCustomer[0].Id, Name: vMainCustomer[0].Name }
+
+                };
+
+                Nsga.Callisto.PCNApprovers.getApproverList(searchEntity, onCreateSuccess, onError);
+
+
+
+            }
+        });
+
+
+        function onCreateSuccess(result) {
+
+            data = result.Entity;
+           
+            //$.each(data, function (index, value) {
+            //  //  debugger;
+            //    if (Email == "") {
+            //        Email = value.Email;
+            //    }
+            //    else {
+            //        Email = Email + ";" + value.Email;
+            //    }
+            //});
+         
+            if (data.length > 0)
+                Email = $.unique(data.map(function (d) { return d.Email; })).join(";");
+           
+
+
+            var e = document.getElementById('gridContent');
+            e.style.display = 'block';
+            PCNApproverData(data);
+
+        }
+
+        function onError(xhr) {
+            debugger;
+            var result = null;
+            var message = "An unexpected error occurred. If the problem persists, contact support.";
+            if (xhr && xhr.responseJSON) {
+                result = xhr.responseJSON;
+                if (result.ExceptionMessage) message = result.ExceptionMessage;
+                else if (result.Message) message = result.Message;
+            }
+        }
+
+
+
+        $("#btnSubmit1").dxButton({
+            text: "Submit",
+            onClick: function (e) {
+                PCNApproverData(data);
+
+            }
+        });
+
+
+        $("#ddlCodeName").dxSelectBox({
+            items: ProductCodeNames,
+            displayExpr: "Name",
+            valueExpr: "Id",
+            //  value: osatId,
+            width: "200px",
+            onValueChanged: function (e) {
+                var m = document.getElementById('gridContent');
+                m.style.display = 'none';
+                PCNApproverData([]);
+            },
+        }).dxValidator({
+            validationRules: [{
+                type: "required",
+                message: "Code Name is required",
+            }]
+        });
+
+
+        $("#ddlmainCustomer").dxSelectBox({
+            items: AccountCustomers,
+            displayExpr: "Name",
+            valueExpr: "Id",
+            //  value: osatId,
+            width: "200px",
+            onValueChanged: function (e) {
+                var m = document.getElementById('gridContent');
+                m.style.display = 'none';
+                PCNApproverData([]);
+            },
+
+        }).dxValidator({
+            validationRules: [{
+                type: "required",
+                message: "Customer Name is required",
+            }]
+        });
+
+        var PCNApproverData = function (records) {
+
+            $("#grdPCNApprover").dxDataGrid({
+                dataSource: records,
+                showBorders: true,
+                headerFilter: { visible: true },
+
+                paging: {
+                    pageSize: 9
+                },
+                editing: {
+                    mode: "row",
+                    allowUpdating: false,
+                  //  allowDeleting: true,
+                    allowAdding: false,
+                    useIcons: true
+                },
+                columns: [
+                    {
+                        dataField: "RoleName",
+                        caption: "Role",
+
+                    },
+                    {
+                        dataField: "ContactName",
+                        caption: "Contact Name",
+
+                    }, {
+                        dataField: 'Mail',
+                        caption: 'Mail',
+                        fixed: true,
+                        fixedPosition: 'right',
+                        width: 50,
+                        alignment: 'center',
+                        //  type: "Edit",
+                        cellTemplate: function (container, options) {
+
+
+                            var divContent = $("<div></div>");
+
+                            var icon = $("<a href='mailto:" + @MvcHtmlString.Create("options.data.Email") + "'></a>");
+                            icon.addClass("fa fa-envelope");
+
+                           // icon.bind("click", function (e) {  });
+                          //  var Add = $("<i ></i>");
+
+                            if (options.data.Email != "") {
+                          //      debugger;
+                                divContent.append(icon).append("&nbsp;&nbsp;")
+                            }
+
+
+                            container.append(divContent);
+
+
+                        },
+                    },
+                ],
+                onRowRemoving: function (e) {
+                    //debugger;
+
+                }
+            });
+        };
+    });
+
+
+</script>
+
+<div id="divContent" class="content  centered">
+    <div style="vertical-align: top;">
+        <div class="bordered padfourpixel marginfourpixel bluebox bglightblue" style="display:inline-block;vertical-align: top;width:940px;">
+            <div class="fixed centered">
+                <div>
+                    <div class=" padsixpixel">
+                        <div class="showinline">
+                            <table class="table-legend">
+                                <tr>
+                                    <td><br /></td>
+                                    <td><br /></td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="showinline floatright" style="margin-right:20px;">
+                           
+                            <span><a title="Click here to manage attribute types" id="lnkProductOwnerships" href="/ProductOwnerships/Index/"><span class="imagelinkbutton bordered"><span class="fa fa-list-alt "></span><span class="margintwopixel">Product Ownerships</span> </span></a></span>
+                            <span><a title="Click here to manage attribute types" id="lnkAccountOwnerships" href="/AccountOwnerships/Index/"><span class="imagelinkbutton bordered"><span class="fa fa-list-alt "></span><span class="margintwopixel">Account Ownerships</span> </span></a></span>                           
+                            <span><a title="Click here to view all non-PRQ build criteria" id="lnkPCNManagerFinder" href="/PCNManagerFinder/Index/"><span class="imagelinkbutton bordered"><span class="fa fa-list-alt "></span><span class="margintwopixel">PCN Manager Finder</span> </span></a></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="divExplorerDetails" class="">
+                <div id="divForm" class="formwrapper ">
+                    <div class="formcontent display ">
+                        <div>
+                            <div class="infotext">
+                                <span class="infotext italic" style="font-size: 14px;">Items marked as <span class="mandatory">*</span> are required inputs</span>
+                            </div>
+                            <div class="padtwopixel margintwopixel" style="display:block;">
+                                <div class="padtwopixel">
+                                    <div class="form">
+                                        <div class="dx-fieldset" style="width:60%;display:inline-block;">
+                                            <div class="dx-field">
+                                                <div class="dx-field-label required" style="width: 300px; font-size: 16px;">Code Name</div>
+                                                <div class="dx-field-value" id="ddlCodeName"></div>
+                                            </div>
+                                            <div class="dx-field">
+                                                <div class="dx-field-label required" style="width: 300px; font-size: 16px;">Main Customer Name</div>
+                                                <div class="dx-field-value" id="ddlmainCustomer"></div>
+                                            </div>
+                                        </div>
+                                        <div class="dx-field">
+                                            <div class="dx-field-label" style="width: 300px; font-size: 16px;"></div>
+                                            <input id="btnSubmit" type="button" value="Submit" style="padding-bottom:4px;padding-top:4px;" />
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="gridContent" class="content  centered"  style="display:none">
+    <div style="vertical-align: top;">
+        <div class="padfourpixel marginfourpixel" style="display:inline-block;vertical-align: top;width:940px;">
+            <div class="floatright">
+                <span><a title="Click here to email all" id="lnkManageAttributeTypes"  href='#'><span class="imagelinkbutton bordered"><span class="fa fa-envelope "></span><span class="margintwopixel">Email All</span> </span></a></span>
+            </div>
+            <div class="clearBoth" style="display:inline-block;vertical-align: top;width:940px;"></div>
+            <div id="divExplorerDetails" class="">
+                <div id="divForm" class="formwrapper ">
+                    <div class="formcontent display ">
+                        <div style="width: 940px;">
+
+                            <div id="grdPCNApprover" style="margin-right:10px;margin-left:10px;margin-bottom:10px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+                        @*<div id="divContent" class=" fluid" style="width: 940px;">
+
+                                <div id="divResults" class="fluid">
+
+                                    <div class="" style="margin-top:4px;">
+                                        <div>
+                                            <div class="marginfourpixel gridcontainer" style="width: 940px;">
+                                                <div id="grdPCNApprover" style="margin-right:10px;margin-left:10px;margin-bottom:10px;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>*@

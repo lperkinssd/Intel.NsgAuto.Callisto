@@ -1,0 +1,391 @@
+﻿@model Intel.NsgAuto.Callisto.UI.Models.OSAT.DesignSummaryModel
+
+@{
+    ViewBag.Title = "OSAT - Component Parts";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+
+
+<style type="text/css">
+    .dx-datagrid-content .dx-datagrid-table .dx-row .dx-command-edit {
+        min-width: 40px;
+    }
+
+    .breakword {
+        white-space: normal;
+        word-wrap: break-word;
+    }
+
+    .dx-scrollable {
+        height: 500px;
+    }
+
+    .dx-scrollbar-vertical.dx-scrollbar-hoverable {  
+    width: 15px;  
+}  
+.dx-scrollbar-vertical .dx-scrollable-scroll {  
+    width: 15px;  
+}  
+</style>
+
+<script type="text/javascript">
+
+    var entity = @(JsonHelper.Serialize(Model.Entity));
+    var buildCombinations = entity.BuildCombinations;
+    var designs = entity.Designs;
+    var osats = entity.Osats;
+    var designsDataSource = createDesignsDataSource(designs);
+    var osatssDataSource = createOsatsDataSource(osats);
+
+    var porCriteriaDataSource = [
+        { Display: "All", Value: "all" },
+        { Display: "Exists", Value: true },
+        { Display: "Does Not Exist", Value: false },
+    ];
+
+    function createOsatsDataSource(d) {
+        var result = [{ Display: "All", Value: "all" }];
+        for (var i = 0; i < d.length; i++) {
+            result.push({ Display: d[i].Name, Value: d[i].Id });
+        }
+        return result;
+    }
+
+    function createDesignsDataSource(d) {
+        var result = [{ Display: "All", Value: "all" }];
+        for (var i = 0; i < d.length; i++) {
+            result.push({ Display: d[i].Name, Value: d[i].Id });
+        }
+        return result;
+    }
+
+    function onError(xhr, status) {
+        Nsga.Callisto.Messages.showError("An unexpected error occurred. If the problem persists, contact support.");
+    };
+
+    function updateGridDataSource(records) {
+        $("#grdRecords").dxDataGrid("instance").option("dataSource", records);
+    };
+
+    function refreshData() {
+        var designId = $("#ddlDesigns").dxSelectBox("instance").option("value");
+        if (designId === "all") designId = "";
+        var osatId = $("#ddlOsats").dxSelectBox("instance").option("value");
+        if (osatId === "all") osatId = null;
+        var porBuildCriteriaSetExists = $("#ddlPorCriteria").dxSelectBox("instance").option("value");
+        if (porBuildCriteriaSetExists === "all") porBuildCriteriaSetExists = "";
+        Nsga.Callisto.Osat.getBuildCombinations3(designId, osatId, porBuildCriteriaSetExists, function (result) { updateGridDataSource(result); }, onError);
+    }
+
+    function onErrorUpdatePublish(xhr, status) {
+        var result = null;
+        var message = "An unexpected error occurred. If the problem persists, contact support.";
+        if (xhr && xhr.responseJSON) {
+            result = xhr.responseJSON;
+            if (result.ExceptionMessage) message = result.ExceptionMessage;
+            else if (result.Message) message = result.Message;
+            if (result.Entity) {
+                updateGridDataSource(result.Entity);
+            }
+        }
+        Nsga.Callisto.Messages.showError(message);
+        return result;
+    }
+
+    function onSuccessUpdatePublish(result) {
+        updateGridDataSource(result.Entity);
+    }
+
+    function updatePublish(id, enabled) {
+        var designId = $("#ddlDesigns").dxSelectBox("instance").option("value");
+        if (designId === "all") designId = null;
+        var osatId = $("#ddlOsats").dxSelectBox("instance").option("value");
+        if (osatId === "all") osatId = "";
+        var porBuildCriteriaSetExists = $("#ddlPorCriteria").dxSelectBox("instance").option("value");
+        if (porBuildCriteriaSetExists === "all") porBuildCriteriaSetExists = null;
+        var entityUpdate = {
+            Id: id,
+            Enabled: enabled,
+            DesignId: designId,
+            PorBuildCriteriaSetExists: porBuildCriteriaSetExists,
+        };
+        Nsga.Callisto.Osat.updateBuildCombinationPublish(entityUpdate, onSuccessUpdatePublish, onErrorUpdatePublish);
+    }
+
+
+    $(window).resize(function () { isZooming(); });
+   
+   
+       
+   
+    function isZooming() {
+        var newPx_ratio = window.devicePixelRatio || window.screen.availWidth / document.documentElement.clientWidth;
+        var doc = document.getElementsByClassName('dx-scrollable');
+       
+        if (newPx_ratio <= 1.0 ) {
+            doc[0].style.height = '500px';            
+        }
+
+        if (newPx_ratio > 1.0 && newPx_ratio < 1.25) {         
+            doc[0].style.height = '400px';                 
+        }
+
+        if (newPx_ratio > 1.25 && newPx_ratio <= 1.50) {           
+            doc[0].style.height = '300px';                   
+        }
+
+        if (newPx_ratio > 1.50 && newPx_ratio <= 1.75) {
+            doc[0].style.height = '200px';
+        }
+     
+    }
+
+    $(document).ready(function () {
+
+        
+
+        $("#ddlDesigns").dxSelectBox({
+            items: designsDataSource,
+            displayExpr: "Display",
+            valueExpr: "Value",
+            value: (entity && entity.SelectedDesign) ? entity.SelectedDesign.Id : "all",
+            width: "150px",
+        }).dxValidator({
+            validationRules: [{
+                type: "required",
+                message: "Design ID is required"
+            }]
+        });
+
+        $("#ddlOsats").dxSelectBox({
+            items: osatssDataSource,
+            displayExpr: "Display",
+            valueExpr: "Value",
+            value: (entity && entity.SelectedDesign) ? entity.SelectedDesign.Id : "all",
+            width: "150px",
+        }).dxValidator({
+            validationRules: [{
+                type: "required",
+                message: "Osat ID is required"
+            }]
+        });
+
+        $("#ddlPorCriteria").dxSelectBox({
+            items: porCriteriaDataSource,
+            displayExpr: "Display",
+            valueExpr: "Value",
+            value: "all",
+            width: "150px",
+        });
+
+        $("#btnSubmit").dxButton({
+            text: "Submit",
+            onClick: function (e) {
+                refreshData();
+               
+            }
+        });
+
+        $("input").bind("keydown", function (event) {
+            var keycode = (event.keyCode ? event.keyCode : (event.which ? event.which : event.charCode));
+            if (keycode === 13) { // keycode for enter key
+                refreshData();
+                return false;
+            } else {
+                return true;
+            }
+        });
+
+        // grdRecords
+        var config = Nsga.Callisto.Dx.dataGridDefaultConfig();
+        config.dataSource = buildCombinations;
+        config.columns = [
+            {
+                dataField: "IntelLevel1PartNumber",
+                caption: "Intel Level 1 Part Number"
+            },
+            {
+                dataField: "IsActive",
+                caption: "Is Active?",
+                falseText: "N",
+                trueText: "Y",
+                alignment: "center",
+                showEditorAlways: false
+            },
+            {
+                dataField: "IntelProdName",
+                caption: "Intel Product Name"
+            },
+            {
+                dataField: "PartUseType.Abbreviation",
+                caption: "ES/Prod"
+            },
+            {
+                dataField: "MaterialMasterField",
+                caption: "MM Number"
+            },
+            {
+                dataField: "IntelMaterialPn",
+                caption: "Intel Part Name"
+            },
+            {
+                dataField: "AssyUpi",
+                caption: "Assembly UPI"
+            },
+            {
+                dataField: "DeviceName",
+                caption: "Device Name"
+            },
+            {
+                dataField: "Mpp",
+                caption: "MPP"
+            },
+            {
+                dataField: "OsatName",
+                caption: "Osat Name"
+            },
+            {
+                dataField: "PorBuildCriteriaSetId",
+                caption: "POR Criteria",
+                cellTemplate: function (container, options) {
+                    if (options.value) {
+                        $("<a>View</a>").attr({ "href": "/OSAT/BuildCriteriaSetDetails/" + options.value, "target": "_blank" }).appendTo(container);
+                    }
+                },
+                allowFiltering: false,
+                width: "110px",
+            },
+            {
+                dataField: "Id",
+                caption: "All Versions",
+                cellTemplate: function (container, options) {
+                    $("<a>View</a>").attr({ "href": "/OSAT/ListBuildCombinationBuildCriteriaSets/" + options.value, "target": "_blank" }).appendTo(container);
+                },
+                allowFiltering: false,
+                width: "110px",
+            },
+            {
+                dataField: "Id",
+                caption: "Create",
+                cellTemplate: function (container, options) {
+                    $("<a>Create</a>").attr({ "href": "/OSAT/CreateBuildCriteriaSet/?buildCombinationId=" + options.value, "target": "_blank" }).appendTo(container);
+                },
+                allowFiltering: false,
+                width: "60px",
+            },
+            {
+                dataField: "IsPublishable",
+                caption: "Is Publishable?",
+                falseText: "N",
+                trueText: "Y",
+                alignment: "center",
+                showEditorAlways: false
+            },
+            {
+                dataField: "Id",
+                caption: "Publish",
+                cellTemplate: function (container, options) {
+                    var id = options.value;
+                    var enabled = false;
+                    if (options.row.data.IsPublishable) {
+                        enabled = true;
+                    }
+                    var divButton = $("<div>");
+                    divButton.dxButton({
+                        stylingMode: "outlined",
+                        text: enabled ? "Disable" : "Enable",
+                        type: "normal",
+                        onClick: function () {
+                            updatePublish(id, !enabled);
+                        }
+                    });
+                    divButton.appendTo(container);
+                },
+                allowFiltering: false,
+            },
+        ];
+         
+        $("#grdRecords").dxDataGrid(config);       
+        setTimeout("isZooming()", 1000);
+
+    });
+
+    $(".gridcontainer .dx-toolbar-items-container").append($("<div class='infotext'><span class='padeightpixel fas fa-exclamation-circle' style='font-size:14px;'></span>Use scroll bar of the table below to scroll and view the content. If scroll bar is very thin and not evidently visible, hover over to bring it up.</div>"));
+
+</script>
+
+<div id="divContent" class="content centered">
+    <div style="vertical-align: top;">
+        <div class="bordered padfourpixel marginfourpixel bluebox bglightblue" style="display:inline-block;vertical-align: top;width:940px;">
+            <div id="divExplorerDetails" class="">
+                <div id="divForm" class="formwrapper ">
+                    <div class="formcontent display ">
+                        <div>
+                            <div class="infotext">
+                                <span class="infotext italic">Items marked as <span class="mandatory">*</span> are required inputs</span>
+                            </div>
+                            <div class="padtwopixel margintwopixel" style="display:block;">
+                                <div class="padtwopixel">
+                                    <div class="form">
+                                        <div class="dx-fieldset" style="width:100%;display:inline-block;">
+                                            @*<div class="dx-field">*@
+                                                <div class="dx-field-label required">Osat ID</div>
+                                                <div class="dx-field-value" id="ddlOsats"></div>
+                                            @*</div>
+                                            <div class="dx-field">*@
+                                                <div class="dx-field-label required" style="margin-left:12px;">Design ID</div>
+                                                <div class="dx-field-value" id="ddlDesigns"></div>
+                                            @*</div>*@
+                                        </div>
+                                        <div class="dx-fieldset" style="width:100%;display:inline-block;">
+                                            @*<div class="dx-field">*@
+                                            <div class="dx-field-label">POR Criteria</div>
+                                            <div class="dx-field-value" id="ddlPorCriteria"></div>
+                                            @*</div>
+        <div class="dx-field">*@
+                                            <div class="dx-field-label"> </div>
+                                                @*<div class="" style="display:inline-block;margin-left:8px;width:20%;text-align:right;vertical-align:middle;">*@
+                                                    <span class="marginfourpixel" style="margin-left:12px;"><input id="btnSubmit" type="button" value="Submit" style="padding-bottom:4px;padding-top:4px;" /></span>
+                                                @*</div>*@
+                                                @*</div>*@
+                                            </div>
+                                            @*<div class="dx-fieldset" style="width:60%;display:inline-block;">
+            <div class="dx-field">
+                <div class="dx-field-label required">Osat ID</div>
+                <div class="dx-field-value" id="ddlOsats"></div>
+            </div>
+            <div class="dx-field">
+                <div class="dx-field-label required">Design ID</div>
+                <div class="dx-field-value" id="ddlDesigns"></div>
+            </div>
+            <div class="dx-field">
+                <div class="dx-field-label">POR Criteria</div>
+                <div class="dx-field-value" id="ddlPorCriteria"></div>
+            </div>
+        </div>
+        <div class="" style="display:inline-block;margin-left:8px;width:20%;text-align:right;vertical-align:middle;">
+            <span class="marginfourpixel" style=""><input id="btnSubmit" type="button" value="Submit" style="padding-bottom:4px;padding-top:4px;" /></span>
+        </div>*@
+                                        </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="divContent" class=" fluid">
+    <div class="grid-wrapper" style="margin-top: 4px; ">
+        <div>
+            <div class="marginfourpixel">
+                <div class="gridcontainer">
+                    <div id="grdRecords" style="margin-right: 20px; margin-left: 10px; "></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>

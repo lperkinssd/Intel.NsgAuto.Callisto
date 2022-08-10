@@ -1,0 +1,325 @@
+﻿@model Intel.NsgAuto.Callisto.UI.Models.MATVersionsModel
+
+@{
+    ViewBag.Title = "MAT Versions";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style scoped>
+
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1; /* Sit on top */
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgb(0,0,0); /* Fallback color */
+        background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    }
+
+    .modal-content {
+        background-color: #fefefe;
+        margin: 15% auto; /* 15% from the top and centered */
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%; /* Could be more or less, depending on screen size */
+    }
+
+    .modal-close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+        .modal-close:hover, .modal-close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+</style>
+
+
+<script type="text/javascript">
+
+    function btnInstructionsClick() {
+        document.getElementById("modalInstructions").style.display = "block";
+    }
+
+    function closeInstructionsClick() {
+        document.getElementById("modalInstructions").style.display = "none";
+    }
+
+    function onError(xhr, status) {
+        Nsga.Callisto.Messages.showError("An unexpected error occurred. If the problem persists, contact support.");
+    };
+
+    function beforeSendHandler() {
+        $("#importIndicator").dxLoadIndicator("instance").option("visible", true);
+    };
+
+    function onUploadSuccess(response) {
+        $("#importIndicator").dxLoadIndicator("instance").option("visible", false);
+        var version = response.Version;
+        var versionMessage = "The file was imported creating version " + version.Version + " which should be listed below.";
+        if (response.Messages && response.Messages.length > 0) {
+            var popupOptions = {
+                width: '500',
+                height: 'auto',
+                contentTemplate: function () {
+                    var divMessages = $("<div />");
+                    $.each(response.Messages, function (index, message) {
+                        divMessages.append($("<p>" + message + "</p>"));
+                    });
+                    return divMessages;
+                },
+                showTitle: true,
+                title: "Imported with errors",
+                visible: false,
+                dragEnabled: false,
+                shading: false,
+                closeOnOutsideClick: true
+            }
+
+            var popupBox = $("<div />")
+                .addClass("popup")
+                .appendTo($("#popupContainer"));
+            popup = popupBox.dxPopup(popupOptions).dxPopup("instance");
+            popup.show();
+        }
+        else {
+            Nsga.Callisto.Messages.showSuccess(versionMessage);
+        }
+        refreshData()
+    };
+
+    function onUploadError(xhr, status, errorThrown) {
+        var message = "An unexpected error occurred. If the problem persists, contact support.";
+        if (xhr && xhr.responseJSON && xhr.responseJSON.Message) message = xhr.responseJSON.Message;
+        Nsga.Callisto.Messages.showError(message);
+        $("#importIndicator").dxLoadIndicator("instance").option("visible", false);
+    };
+
+    function validateFile() {
+        var fileName = $("#uploadFile").val();
+        if (!fileName) {
+            Nsga.Callisto.Messages.showError("Please select a file to upload.");
+            return false;
+        }
+        var dotIndex = fileName.lastIndexOf(".") + 1;
+        var extension = fileName.substr(dotIndex, (fileName.length - dotIndex));
+        if (extension.toUpperCase() === "XLS" || extension.toUpperCase() === "XLSX")
+            return true;
+        else {
+            Nsga.Callisto.Messages.showError("File with " + extension + " is invalid. Upload a valid file with xls/xlsx extension.");
+            return false;
+        }
+        return true;
+    };
+
+    function uploadFile(e) {
+        var loadIndicator = $("#importIndicator").dxLoadIndicator({ visible: false }).dxLoadIndicator("instance");
+        loadIndicator.option("visible", false);
+        if (validateFile()) {
+            loadIndicator.option("visible", true);
+            var formData = new FormData();
+            var file = $("#uploadFile")[0];
+            formData.append("uploadFile", file.files[0]);
+            $.ajax({
+                url: Nsga.Callisto.Constants.URL_IMPORTMATVERSION,
+                type: "POST",
+                beforeSend: beforeSendHandler,
+                success: onUploadSuccess,
+                error: onUploadError,
+                data: formData,
+                cache: false,
+                contentType: false,
+                processData: false
+            });
+        }
+    };
+
+    function refreshData() {
+        Nsga.Callisto.MATVersions.getAll(function (result) { updateGridDataSource(result); }, onError);
+    }
+
+    function updateGridDataSource(records) {
+        var element = $("#grdRecords");
+        element.hide();
+        if (records) {
+            element.dxDataGrid("instance").option("dataSource", records);
+            element.show();
+        }
+    };
+
+    $(document).ready(function () {
+
+        // this is included so that the instructions modal will close if the user clicks anywhere outside the modal
+        var modalInstructions = document.getElementById("modalInstructions");
+        window.onclick = function (e) {
+            if (e.target == modalInstructions) {
+                modalInstructions.style.display = "none";
+            }
+        }
+
+        $("#importIndicator").dxLoadIndicator({ visible: false });
+
+        $("#grdRecords").dxDataGrid({
+            columnAutoWidth: true,
+            showColumnLines: true,
+            showRowLines: true,
+            rowAlternationEnabled: true,
+            showBorders: true,
+            headerFilter: { visible: true },
+            filterRow: { visible: true },
+            loadPanel: {
+                enabled: true
+            },
+            paging: { enabled: false },
+            editing: {
+                mode: "row",
+                allowUpdating: false,
+                allowDeleting: false,
+                allowAdding: false,
+                useIcons: true
+            },
+            columns: [
+                {
+                    dataField: "Version",
+                },
+                {
+                    dataField: "IsActive",
+                    caption: "Is Active?",
+                    falseText: "N",
+                    trueText: "Y",
+                    alignment: "center",
+                    showEditorAlways: false
+                },
+                {
+                    dataField: "Status.Name",
+                    caption: "Status"
+                },
+                {
+                    dataField: "IsPOR",
+                    caption: "Is POR?",
+                    falseText: "N",
+                    trueText: "Y",
+                    alignment: "center",
+                    showEditorAlways: false
+                },
+                {
+                    dataField: "CreatedBy",
+                    caption: "Created By"
+                },
+                {
+                    dataField: "CreatedOn",
+                    dataType: "datetime",
+                    format: "MM/dd/yyyy hh:mm:ss a",
+                    caption: "Created On"
+                },
+                {
+                    dataField: "UpdatedBy",
+                    caption: "Updated By"
+                },
+                {
+                    dataField: "UpdatedOn",
+                    dataType: "datetime",
+                    format: "MM/dd/yyyy hh:mm:ss a",
+                    caption: "Updated On"
+                },
+                {
+                    dataField: "Details",
+                    caption: "",
+                    allowFiltering: false,
+                    cellTemplate: function (container, options) {
+                        $("<a> View Details </a>")
+                            .attr("href", "/MATVersions/Details/" + options.data["Id"])
+                            .appendTo(container);
+                    }
+                }
+            ]
+        });
+
+        $("#lnkImport").bind("click", function (e) {
+            e.preventDefault();
+            uploadFile(e);
+        });
+
+        refreshData();
+
+    });
+
+</script>
+
+
+<div id="popupContainer" />
+
+<div class="fixed centered">
+    @{
+        //if (Intel.NsgAuto.Web.Mvc.Core.Functions.IsSuperUser())
+        if (true)
+        {
+            <div style="margin-top:10px; vertical-align: top; padding-left:10px" class="bluebox padfourpixel ">
+                <div style="width: 45%; display: inline-block; margin-right: 30px; margin-top:6px;">
+                    <div class="subheading" style="margin-bottom: 6px;">Step 1. Download the Template &amp; Fill Details</div>
+                    <div class="">
+                        <div style="margin-bottom: 6px;">
+                            <span class="help annotate">
+                                <span>
+                                    <a id="lnkDownload" class="imagelinkbutton bordered" href="/Templates/MATsTemplate.xlsx" target="_blank" title="Click here to download the spreadsheet template">
+                                        <span>
+                                            <span class="fas fa-file-download"></span>
+                                            <span style="padding-top: 1px; padding-bottom: 1px;">Download</span>
+                                        </span>
+                                    </a>
+                                </span>the excel file template &amp; fill up.<br /><br>
+                            </span>
+                            <div>
+                                <button id="btnInstructions" onclick="btnInstructionsClick()">Instructions</button>
+                                <div id="modalInstructions" class="modal">
+                                    <div class="modal-content">
+                                        <span id="closeInstructions" class="modal-close" onclick="closeInstructionsClick()">&times;</span>
+                                        @Html.Partial("_ImportInstructions")
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div style="width:49%;display:inline-block;vertical-align: top; margin-top: 2px; " class="bluebox bglightblue padfourpixel">
+                    <div class="subheading" style="margin-left: 6px">Step 2. Upload the data</div>
+                    <div class="showinline">
+                        <div class="padeightpixel" style="vertical-align:top;">
+                            <div class="">
+                                <input type="file" class="fileimport" id="uploadFile" name="uploadFile" style="width: 330px; height: 28px;" />
+                                <a id="lnkImport" class="imagelinkbutton bordered padfourpixel" href="javascript:void(0);" style="vertical-align:top;" title="Click here to browse and upload the spreadsheet with MATs">
+                                    <span style="padding-top: 1px; padding-bottom: 1px;padding-left:1px;padding-right:1px;">
+                                        <span class="fas fa-file-upload"></span>
+                                        <span>Import</span>
+                                    </span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</div>
+
+<div id="importIndicator"></div>
+
+<div class="centeralign">
+    <div class="grid-wrapper" style="margin-top:4px;">
+        <div>
+            <div class="marginfourpixel">
+                <div class="gridcontainer">
+                    <div id="grdRecords" style="margin-right:20px;margin-left:10px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,132 @@
+﻿@model Intel.NsgAuto.Callisto.UI.Models.MMRecipesModel
+
+@{
+    ViewBag.Title = "MM Recipes";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style scoped>
+    .dx-row {
+        cursor: pointer;
+    }
+</style>
+
+<script type="text/javascript">
+
+    function onError(xhr, status) {
+        $("#indicator").dxLoadIndicator("instance").option("visible", false);
+        Nsga.Callisto.Messages.showError("An unexpected error occurred. If the problem persists, contact support.");
+    };
+
+    function refresh() {
+        $("#indicator").dxLoadIndicator({ visible: true });
+        Nsga.Callisto.MMRecipes.getAll(function (result) { updateGridDataSource(result); }, onError);
+    };
+
+    function updateGridDataSource(records) {
+        if (records) {
+            $("#grdRecords").dxDataGrid("instance").option("dataSource", records);
+        }
+        $("#indicator").dxLoadIndicator("instance").option("visible", false);
+    };
+
+    $(document).ready(function () {
+
+        $("#tooltip").dxTooltip({
+            showEvent: "mouseenter",
+            hideEvent: "mouseleave",
+            closeOnOutsideClick: false,
+        });
+
+        // grdRecords
+        var config = Nsga.Callisto.Dx.dataGridDefaultConfig();
+        config.columns = [
+            {
+                dataField: "ProductFamily.Name",
+                caption: "Product Family",
+            },
+            {
+                dataField: "ProductLabel.Capacity",
+                caption: "Capacity",
+            },
+            {
+                dataField: "PCode",
+                caption: "PCode MM Number",
+            },
+            {
+                dataField: "SCode",
+                caption: "SCode MM Number",
+            },
+            {
+                dataField: "Version",
+                caption: "Version",
+            },
+            {
+                dataField: "IsPOR",
+                caption: "Is POR?",
+                falseText: "N",
+                trueText: "Y",
+                alignment: "center",
+                showEditorAlways: false
+            },
+            {
+                dataField: "Status.Name",
+                caption: "Status",
+            },
+            {
+                dataField: "CreatedOn",
+                caption: "Created On",
+                dataType: "datetime",
+                format: "MM/dd/yyyy hh:mm:ss a",
+            },
+            {
+                dataField: "UpdatedOn",
+                caption: "Updated On",
+                dataType: "datetime",
+                format: "MM/dd/yyyy hh:mm:ss a",
+            },
+            {
+                caption: "",
+                cellTemplate: function (container, options) {
+                    $("<a>Details</a>").attr({ "href": "/MMRecipes/Details/" + options.data["Id"], "target": "_blank" }).appendTo(container);
+                },
+                allowFiltering: false,
+            },
+        ];
+        config.hoverStateEnabled = true;
+        config.onRowClick = function (e) {
+            if (e.rowType == "data") {
+                window.open('/MMRecipes/Details/' + e.data.Id, "_blank");
+            }
+        };
+        // using the row tooltip technique given by the devexpress support team
+        // https://supportcenter.devexpress.com/ticket/details/t383731/dxdatagrid-tooltip-on-row
+        config.onRowPrepared = function (e) {
+            if (e.rowType == "data") {
+                e.rowElement.mousemove(function () {
+                    $("#tooltip").dxTooltip("instance").show(e.rowElement);
+                });
+            }
+        };
+        config.keyExpr = "Id";
+        $("#grdRecords").dxDataGrid(config);
+
+        refresh();
+
+    });
+
+</script>
+
+
+<div class="padeightpixel">
+    <div class="centeralign">
+        <div id="indicator"></div>
+    </div>
+    <div class="rightalign" style="padding: 2px;">
+        <button id="btnRefresh" onclick="refresh()">Refresh</button>
+    </div>
+    <div>
+        <div id="tooltip">Click to view the details for this item</div>
+        <div id="grdRecords"></div>
+    </div>
+</div>

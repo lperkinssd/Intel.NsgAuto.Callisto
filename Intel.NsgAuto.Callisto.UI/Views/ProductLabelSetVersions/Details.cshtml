@@ -1,0 +1,273 @@
+﻿@model Intel.NsgAuto.Callisto.UI.Models.ProductLabelSetVersionModel
+@using ImportSpecification = Intel.NsgAuto.Callisto.Business.Core.ImportSpecifications.ProductLabels
+
+@{
+    ViewBag.Title = "Product Label Set Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<script type="text/javascript">
+
+    var model = @(JsonHelper.Serialize(Model.Version));
+    var userId = "@Html.Raw(Intel.NsgAuto.Web.Mvc.Core.Functions.GetCurrentUserIdSid())";
+
+
+    function populateFields() {
+        $("#spnId").text(model.Id);
+        $("#spnVersion").text(model.Version);
+        $("#spnIsActive").text(model.IsActive);
+        $("#spnIsPOR").text(model.IsPOR);
+        $("#spnIsPOR").text(model.IsPOR);
+        $("#spnStatus").text(model.Status.Name);
+        $("#spnCreatedBy").text(model.CreatedBy);
+        $("#spnCreatedOn").text(Nsga.Callisto.Dates.isoToLocaleString(model.CreatedOn));
+        $("#spnUpdatedBy").text(model.UpdatedBy);
+        $("#spnUpdatedOn").text(Nsga.Callisto.Dates.isoToLocaleString(model.UpdatedOn));
+        var statusName = model.Status.Name;
+        if (statusName === "Draft" && userId === model.CreatedBy)
+        {
+            document.getElementById("btnSubmit").style.visibility = "visible";
+            document.getElementById("btnCancel").style.visibility = "visible";
+        }
+        else
+        {
+            document.getElementById("btnSubmit").style.visibility = "hidden";
+            document.getElementById("btnCancel").style.visibility = "hidden";
+            if (statusName == "Submitted" || statusName == "In Review") // TODO: and userId is a "reviewer"
+            {
+                document.getElementById("btnApprove").style.visibility = "visible";
+                document.getElementById("btnReject").style.visibility = "visible";
+            }
+            else
+            {
+                document.getElementById("btnApprove").style.visibility = "hidden";
+                document.getElementById("btnReject").style.visibility = "hidden";
+            }
+        }
+    }
+
+    function onError(xhr, status) {
+        var message = "An unexpected error occurred. If the problem persists, contact support.";
+        if (xhr && xhr.responseJSON) {
+            if (xhr.responseJSON.ExceptionMessage) message = xhr.responseJSON.ExceptionMessage;
+            else if (xhr.responseJSON.Message) message = xhr.responseJSON.Message;
+        }
+        Nsga.Callisto.Messages.showError(message);
+        if (result.Entity) {
+            model = result.Entity;
+            populateFields();
+        }
+    };
+
+    function onChangeStatus(result)
+    {
+        model = result.Entity;
+        populateFields();
+    }
+
+    function approve()
+    {
+        Nsga.Callisto.ProductLabelSetVersions.approve(model.Id, onChangeStatus, onError);
+    }
+
+    function cancel()
+    {
+        Nsga.Callisto.ProductLabelSetVersions.cancel(model.Id, onChangeStatus, onError);
+    }
+
+    function reject()
+    {
+        Nsga.Callisto.ProductLabelSetVersions.reject(model.Id, onChangeStatus, onError);
+    }
+
+    function submit1()
+    {
+        Nsga.Callisto.ProductLabelSetVersions.submit(model.Id, onChangeStatus, onError);
+    }
+
+    function updateGridDataSource(records) {
+        var element = $("#grdRecords");
+        element.hide();
+        if (records) {
+            element.dxDataGrid("instance").option("dataSource", records);
+            element.show();
+        }
+    };
+
+    $("document").ready(function () {
+
+        populateFields(model);
+
+        var records = null;
+        @if (Model.ProductLabels != null)
+        {
+        <text>
+        records = @(JsonHelper.Serialize(Model.ProductLabels));
+        </text>
+        }
+
+        // grdRecords
+        var config = Nsga.Callisto.Dx.dataGridDefaultConfig();
+        config.dataSource = records;
+        config.keyExpr = "Id";
+        config.wordWrapEnabled = true;
+        config.columns = [
+            {
+                caption: "@(Html.Raw(ImportSpecification.ColumnNames.ProductFamily))",
+                dataField: "ProductFamily.Name",
+                alignment: "left",
+                fixed: true,
+                fixedPosition: "left",
+                width: "100px"
+            },
+            {
+                caption: "@(Html.Raw(ImportSpecification.ColumnNames.Customer))",
+                dataField: "Customer.Name",
+                alignment: "left",
+                fixed: true,
+                fixedPosition: "left",
+                width: "95px"
+            },
+            {
+                caption: "@(Html.Raw(ImportSpecification.ColumnNames.ProductionProductCode))",
+                dataField: "ProductionProductCode",
+                fixed: true,
+                fixedPosition: "left",
+                width: "145px"
+            },
+            {
+                caption: "@(Html.Raw(ImportSpecification.ColumnNames.ProductFamilyNameSeries))",
+                dataField: "ProductFamilyNameSeries.Name",
+                fixed: true,
+                fixedPosition: "left"
+            },
+            {
+                caption: "@(Html.Raw(ImportSpecification.ColumnNames.Capacity))",
+                dataField: "Capacity",
+                fixed: true,
+                fixedPosition: "left"
+            },
+            {
+                caption: "@(Html.Raw(ImportSpecification.ColumnNames.ModelString))",
+                dataField: "ModelString",
+                fixed: true,
+                fixedPosition: "left"
+            },
+            {
+                caption: "@(Html.Raw(ImportSpecification.ColumnNames.VoltageCurrent))",
+                dataField: "VoltageCurrent",
+                fixed: true,
+                fixedPosition: "left"
+            },
+            {
+                caption: "@(Html.Raw(ImportSpecification.ColumnNames.InterfaceSpeed))",
+                dataField: "InterfaceSpeed",
+                fixed: true,
+                fixedPosition: "left"
+            },
+            {
+                caption: "@(Html.Raw(ImportSpecification.ColumnNames.OpalType))",
+                dataField: "OpalType.Name",
+                fixed: true,
+                fixedPosition: "left"
+            },
+            {
+                caption: "@(Html.Raw(ImportSpecification.ColumnNames.KCCId))",
+                dataField: "KCCId",
+                fixed: true,
+                fixedPosition: "left"
+            },
+            {
+                caption: "@(Html.Raw(ImportSpecification.ColumnNames.CanadianStringClass))",
+                dataField: "CanadianStringClass",
+                fixed: true,
+                fixedPosition: "left"
+            },
+        ];
+        config.masterDetail = {
+            enabled: true,
+            template: function (container, options) {
+                $("<div>")
+                    .dxDataGrid({
+                        columnAutoWidth: true,
+                        showBorders: true,
+                        columns: [
+                            {
+                                caption: "Attribute Name",
+                                dataField: "AttributeType.NameDisplay",
+                            },
+                            {
+                                caption: "Attribute Value",
+                                dataField: "Value",
+                            },
+                        ],
+                        dataSource: options.data.Attributes
+                    }).appendTo(container);
+            }
+        };
+        config.onCellPrepared = function(e) {
+            if (e.rowType === "data" && e.column.command === "expand") {
+                if (e.data.Attributes === null || e.data.Attributes.length == 0) {
+                    e.cellElement.removeClass("dx-datagrid-expand");
+                    e.cellElement.empty();
+                }
+            }
+        };
+        $("#grdRecords").dxDataGrid(config);
+
+    });
+
+</script>
+
+
+<div class="padeightpixel">
+    <div class="rightalign">
+        <div class="padeightpixel">
+            <span><a title="Click here to view all versions" id="lnkViewAll" href="/ProductLabelSetVersions/List/"><span class="imagelinkbutton bordered"><span class="fa fa-list-alt "></span><span class="margintwopixel">All Sets</span> </span></a></span>
+        </div>
+    </div>
+    <div id="accDetails" class="accordion-label open">Details</div>
+    <div id="divDetails" class="accordion-panel" style="padding: 8px;">
+        <table style="width:96%; padding:2px;margin:2px;">
+            <tr>
+                <td style="width:25%"><label for="spnId" class="formlabel">Id</label></td>
+                <td style="width:25%"><span type="text" id="spnId"></span></td>
+                <td style="width:25%"><label for="spnCreatedBy" class="formlabel">Created By</label></td>
+                <td style="width:25%"><span type="text" id="spnCreatedBy"></span></td>
+            </tr>
+            <tr>
+                <td><label for="spnVersion" class="formlabel">Version</label></td>
+                <td><span type="text" id="spnVersion"></span></td>
+                <td><label for="spnCreatedOn" class="formlabel">Created On</label></td>
+                <td><span type="text" id="spnCreatedOn"></span></td>
+            </tr>
+            <tr>
+                <td><label for="spnIsActive" class="formlabel">Is Active?</label></td>
+                <td><span type="text" id="spnIsActive"></span></td>
+                <td><label for="spnUpdatedBy" class="formlabel">Updated By</label></td>
+                <td><span type="text" id="spnUpdatedBy"></span></td>
+            </tr>
+            <tr>
+                <td><label for="spnIsPOR" class="formlabel">Is POR?</label></td>
+                <td><span type="text" id="spnIsPOR"></span></td>
+                <td><label for="spnUpdatedOn" class="formlabel">Last Updated On</label></td>
+                <td><span type="text" id="spnUpdatedOn"></span></td>
+            </tr>
+            <tr>
+                <td><label for="spnStatus" class="formlabel">Status</label></td>
+                <td><span type="text" id="spnStatus"></span></td>
+                <td><button id="btnSubmit" onclick="submit1()" style="visibility: hidden;">Submit For Review</button>&nbsp;&nbsp;<button id="btnCancel" onclick="cancel()" style="visibility: hidden;">Cancel</button></td>
+                <td></td>
+            </tr>
+        </table>
+    </div>
+    <div id="accReview" class="accordion-label open">Review</div>
+    <div id="divReview" class="accordion-panel">
+        <div style="padding: 8px; width: 100%; text-align: center;"><button id="btnApprove" onclick="approve()" style="visibility: hidden;">Approve</button>&nbsp;&nbsp;<button id="btnReject" onclick="reject()" style="visibility: hidden;">Reject</button></div>
+    </div>
+    <div id="accProductLabels" class="accordion-label open">Product Labels</div>
+    <div id="divProductLabels" class="accordion-panel">
+        <div id="grdRecords"></div>
+    </div>
+</div>

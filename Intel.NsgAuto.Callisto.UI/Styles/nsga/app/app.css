@@ -1,0 +1,50 @@
+﻿.dx-datagrid-headers {color: #fff;/*border-bottom: 1px solid #cbd9e6;*/background-color: #5b9bd5;font-weight:bold;}
+.dx-sort{color: #fff;}
+/*.dx-datagrid .dx-header-filter {color: #fff;}*/
+.dx-widget{font-size:12px;}
+.removereviewer{color: darkred;}
+.reticledoclinks{text-align:left;}
+.wrapped {white-space: normal;word-wrap: break-word;}
+.graybox{border:1px solid #dcdcdc;}
+.left25margin{margin-left:25px;}
+
+.dx-field-value, .dx-field-value-static {float: left;}
+.dx-field-label {text-align:left;color:#0123b4;vertical-align:middle;font-size: 12px;width:25%;}
+.dx-fieldset-header {font-weight: bold;font-size: 12px;margin:2px;}
+.dx-fieldset {margin:2px;padding: 0;}
+.dx-button {-webkit-border-radius: 0px !important;-moz-border-radius: 0px !important;-ms-border-radius: 0px !important;-o-border-radius: 0px !important;-webkit-box-shadow: 0 1px 3px transparent;-moz-box-shadow: 0 1px 3px transparent;box-shadow: 0px 1px 3px transparent;border-radius: 0px !important;}
+.dx-button{line-height:20px !important;min-height: 28px !important;font-family: Verdana,Arial,Helvetica,sans-serif !important;font-size: 12px !important;}
+.dx-button.dx-state-hover, .dx-button.dx-state-focused {color: #ddd !important;background-color: #0071c5 !important;border: #0071c5 1px solid;}
+
+.fa, .fas, .far {margin-right:4px;}
+
+.dx-icon-edit-button-addrow { font-size: 12px !important; margin-right: 2px; }
+.dx-button-content span { display: inline-block !important; font-size: 12px; }
+.gridcontainer { height: 100%; width: 99.6%; position: absolute; }
+.gridcontainer { box-sizing: border-box; }
+.dx-icon { color: #0071c5; }
+.dx-icon-export-excel-button { /*color: #f5f5f5;background-color: #0071c5;*/ cursor: pointer; /*border: #0071c5 1px solid;*/ }
+.dx-datagrid-export-button .dx-icon-export-excel-button { width: 110px; }
+.exporttoexceltext { font-size: 12px; font-family: Verdana,Tahoma,helvetica,sans-serif; }
+.dx-header-row { background-color: #5b9bd5; }
+.dx-field-item-label-content { min-width: 125px !important; }
+.dx-popup-title.dx-toolbar .dx-toolbar-label { color: #0071c5; font-family: Verdana,Tahoma,helvetica,sans-serif; font-size: 14px; font-weight: bold; margin: 12px 8px 12px 2px; }
+.dx-menu-item-content{font-size: 12px; font-family: Verdana,Tahoma,helvetica,sans-serif;}
+.dx-field-item-label-text { text-align: left; color: #0123b4; vertical-align: middle; font-size: 12px; }
+
+.toolbarheading {color: #000;font-family: Verdana,Tahoma,helvetica,sans-serif;font-size: 12px;font-weight: bold; }
+.toolbarlink{text-decoration: none;color: #0071c5 !important;font-size: 12px;cursor: pointer;}
+.question{color: #000 !important;overflow-wrap: break-word;word-break: break-word;white-space: normal;}
+
+.dx-header-filter{color: #39ded4 !important;}
+.dx-header-filter-empty {color: #fff !important;}
+.dx-datagrid-nodata{position:relative;color:#666;font-size:12px;height:25px;line-height:25px;float: left;clear:both;margin-top:6px;}
+
+.dx-header-row .fixedcolumn { background-color: #676D7B !important; }
+.dx-datagrid .dx-datagrid-rowsview .dx-data-row td.dx-pointer-events-none,
+.dx-datagrid .dx-datagrid-rowsview .dx-freespace-row td.dx-pointer-events-none,
+.dx-datagrid .dx-datagrid-headers .dx-row td.dx-pointer-events-none { border-left: 2px solid #676D7B; border-right: 2px solid #ddd; }
+.dx-scrollable-scrollbar .dx-widget .dx-scrollbar-horizontal .dx-scrollbar-hoverable .dx-state-hover { height:20px !important;}
+.dx-scrollbar-horizontal .dx-scrollable-scroll { height: 20px !important; }
+.dx-scrollbar-horizontal.dx-scrollbar-hoverable { height: 14px !important; }
+.dx-scrollable-scroll-content { background-color: #676D7B; }

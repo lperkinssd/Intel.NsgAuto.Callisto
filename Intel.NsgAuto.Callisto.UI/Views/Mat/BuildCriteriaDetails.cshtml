@@ -1,0 +1,507 @@
+﻿@model Intel.NsgAuto.Callisto.UI.Models.Mat.BuildCriteriaModel
+
+@{
+    ViewBag.Title = "Build Criteria Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@Html.Partial("_ReviewStyling")
+
+<style scoped>
+
+    del {
+        text-decoration: line-through;
+        background-color: #fbb;
+        color: #555;
+    }
+
+    ins {
+        text-decoration: none;
+        background-color: #d4fcbc;
+    }
+</style>
+
+<script type="text/javascript">
+
+    var entity = null;
+    var model = null;
+    var conditions = null;
+    var comparisonResults = null;
+    var modelCompare = null;
+    var modelsCompare = null;
+    var review = null;
+    var userId = "@(Html.Raw(Intel.NsgAuto.Web.Mvc.Core.Functions.GetCurrentUserIdSid()))";
+    var comparisonEnabled = false;
+    var buildCriteria = null;
+    var source = null;
+
+    updateFromEntity(@(JsonHelper.Serialize(Model.Entity)));
+
+    function updateFromEntity(entityNew) {
+        entity = entityNew;
+        model = entity.BuildCriteria;
+        //buildCriteria = [{ "Id": model.Id, "Design": model.Design.Name, "ProductFamily": model.ProductFamily.Name, "FabricationFacility": model.FabricationFacility.Name, "Device": model.Device.Name, "Capacity": model.Capacity.Name, "Scode": model.Scode.Name, "MediaIPN": model.MediaIPN.Name}];
+        buildCriteria = [{ "Id": 1, "Design": "S15C", "ProductFamily": "", "FabricationFacility": "FAB 2", "Device": "29P32B2AMDNF2", "Capacity": "128GB", "Scode": "999AVV", "MediaIPN": "J23297-002" }];
+        //source =
+        //    [
+        //    ];
+
+        conditions = model.Conditions;
+        comparisonResults = entity.ComparisonResults;
+        modelCompare = entity.BuildCriteriaCompare;
+        modelsCompare = entity.BuildCriteriasCompare;
+        review = entity.Review;
+        var idCompare = null;
+        if (modelCompare) {
+            comparisonEnabled = true;
+            idCompare = modelCompare.Id;
+        }
+        else {
+            comparisonEnabled = false;
+        }
+        var dxDrpCompareTo = $("#drpCompareTo").dxSelectBox("instance");
+        if (dxDrpCompareTo) {
+            dxDrpCompareTo.option("value", idCompare);
+        }
+    }
+
+    function refreshFields() {
+        $("#lnkCreateNew").attr("href", "/Mat/CreateBuildCriteria/" + model.Id);
+        $("#spnId").text(model.Id);
+        $("#spnVersion").text(model.Version);
+        $("#spnIsActive").text(model.IsActive);
+        $("#spnIsPOR").text(model.IsPOR);
+        $("#spnStatus").text(model.Status.Name);
+        $("#spnCreatedBy").text(model.CreatedByUserName ? model.CreatedByUserName : model.CreatedBy);
+        $("#spnCreatedOn").text(Nsga.Callisto.Dates.isoToLocaleString(model.CreatedOn));
+        $("#spnUpdatedBy").text(model.UpdatedByUserName ? model.UpdatedByUserName : model.UpdatedBy);
+        $("#spnUpdatedOn").text(Nsga.Callisto.Dates.isoToLocaleString(model.UpdatedOn));
+        $("#spnEffectiveOn").text(Nsga.Callisto.Dates.isoToLocaleString(model.EffectiveOn));
+        $("#spnComments").text(model.Comments);
+        if (model.Design) $("#spnDesign").text(model.Design.Name);
+        if (model.FabricationFacility) $("#spnFabricationFacility").text(model.FabricationFacility.Name);
+        if (model.Device) $("#spnDevice").text(model.Device.Name);
+        if (model.Capacity) $("#spnCapacity").text(model.Capacity.Name);
+        if (model.Scode) $("#spnScode").text(model.Scode.Name);
+        if (model.MediaIPN) $("#spnMediaIpn").text(model.MediaIPN.Name);
+    }
+
+    function refreshConditionsDataSource() {
+        var grdConditionsStandard = $("#grdConditionsStandard");
+        var grdConditionsRule = $("#grdConditionsRule");
+
+        var dataSource = null;
+        if (comparisonEnabled) {
+            dataSource = [];
+
+            var comparisonResult = null;
+            var condition = null;
+
+            // two new properties will be added to each condition: ComparisonStatus (string), and ValueCompare (string)
+
+            // append all conditions from current version and check to see if they have been inserted with respect to the compared version
+            for (var i = 0; i < conditions.length; i++) {
+                condition = conditions[i];
+                condition.ComparisonStatus = "Equal";
+                condition.ValueCompare = null;
+                for (var j = 0; j < comparisonResults.length; j++) {
+                    comparisonResult = comparisonResults[j];
+                    if (comparisonResult.EntityType === "AcBuildCriteriaCondition") {
+                        if (comparisonResult.Id1 === condition.Id) {
+                            if (comparisonResult.MissingFrom === 2) {
+                                condition.ComparisonStatus = "Inserted";
+                            }
+                            else if (comparisonResult.Different && comparisonResult.Field === "Value") {
+                                condition.ComparisonStatus = "Updated";
+                                condition.ValueCompare = comparisonResult.Value2;
+                            }
+                        }
+                    }
+                }
+                dataSource.push(condition);
+            }
+
+            // append only the conditions from compared version that have been deleted in the current version
+            for (var i = 0; i < modelCompare.Conditions.length; i++) {
+                condition = modelCompare.Conditions[i];
+                condition.ComparisonStatus = null;
+                condition.ValueCompare = null;
+                for (var j = 0; j < comparisonResults.length; j++) {
+                    comparisonResult = comparisonResults[j];
+                    if (comparisonResult.EntityType === "AcBuildCriteriaCondition") {
+                        if (comparisonResult.Id2 === condition.Id) {
+                            if (comparisonResult.MissingFrom === 1) {
+                                condition.ComparisonStatus = "Deleted";
+                                break;
+                            }
+                        }
+                    }
+                }
+                if (condition.ComparisonStatus === "Deleted") {
+                    dataSource.push(condition);
+                }
+            }
+
+            grdConditionsStandard.dxDataGrid("columnOption", "ComparisonStatus", "visible", true);
+            grdConditionsRule.dxDataGrid("columnOption", "ComparisonStatus", "visible", true);
+        }
+        else {
+            for (var i = 0; i < conditions.length; i++) {
+                conditions[i].ComparisonStatus = null;
+            }
+            dataSource = conditions;
+
+            grdConditionsStandard.dxDataGrid("columnOption", "ComparisonStatus", "visible", false);
+            grdConditionsRule.dxDataGrid("columnOption", "ComparisonStatus", "visible", false);
+        }
+        grdConditionsStandard.dxDataGrid("instance").option("dataSource", dataSource);
+        grdConditionsRule.dxDataGrid("instance").option("dataSource", dataSource);
+    }
+
+
+    function refreshUi() {
+        refreshFields();
+        //refreshCompare();
+        //refreshReview();
+        //refreshDrpCompareToDataSource();
+        refreshConditionsDataSource();
+        //refreshAcdReviewDataSource();
+    }
+
+    function conditionsViewToggle() {
+        var grdConditionsStandard = $("#grdConditionsStandard");
+        var grdConditionsRule = $("#grdConditionsRule");
+        var btnConditionsViewToggle = $("#btnConditionsViewToggle");
+        if (grdConditionsStandard.is(":visible")) {
+            grdConditionsStandard.hide();
+            grdConditionsRule.show();
+            btnConditionsViewToggle.html("Switch To Standard View");
+        }
+        else {
+            grdConditionsStandard.show();
+            grdConditionsRule.hide();
+            btnConditionsViewToggle.html("Switch To Build Rule View");
+        }
+    }
+
+
+    function cellTemplateConditions(container, options) {
+        var divContent = $("<div></div>");
+        if (comparisonEnabled) {
+            if (options.column.dataField === "ComparisonStatus") {
+                var icon = $("<i></i>");
+                if (options.data.ComparisonStatus === "Deleted") {
+                    icon.addClass("dx-icon-remove");
+                }
+                else if (options.data.ComparisonStatus === "Inserted") {
+                    icon.addClass("dx-icon-add");
+                }
+                else if (options.data.ComparisonStatus === "Updated") {
+                    icon.addClass("dx-icon-edit");
+                }
+                else {
+                    icon.addClass("dx-icon-equal");
+                }
+                divContent.append(icon).append("&nbsp;&nbsp;").append(@MvcHtmlString.Create("options.text"));
+            }
+            else if (options.data.ComparisonStatus === "Inserted") {
+                var insElement = $("<ins>" + @MvcHtmlString.Create("options.text") + "</ins>");
+                divContent.append(insElement);
+            }
+            else if (options.data.ComparisonStatus === "Deleted") {
+                var delElement = $("<del>" + @MvcHtmlString.Create("options.text") + "</del>");
+                divContent.append(delElement);
+            }
+            else if (options.data.ComparisonStatus === "Updated" && options.column.dataField === "Value") {
+                var insElement = $("<ins>" + @MvcHtmlString.Create("options.text") + "</ins>");
+                divContent.append(insElement);
+                var delElement = $("<del>" + options.data.ValueCompare + "</del>");
+                divContent.append("&nbsp;").append(delElement);
+            }
+            else {
+                divContent.append(@MvcHtmlString.Create("options.text"));
+            }
+        }
+        else {
+            divContent.append(@MvcHtmlString.Create("options.text"));
+        }
+        container.append(divContent);
+    }
+
+    $("document").ready(function () {
+
+        // set initially to hidden (can be toggled in the UI)
+        $("#grdConditionsRule").hide();
+
+        // expand the comparison section only if comparison is currently enabled
+        if (comparisonEnabled) {
+            var accCompare = $("#accCompare");
+            accCompare.addClass("open");
+            updateAccordionPanelFromLabel(accCompare[0]);
+        }
+
+        var drpCompareDefaultValue = null;
+        if (modelCompare) drpCompareDefaultValue = modelCompare.Id;
+        $("#drpCompareTo").dxSelectBox({
+            valueExpr: "Id",
+            displayExpr: function (item) {
+                var result = null;
+                if (item) {
+                    result = "Version " + item.Version;
+                    if (item.IsPOR) result += "; PRQ";
+                    else result += "; " + item.Status.Name;
+                    result += "; " + item.CreatedBy;
+                }
+                return result;
+            },
+            onValueChanged: function (e) {
+                if (e.event !== undefined) { // do not enter this block if value was changed programatically
+                    var idCompare = e.value;
+                    if (idCompare) {
+                        Nsga.Callisto.AutoChecker.getBuildCriteriaDetails(model.Id, idCompare, onSuccess, onError);
+                    }
+                    else {
+                        comparisonEnabled = false;
+                        refreshUi();
+                    }
+                }
+            },
+            value: drpCompareDefaultValue,
+            width: "300px",
+        });
+
+        // grdBuildCriteria
+        var config = Nsga.Callisto.Dx.dataGridDefaultConfig();
+        config.dataSource = buildCriteria;
+        config.filterRow = { visible: false };
+        config.keyExpr = "Id";
+        config.headerFilter = { visible: false };
+        config.columns = [
+            {
+                caption: "Design",
+                dataField: "Design",
+                cellTemplate: cellTemplateConditions,
+            },
+            {
+                caption: "Product Family",
+                dataField: "ProductFamily",
+                cellTemplate: cellTemplateConditions,
+            },
+            {
+                caption: "Fabrication Facility",
+                dataField: "FabricationFacility",
+                cellTemplate: cellTemplateConditions,
+            },
+            {
+                caption: "Device",
+                dataField: "Device",
+                cellTemplate: cellTemplateConditions,
+            },
+            {
+                caption: "Capacity",
+                dataField: "Capacity",
+                cellTemplate: cellTemplateConditions,
+            },
+            {
+                caption: "Scode",
+                dataField: "Scode",
+                cellTemplate: cellTemplateConditions,
+            },
+            {
+                caption: "Media IPN",
+                dataField: "MediaIPN",
+                cellTemplate: cellTemplateConditions,
+            },
+        ];
+        $("#grdBuildCriteria").dxDataGrid(config);
+
+        // grdConditionsStandard
+        var config = Nsga.Callisto.Dx.dataGridDefaultConfig();
+        config.keyExpr = "Id";
+        config.columns = [
+            {
+                caption: "Comparison Status",
+                dataField: "ComparisonStatus",
+                cellTemplate: cellTemplateConditions,
+            },
+            {
+                caption: "Attribute",
+                dataField: "AttributeType.NameDisplay",
+                cellTemplate: cellTemplateConditions,
+            },
+            {
+                caption: "Comparison Operation",
+                dataField: "ComparisonOperation.Name",
+                cellTemplate: cellTemplateConditions,
+            },
+            {
+                caption: "Value",
+                dataField: "Value",
+                cellTemplate: cellTemplateConditions,
+            },
+        ];
+        $("#grdConditionsStandard").dxDataGrid(config);
+
+        // grdConditionsRule
+        config = Nsga.Callisto.Dx.dataGridDefaultConfig();
+        config.columnAutoWidth = true;
+        config.keyExpr = "Id";
+        config.columns = [
+            {
+                caption: "Comparison Status",
+                dataField: "ComparisonStatus",
+                cellTemplate: cellTemplateConditions,
+            },
+            //{
+            //    caption: "Design",
+            //    dataField: "Design.Name",
+            //    cellTemplate: cellTemplateConditions,
+            //},
+            //{
+            //    caption: "Product Family",
+            //    dataField: "ProductFamily.Name",
+            //    cellTemplate: cellTemplateConditions,
+            //},
+            //{
+            //    caption: "Fabrication Facility",
+            //    dataField: "FabricationFacility.Name",
+            //    cellTemplate: cellTemplateConditions,
+            //},
+            //{
+            //    caption: "Device",
+            //    dataField: "Device.Name",
+            //    cellTemplate: cellTemplateConditions,
+            //},
+            //{
+            //    caption: "Capacity",
+            //    dataField: "Capacity.Name",
+            //    cellTemplate: cellTemplateConditions,
+            //},
+            //{
+            //    caption: "Scode",
+            //    dataField: "Scode.Name",
+            //    cellTemplate: cellTemplateConditions,
+            //},
+            //{
+            //    caption: "Media IPN",
+            //    dataField: "MediaIPN.Name",
+            //    cellTemplate: cellTemplateConditions,
+            //},
+            {
+                caption: "Attribute",
+                dataField: "AttributeType.Name",
+                cellTemplate: cellTemplateConditions,
+            },
+            {
+                caption: "Logical Operation",
+                dataField: "LogicalOperation.Name",
+                cellTemplate: cellTemplateConditions,
+            },
+            {
+                caption: "Comparison Operation",
+                dataField: "ComparisonOperation.KeyTreadstone",
+                cellTemplate: cellTemplateConditions,
+            },
+            {
+                caption: "Value",
+                dataField: "Value",
+                minWidth: 500,
+                cellTemplate: cellTemplateConditions,
+            },
+        ];
+        $("#grdConditionsRule").dxDataGrid(config);
+
+
+        refreshUi();
+
+    });
+
+</script>
+
+<div class="padeightpixel">
+    <div class="rightalign">
+        <div class="padeightpixel">
+            @*<a title="Click here to create a new build criteria using this version as a starting point" id="lnkCreateNew" href=""><span class="imagelinkbutton bordered"><span class="margintwopixel">Create New From This</span></span></a>*@
+            <span><a title="Click here to view all PRQ build criteria" id="lnkAllPOR" href="/Mat/ListBuildCriteriaPOR/"><span class="imagelinkbutton bordered"><span class="fa fa-list-alt "></span><span class="margintwopixel">All PRQ</span></span></a></span>
+            <span><a title="Click here to view all non-PRQ build criteria" id="lnkAllNonPOR" href="/Mat/ListBuildCriteriaNonPOR/"><span class="imagelinkbutton bordered"><span class="fa fa-list-alt "></span><span class="margintwopixel">All Non-PRQ</span></span></a></span>
+        </div>
+    </div>
+    <div id="accDetails" class="accordion-label open">Details</div>
+    <div id="divDetails" class="accordion-panel" style="padding: 8px;">
+        <table style="width:96%; padding:2px;margin:2px;">
+            <tr>
+                <td style="width:25%"><label for="spnId" class="formlabel">Id</label></td>
+                <td style="width:25%"><span type="text" id="spnId"></span></td>
+                <td style="width:25%"><label for="spnCreatedBy" class="formlabel">Created By</label></td>
+                <td style="width:25%"><span type="text" id="spnCreatedBy"></span></td>
+            </tr>
+            <tr>
+                <td><label for="spnVersion" class="formlabel">Version</label></td>
+                <td><span type="text" id="spnVersion"></span></td>
+                <td><label for="spnCreatedOn" class="formlabel">Created On</label></td>
+                <td><span type="text" id="spnCreatedOn"></span></td>
+            </tr>
+            <tr>
+                <td><label for="spnIsActive" class="formlabel">Is Active?</label></td>
+                <td><span type="text" id="spnIsActive"></span></td>
+                <td><label for="spnUpdatedBy" class="formlabel">Updated By</label></td>
+                <td><span type="text" id="spnUpdatedBy"></span></td>
+            </tr>
+            <tr>
+                <td><label for="spnIsPOR" class="formlabel">Is PRQ?</label></td>
+                <td><span type="text" id="spnIsPOR"></span></td>
+                <td><label for="spnUpdatedOn" class="formlabel">Last Updated On</label></td>
+                <td><span type="text" id="spnUpdatedOn"></span></td>
+            </tr>
+            <tr>
+                <td><label for="spnStatus" class="formlabel">Status</label></td>
+                <td><span type="text" id="spnStatus"></span></td>
+                <td><label for="spnEffectiveOn" class="formlabel">Effective On</label></td>
+                <td><span type="text" id="spnEffectiveOn"></span></td>
+            </tr>
+            @*<tr>
+                <td><label for="spnDesign" class="formlabel">Design</label></td>
+                <td><span type="text" id="spnDesign"></span></td>
+                <td><label for="spnFabricationFacility" class="formlabel">Fabrication Facility</label></td>
+                <td><span type="text" id="spnFabricationFacility"></span></td>
+            </tr>
+            <tr>
+                <td><label for="spnDevice" class="formlabel">Device</label></td>
+                <td><span type="text" id="spnDevice"></span></td>
+                <td><label for="spnCapacity" class="formlabel">Capacity</label></td>
+                <td><span type="text" id="spnCapacity"></span></td>
+            </tr>
+            <tr>
+                <td><label for="spnScode" class="formlabel">Scode</label></td>
+                <td><span type="text" id="spnScode"></span></td>
+                <td><label for="spnMediaIpn" class="formlabel">Media IPN</label></td>
+                <td><span type="text" id="spnMediaIpn"></span></td>
+            </tr>
+            <tr>
+                <td><label for="spnComments" class="formlabel">Comments</label></td>
+                <td colspan="3"><span type="text" id="spnComments"></span></td>
+            </tr>*@
+        </table>
+    </div>
+    <div id="accCompare" class="accordion-label">Compare To</div>
+    <div id="divCompare" class="accordion-panel">
+        <table style="margin: auto;">
+            <tr>
+                <td><div id="drpCompareTo"></div></td>
+                <td><a title="Click here to view details for the version selected" id="lnkCompareTo" href="" target="_blank">View Details</a></td>
+            </tr>
+        </table>
+    </div>
+    <div id="accConditions" class="accordion-label open">Criteria</div>
+    <div id="divConditions" class="accordion-panel">
+        <div id="divConditionsViewToggle" style="text-align: right;"><button id="btnConditionsViewToggle" onclick="conditionsViewToggle()" style="width: 200px;">Switch To Build Rule View</button></div>
+        <div id="grdBuildCriteria"></div>
+        <div id="grdConditionsStandard"></div>
+        <div id="grdConditionsRule"></div>
+    </div>
+    <div id="accReview" class="accordion-label open">Review</div>
+    <div id="divReview" class="accordion-panel">
+        <div id="divSubmitCancel" style="padding: 8px; width: 100%; text-align: center; display: none;"><button id="btnCancel" onclick="cancel()">Cancel</button>&nbsp;&nbsp;<button id="btnSubmit" onclick="submit1()">Submit For Review</button></div>
+        <div id="acdReview" style="padding: 8px; width: 100%;"></div>
+    </div>
+</div>

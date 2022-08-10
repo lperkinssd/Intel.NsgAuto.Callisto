@@ -1,0 +1,114 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MATs.MATVersions" Collapsed="true">
+    <Position X="2.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\MATs\MATVersions.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MATs.MATVersionImportResponse" Collapsed="true">
+    <Position X="0.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQACAAAA=</HashCode>
+      <FileName>Entities\MATs\MATVersionImportResponse.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MATs.MATVersion" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="5.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAACEAAEAAAAAAAAEAAAAAACAAACAAAAIACAAAAAAAE=</HashCode>
+      <FileName>Entities\MATs\MATVersion.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MATs.MATsImport" Collapsed="true">
+    <Position X="4" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\MATs\MATsImport.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MATs.MATs" Collapsed="true">
+    <Position X="2.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAA=</HashCode>
+      <FileName>Entities\MATs\MATs.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MATs.MATImport" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="0.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAAAAAAhAAAAggRBgABAgAAAECIAAEAAAAIIAAIAAA=</HashCode>
+      <FileName>Entities\MATs\MATImport.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MATs.MATAttributeType" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="5.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACCAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\MATs\MATAttributeType.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MATs.MATAttributes" Collapsed="true">
+    <Position X="4" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\MATs\MATAttributes.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MATs.MATAttribute" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="2.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACCEAAAAAIAAACAAAAAAAQAAAACAAAAIAAgAAAAIAE=</HashCode>
+      <FileName>Entities\MATs\MATAttribute.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MATs.MAT" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="0.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQACEAAAhAAAAkgRAgABAAAQAECKgAAAIAAIIAAIAAE=</HashCode>
+      <FileName>Entities\MATs\MAT.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Interface Name="Intel.NsgAuto.Callisto.Business.Entities.MATs.IMATVersion" Collapsed="true">
+    <Position X="5.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAACEAAEAAAAAAAAEAAAAAACAAACAAAAIAAAAAAAAAE=</HashCode>
+      <FileName>Entities\MATs\IMATVersion.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Intel.NsgAuto.Callisto.Business.Entities.MATs.IMATImport" Collapsed="true">
+    <Position X="5.75" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAAAAAAhAAAAggRBgABAgAAAECIAAEAAAAIIAAIAAA=</HashCode>
+      <FileName>Entities\MATs\IMATImport.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Intel.NsgAuto.Callisto.Business.Entities.MATs.IMATAttributeType" Collapsed="true">
+    <Position X="4" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACCAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\MATs\IMATAttributeType.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Intel.NsgAuto.Callisto.Business.Entities.MATs.IMATAttribute" Collapsed="true">
+    <Position X="2.25" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACCEAAAAAIAAACAAAAAAAQAAAACAAAAIAAgAAAAIAE=</HashCode>
+      <FileName>Entities\MATs\IMATAttribute.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Intel.NsgAuto.Callisto.Business.Entities.MATs.IMAT" Collapsed="true">
+    <Position X="0.5" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQACEAAAhAAAAkgRAgABAAAQAECKgAAAIAAIIAAIAAE=</HashCode>
+      <FileName>Entities\MATs\IMAT.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

@@ -1,0 +1,251 @@
+﻿@{
+    ViewBag.Title = "Access Denied";
+    Layout = "~/Views/Shared/_ErrorLayout.cshtml";
+}
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $('.shot').hide();
+        $('#btnScreenshotsToggler').bind("click", function (e) {
+            e.preventDefault();
+            var _$self = $(this);            
+            var icon = _$self.find("i"); 
+            if (_$self.hasClass('hidescreenshots')) {                
+                $('.shot').hide();
+                icon.removeClass('fa-eye-slash').addClass('fa-eye');
+                _$self.removeClass('hidescreenshots').addClass('showscreenshots');
+            } else {
+                $('.shot').show();
+                icon.removeClass('fa-eye').addClass('fa-eye-slash');
+                _$self.removeClass('showscreenshots').addClass('hidescreenshots');                
+            }
+        });
+    });
+</script>
+<style scoped>
+    li { padding:6px;}
+    .infotext{font-size:12px;}
+    .fa-check-circle { font-size:18px;}
+    .green{color:green;}
+    .screenshotpage {margin: 2px;width:920px;}
+    .screenshot {margin: 2px;}
+    #btnScreenshotsToggler{cursor:pointer;}
+</style>
+<div class="fixed">
+    <div class="fixed">
+        <!-- Callisto Users -->
+        <div class="bluebox padtenpixel">
+            <div>
+                <div class="bglightblue bluebox padtenpixel infotext inline">
+                    <span class="fas fa-exclamation-circle"></span>You will require application access to use Callisto.
+                </div>
+                <div class="infotext inline">
+                    <div id="btnScreenshotsToggler" class="floatright showscreenshots imagelinkbutton bordered" title="Click to view screen shots">
+                        <i class="far fa-eye"></i><span class="margintwopixel">Screen Shots</span>
+                    </div>
+                </div>
+            </div>
+            <div style="margin-top:20px;">
+                <div class="subheading">How to get application access?</div>
+                <div class="padfourpixel infotext" style="font-size:11px;"><span class="fas fa-exclamation-circle"></span>Click the 'Screen Shots' button to view screen shots with instructions.</div>
+                <ul>
+                    <li><span class="infotext far fa-hand-point-right"></span>Browse to <span class="bold"><a href="link here" target="_blank">AGS</a></span></li>
+                    <li>
+                        <span class="infotext far fa-hand-point-right"></span>Search for the user who needs access. Search for Users by Name, WWID, Email, or IDSID.
+                        <img src="/Images/ags/searchuser.jpg" class="bluebox screenshotpage shot" />
+                    </li>
+                    <li>
+                        <span class="infotext far fa-hand-point-right"></span>Select the user by clicking <i class="far fa-check-circle"></i>. Selection will be indicated by a <i class="fas fa-check-circle green"></i>.
+                        <img src="/Images/ags/selectusers.jpg" class="bluebox screenshotpage shot" />
+                    </li>
+                    <li><span class="infotext far fa-hand-point-right"></span>Click 'Next' button.</li>
+                    <li>
+                        <span class="infotext far fa-hand-point-right"></span>In the Add Access tab, <span class="bold">'Search Access'</span> by typing in <span class="bold">Callisto Users</span>.
+                        <img src="/Images/ags/searchaccess.jpg" class="bluebox screenshotpage shot" />
+                    </li>
+                    <li>
+                        <span class="infotext far fa-hand-point-right"></span>Select the access by clicking <i class="far fa-check-circle"></i>. Selection will be indicated by a <i class="fas fa-check-circle green"></i>. Click 'Next' button.
+                        <img src="/Images/ags/providejustification.jpg" class="bluebox screenshotpage shot" />
+                    </li>
+                    <li>
+                        <span class="infotext far fa-hand-point-right"></span>Provide justification in the comments box. You may choose to apply same justification comment to all selected role(s).
+                        <div>
+                            <img src="/Images/ags/providecomments.jpg" class="bluebox screenshot shot" />
+                        </div>
+                    </li>
+                    <li>
+                        <span class="infotext far fa-hand-point-right"></span>Click 'Submit' button.
+                        <img src="/Images/ags/submit.jpg" class="bluebox screenshotpage shot" />
+                    </li>
+                    <li><span class="infotext far fa-hand-point-right"></span>You should see a message stating 'Request submitted successfully.'</li>
+                </ul>
+            </div>
+            <div>
+                <div class="warningtext padtenpixel" style="font-size:12px;"><span class="fas fa-exclamation-triangle"></span>Note: After receiving the approval completion email notification, it may take upto an hour for your access to be enabled.</div>
+            </div>
+        </div>
+
+        <!-- Callisto NAND Users -->
+        <div class="bluebox padtenpixel">
+            <div style="margin-top:20px;">
+                <div class="subheading">How to get technology data access?</div>
+                <div class="padfourpixel infotext" style="font-size:11px;"></div>
+                <ul>
+                    <li><span class="infotext far fa-hand-point-right"></span>Browse to <span class="bold"><a href="link here" target="_blank">AGS</a></span></li>
+                    <li>
+                        <span class="infotext far fa-hand-point-right"></span>Search for the user who needs access. Search for Users by Name, WWID, Email, or IDSID.
+                    </li>
+                    <li>
+                        <span class="infotext far fa-hand-point-right"></span>Select the user by clicking <i class="far fa-check-circle"></i>. Selection will be indicated by a <i class="fas fa-check-circle green"></i>.
+                        <img src="/Images/ags/selectusers.jpg" class="bluebox screenshotpage shot" />
+                    </li>
+                    <li><span class="infotext far fa-hand-point-right"></span>Click 'Next' button.</li>
+
+                    <!-- NAND technology data access-->
+                    <li>
+                        <span class="infotext far fa-hand-point-right"></span>To request "NAND technology data access",
+                        <span class="infotext far fa-hand-point-right"></span>In the Add Access tab, <span class="bold">'Search Access'</span> by typing in <span class="bold">Callisto NAND Users</span>.
+                        <img src="/Images/ags/searchaccess.jpg" class="bluebox screenshotpage shot" />
+                    </li>
+                    <!-- Select the item in the search result -->
+                    <li>
+                        <span class="infotext far fa-hand-point-right"></span>Select the access by clicking <i class="far fa-check-circle"></i>. Selection will be indicated by a <i class="fas fa-check-circle green"></i>. Click 'Next' button.
+                        <img src="/Images/ags/providejustification.jpg" class="bluebox screenshotpage shot" />
+                    </li>
+                    <!--- NAND tech data access END -->
+                    <li>
+                        <img src="/Images/ags/searchaccess.jpg" class="bluebox screenshotpage shot" />
+                    </li>
+
+                    <!-- Select the item in the search result -->
+                    <li>
+                        <span class="infotext far fa-hand-point-right"></span>Select the access by clicking <i class="far fa-check-circle"></i>. Selection will be indicated by a <i class="fas fa-check-circle green"></i>. Click 'Next' button.
+                        <img src="/Images/ags/providejustification.jpg" class="bluebox screenshotpage shot" />
+                    </li>
+
+                    <!-- Both NAND data access -->
+                    <li>
+                        <span class="infotext far fa-hand-point-right"></span>To request Both "NAND access",
+                        <span class="infotext far fa-hand-point-right"></span>In the Add Access tab, <span class="bold">'Search Access'</span> by typing in <span class="bold">both "Callisto NAND Users"</span>.
+                        <img src="/Images/ags/searchaccess.jpg" class="bluebox screenshotpage shot" />
+                    </li>
+
+                    <!-- Select the item in the search result -->
+                    <li>
+                        <span class="infotext far fa-hand-point-right"></span>Select the access by clicking <i class="far fa-check-circle"></i>. Selection will be indicated by a <i class="fas fa-check-circle green"></i>.
+                    </li>
+
+                    <!-- Select the item in the search result -->
+                    <!-- Comment Box -->
+                    <li>
+                        <span class="infotext far fa-hand-point-right"></span>Provide justification in the comments box. You may choose to apply same justification comment to all selected role(s).
+                        <div>
+                            <img src="/Images/ags/providecomments.jpg" class="bluebox screenshot shot" />
+                        </div>
+                    </li>
+                    <!-- Submit Button -->
+                    <li>
+                        <span class="infotext far fa-hand-point-right"></span>Click 'Submit' button.
+                        <img src="/Images/ags/submit.jpg" class="bluebox screenshotpage shot" />
+                    </li>
+
+                    <!-- Request submitted successfully msg -->
+                    <li><span class="infotext far fa-hand-point-right"></span>You should see a message stating 'Request submitted successfully.'</li>
+                </ul>
+            </div>
+            <div>
+                <div class="warningtext padtenpixel" style="font-size:12px;"><span class="fas fa-exclamation-triangle"></span>Note: After receiving the approval completion email notification, it may take upto an hour for your access to be enabled.</div>
+            </div>
+        </div>
+
+        <!-- Callisto Autochecker Criteria Authors-->
+        <div class="bluebox padtenpixel">
+            <div style="margin-top:20px;">
+                <div class="subheading">How to get feature access?</div>
+                <div class="padfourpixel infotext" style="font-size:11px;"></div>
+                <ul>
+                    <li><span class="infotext far fa-hand-point-right"></span>Browse to <span class="bold"><a href="https://ags.domain.com/identityiq/accessRequest/accessRequest.jsf#/accessRequestSelf/add" target="_blank">AGS</a></span></li>
+                    <li>
+                        <span class="infotext far fa-hand-point-right"></span>Search for the user who needs access. Search for Users by Name, WWID, Email, or IDSID.
+                    </li>
+                    <li>
+                        <span class="infotext far fa-hand-point-right"></span>Select the user by clicking <i class="far fa-check-circle"></i>. Selection will be indicated by a <i class="fas fa-check-circle green"></i>.
+                        <img src="/Images/ags/selectusers.jpg" class="bluebox screenshotpage shot" />
+                    </li>
+                    <li><span class="infotext far fa-hand-point-right"></span>Click 'Next' button.</li>
+
+                    <!-- Callisto Autochecker Criteria Authors technology data access-->
+                    <li>
+                        <span class="infotext far fa-hand-point-right"></span>To request "Autochecker Criteria Authors feature access",
+                        <span class="infotext far fa-hand-point-right"></span>In the Add Access tab, <span class="bold">'Search Access'</span> by typing in <span class="bold">Callisto Autochecker Criteria Authors </span>.
+                        <img src="/Images/ags/searchaccess.jpg" class="bluebox screenshotpage shot" />
+                    </li>
+                    <!-- Select the item in the search result -->
+                    <li>
+                        <span class="infotext far fa-hand-point-right"></span>Select the access by clicking <i class="far fa-check-circle"></i>. Selection will be indicated by a <i class="fas fa-check-circle green"></i>. Click 'Next' button.
+                        <img src="/Images/ags/providejustification.jpg" class="bluebox screenshotpage shot" />
+                    </li>
+                    <!--- Autochecker tech data access END -->
+                    <!-- -->
+                    <!-- Callisto OSAT PAS Authors -->
+                    <li>
+                        <span class="infotext far fa-hand-point-right"></span>To request "OSAT PAS Authors features access",
+                        <span class="infotext far fa-hand-point-right"></span>In the Add Access tab, <span class="bold">'Search Access'</span> by typing in <span class="bold">Callisto OSAT PAS Authors </span>.
+                        <img src="/Images/ags/searchaccess.jpg" class="bluebox screenshotpage shot" />
+                    </li>
+                    <!-- Select the item in the search result -->
+                    <li>
+                        <span class="infotext far fa-hand-point-right"></span>Select the access by clicking <i class="far fa-check-circle"></i>. Selection will be indicated by a <i class="fas fa-check-circle green"></i>. Click 'Next' button.
+                        <img src="/Images/ags/providejustification.jpg" class="bluebox screenshotpage shot" />
+                    </li>
+                    <!-- Callisto OSAT PAS Authors END -->
+                    
+                    <!-- Callisto OSAT Criteria Authors -->
+                    <li>
+                        <span class="infotext far fa-hand-point-right"></span>To request "OSAT Criteria Authors access",
+                        <span class="infotext far fa-hand-point-right"></span>In the Add Access tab, <span class="bold">'Search Access'</span> by typing in <span class="bold">Callisto OSAT Criteria Authors </span>.
+                        <img src="/Images/ags/searchaccess.jpg" class="bluebox screenshotpage shot" />
+                    </li>
+                    <!-- Select the item in the search result -->
+                    <li>
+                        <span class="infotext far fa-hand-point-right"></span>Select the access by clicking <i class="far fa-check-circle"></i>. Selection will be indicated by a <i class="fas fa-check-circle green"></i>. Click 'Next' button.
+                        <img src="/Images/ags/providejustification.jpg" class="bluebox screenshotpage shot" />
+                    </li>
+                    <!-- Callisto OSAT Criteria Authors END -->
+
+                    <!-- Callisto ODM Qual Filter Authors -->
+                    <li>
+                        <span class="infotext far fa-hand-point-right"></span>To request "ODM Qual Filter Authors feature access",
+                        <span class="infotext far fa-hand-point-right"></span>In the Add Access tab, <span class="bold">'Search Access'</span> by typing in <span class="bold">Callisto ODM Qual Filter Authors </span>.
+                        <img src="/Images/ags/searchaccess.jpg" class="bluebox screenshotpage shot" />
+                    </li>
+                    <!-- Select the item in the search result -->
+                    <li>
+                        <span class="infotext far fa-hand-point-right"></span>Select the access by clicking <i class="far fa-check-circle"></i>. Selection will be indicated by a <i class="fas fa-check-circle green"></i>. Click 'Next' button.
+                        <img src="/Images/ags/providejustification.jpg" class="bluebox screenshotpage shot" />
+                    </li>
+                    <!-- Callisto ODM Qual Filters Authors -->
+
+                    <!-- Comment Box -->
+                    <li>
+                        <span class="infotext far fa-hand-point-right"></span>Provide justification in the comments box. You may choose to apply same justification comment to all selected role(s).
+                        <div>
+                            <img src="/Images/ags/providecomments.jpg" class="bluebox screenshot shot" />
+                        </div>
+                    </li>
+                    <!-- Submit Button -->
+                    <li>
+                        <span class="infotext far fa-hand-point-right"></span>Click 'Submit' button.
+                        <img src="/Images/ags/submit.jpg" class="bluebox screenshotpage shot" />
+                    </li>
+
+                    <!-- Request submitted successfully msg -->
+                    <li><span class="infotext far fa-hand-point-right"></span>You should see a message stating 'Request submitted successfully.'</li>
+                </ul>
+            </div>
+            <div>
+                <div class="warningtext padtenpixel" style="font-size:12px;"><span class="fas fa-exclamation-triangle"></span>Note: After receiving the approval completion email notification, it may take upto an hour for your access to be enabled.</div>
+            </div>
+        </div>
+    </div>
+</div>

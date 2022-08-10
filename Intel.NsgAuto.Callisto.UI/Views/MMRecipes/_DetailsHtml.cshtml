@@ -1,0 +1,215 @@
+﻿<div id="divMMRecipeContent" style="display:none;margin-top: 5px;">
+
+    <div class="graybox bglightgray padeightpixel">
+        <div>
+            <div class="subheading">System Information</div>
+        </div>
+        <div>
+            <table style="width:96%; padding:2px;margin:2px;">
+                <tr>
+                    <td style="width:25%"><label for="spnPCode" class="formlabel">PCode MM Number</label></td>
+                    <td style="width:25%"><span type="text" id="spnPCode"></span></td>
+                    <td style="width:25%"><label for="spnVersion" class="formlabel">Version</label></td>
+                    <td style="width:25%"><span type="text" id="spnVersion"></span></td>
+                </tr>
+                <tr>
+                    <td><label for="spnCreatedBy" class="formlabel">Created By</label></td>
+                    <td><span type="text" id="spnCreatedBy"></span></td>
+                    <td><label for="spnUpdatedBy" class="formlabel">Updated By</label></td>
+                    <td><span type="text" id="spnUpdatedBy"></span></td>
+                </tr>
+                <tr>
+                    <td><label for="spnCreatedOn" class="formlabel">Created On</label></td>
+                    <td><span type="text" id="spnCreatedOn"></span></td>
+                    <td><label for="spnUpdatedOn" class="formlabel">Updated On</label></td>
+                    <td><span type="text" id="spnUpdatedOn"></span></td>
+                </tr>
+                <tr>
+                    <td><label for="spnIsPOR" class="formlabel">Is POR?</label></td>
+                    <td><span type="text" id="spnIsPOR"></span></td>
+                    <td><label for="spnStatus" class="formlabel">Status</label></td>
+                    <td><span type="text" id="spnStatus"></span></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="graybox bglightgray padeightpixel">
+        <div>
+            <div class="subheading">Product Details</div>
+        </div>
+        <div>
+            <table style="width:96%; padding:2px;margin:2px;">
+                <tr>
+                    <td style="width:25%"><label for="spnProductName" class="formlabel">Product Name</label></td>
+                    <td style="width:25%"><span type="text" id="spnProductName"></span></td>
+                    <td style="width:25%"><label for="dbPRQDate" class="formlabel">PRQ Date</label></td>
+                    <td style="width:25%"><div id="dbPRQDate"></div></td>
+                </tr>
+                <tr>
+                    <td><label for="spnFamilyName" class="formlabel">Family Name</label></td>
+                    <td><span type="text" id="spnFamilyName"></span></td>
+                    <td><label for="ddlCustomerQualStatus" class="formlabel">Customer Qual Status</label></td>
+                    <td><div id="ddlCustomerQualStatus"></div></td>
+                </tr>
+                <tr>
+                    <td><label for="spnMOQ" class="formlabel">MOQ</label></td>
+                    <td><span type="text" id="spnMOQ"></span></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td><label for="spnProductionProductCode" class="formlabel">Production Product Code</label></td>
+                    <td><span type="text" id="spnProductionProductCode"></span></td>
+                    <td><label for="spnSCodeProductCode" class="formlabel">SCode Product Code</label></td>
+                    <td><span type="text" id="spnSCodeProductCode"></span></td>
+                </tr>
+                <tr>
+                    <td><label for="spnSCode" class="formlabel">SCode MM Number</label></td>
+                    <td><span type="text" id="spnSCode"></span></td>
+                    <td><label for="spnModelString" class="formlabel">Model String</label></td>
+                    <td><span type="text" id="spnModelString"></span></td>
+                </tr>
+                <tr>
+                    <td><label for="spnFormFactor" class="formlabel">Form Factor</label></td>
+                    <td><span type="text" id="spnFormFactor"></span></td>
+                    <td><label for="ddlPLCStage" class="formlabel">PLC Stage</label></td>
+                    <td><div id="ddlPLCStage"></div></td>
+                </tr>
+                <tr>
+                    <td><label for="spnCustomer" class="formlabel">Customer</label></td>
+                    <td><span type="text" id="spnCustomer"></span></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="graybox bglightgray padeightpixel" style="margin-top: 5px;">
+        <div>
+            <div class="subheading">NAND/Media Details</div>
+        </div>
+        <div style="width: 100%;">
+            <div id="grdNandMediaItems"></div>
+        </div>
+    </div>
+
+    <div class="graybox bglightgray padeightpixel" style="margin-top: 5px;">
+        <div>
+            <div class="subheading">Other Associated Items</div>
+        </div>
+        <div style="width: 100%;">
+            <div id="grdOtherAssociatedItems"></div>
+        </div>
+    </div>
+
+    <div class="graybox bglightgray padeightpixel" style="margin-top: 5px;">
+        <div>
+            <div class="subheading">Product Label List</div>
+        </div>
+        <div>
+            <table style="width:96%; padding:2px;margin:2px;">
+                <tr>
+                    <td style="width:20%"><label for="spnOpalType" class="formlabel">Opal Type</label></td>
+                    <td style="width:40%"><span type="text" id="spnOpalType"></span></td>
+                    <td style="width:20%"><label for="spnCapacity" class="formlabel">Density/Capacity</label></td>
+                    <td style="width:20%"><span type="text" id="spnCapacity"></span></td>
+                </tr>
+                <tr>
+                    <td><label for="spnProductFamilyNameSeries" class="formlabel" title="(BSN label spec)">Product Family Name Series</label></td>
+                    <td><span type="text" id="spnProductFamilyNameSeries"></span></td>
+                    <td><label for="spnVoltageCurrent" class="formlabel">Voltage/Current</label></td>
+                    <td><span type="text" id="spnVoltageCurrent"></span></td>
+                </tr>
+                <tr>
+                    <td><label for="spnKCCId" class="formlabel">KCC ID #</label></td>
+                    <td><span type="text" id="spnKCCId"></span></td>
+                    <td><label for="spnCanadianStringClass" class="formlabel">Canadian String</label></td>
+                    <td><span type="text" id="spnCanadianStringClass"></span></td>
+                </tr>
+                <tr>
+                    <td><label for="spnUPC" class="formlabel">UPC</label></td>
+                    <td><span type="text" id="spnUPC"></span></td>
+                    <td><label for="spnInterfaceSpeed" class="formlabel" title="(XGb/s) SATA SFF only">Interface Speed</label></td>
+                    <td><span type="text" id="spnInterfaceSpeed"></span></td>
+                </tr>
+            </table>
+        </div>
+        <div>
+            <div class="subheading">Customer Specific Attributes</div>
+        </div>
+        <div style="width: 100%; padding-top:5px;">
+            <div id="grdProductLabelAttributes"></div>
+        </div>
+    </div>
+
+    <div class="graybox bglightgray padeightpixel" style="margin-top: 5px; display: none;">
+        <div>
+            <div class="subheading">Testing Component</div>
+        </div>
+        <div>
+            <table style="width:96%; padding:2px;margin:2px;">
+                <tr>
+                    <td style="width:25%"><label for="spnTTVersion" class="formlabel">TT Version</label></td>
+                    <td style="width:25%"><span type="text" id="spnTTVersion"></span></td>
+                    <td style="width:25%"><label for="spnBaseBoardBootLoader" class="formlabel">Base Board Boot Loader</label></td>
+                    <td style="width:25%"><span type="text" id="spnBaseBoardBootLoader"></span></td>
+                </tr>
+                <tr>
+                    <td><label for="spnFWVersion" class="formlabel">FW Version</label></td>
+                    <td><span type="text" id="spnFWVersion"></span></td>
+                    <td><label for="spnMICVersion" class="formlabel">MIC Version</label></td>
+                    <td><span type="text" id="spnMICVersion"></span></td>
+                </tr>
+                <tr>
+                    <td><label for="spnSCodeTestingSA" class="formlabel">S-Code Testing SA</label></td>
+                    <td><span type="text" id="spnSCodeTestingSA"></span></td>
+                    <td><label for="spnPCodeTestingSA" class="formlabel">P-Code Testing SA</label></td>
+                    <td><span type="text" id="spnPCodeTestingSA"></span></td>
+                </tr>
+                <tr>
+                    <td><label for="spnEFAIToolVersion" class="formlabel">eFAI Tool Version</label></td>
+                    <td><span type="text" id="spnEFAIToolVersion"></span></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="graybox bglightgray padeightpixel" style="margin-top: 5px; display: none;">
+        <div>
+            <div class="subheading">BOM Components</div>
+        </div>
+        <div>
+            <table style="width:96%; padding:2px;margin:2px;">
+                <tr>
+                    <td style="width:25%"><label for="spnMemoryBoardBootLoader" class="formlabel">Memory Board Boot Loader</label></td>
+                    <td style="width:25%"><span type="text" id="spnMemoryBoardBootLoader"></span></td>
+                    <td style="width:25%">&nbsp;</td>
+                    <td style="width:25%">&nbsp;</td>
+                </tr>
+                <tr>
+                    <td><label for="spnBaseBoardPIC" class="formlabel">Base Board PIC</label></td>
+                    <td><span type="text" id="spnBaseBoardPIC"></span></td>
+                    <td><label for="spnBaseBoardPCB" class="formlabel">Base Board PCB</label></td>
+                    <td><span type="text" id="spnBaseBoardPCB"></span></td>
+                </tr>
+                <tr>
+                    <td><label for="spnBaseBoardEEPROM" class="formlabel">Base Board EEPROM</label></td>
+                    <td><span type="text" id="spnBaseBoardEEPROM"></span></td>
+                    <td><label for="spnBaseBoardASICRev" class="formlabel">Base Board ASIC Rev</label></td>
+                    <td><span type="text" id="spnBaseBoardASICRev"></span></td>
+                </tr>
+                <tr>
+                    <td><label for="spnMemoryBoardASICRev" class="formlabel">Memory Board ASIC Rev</label></td>
+                    <td><span type="text" id="spnMemoryBoardASICRev"></span></td>
+                    <td><label for="spnMemoryBoardPCB" class="formlabel">Memory Board PCB</label></td>
+                    <td><span type="text" id="spnMemoryBoardPCB"></span></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+</div>

@@ -1,0 +1,27 @@
+﻿@{
+    ViewBag.Title = "Page Not Found";
+    Layout = "~/Views/Shared/_ErrorLayout.cshtml";
+}
+<style scoped>
+    li { padding: 6px; }
+    .infotext { font-size: 12px; }
+    .fa-check-circle { font-size: 18px; }
+    .green { color: green; }
+</style>
+<div class="fixed">
+    <div class="bluebox padtenpixel">
+        <div>
+            <div class="bglightblue bluebox padtenpixel">
+                The page you are looking for is not found.
+            </div>
+        </div>
+        <div style="margin-top:20px;">
+            <div class="subheading">You may try the following:</div>
+            <ul>
+                <li><span class="infotext far fa-hand-point-right"></span>If you typed the web address, check it is correct.</li>
+                <li><span class="infotext far fa-hand-point-right"></span>If you pasted the web address, check you copied the entire address.</li>
+                <li><span class="infotext far fa-hand-point-right"></span>Browse to <span><a title="Click here to access the home page" id="homelink" href="/"><span class="imagelinkbutton bordered"><span class="homelink "></span><span class="margintwopixel">Home</span> </span></a></span> and use the navigation 'Menu' option.</li>
+            </ul>
+        </div>
+    </div>
+</div>

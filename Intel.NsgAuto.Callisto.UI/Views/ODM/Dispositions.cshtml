@@ -1,0 +1,393 @@
+﻿@model Intel.NsgAuto.Callisto.UI.Models.Odm.DispositionsModel
+
+@{
+    ViewBag.Title = "Dispositions";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style scoped>
+    .modal { display: none; position: fixed; z-index: 1; /* Sit on top */ left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgb(0,0,0); /* Fallback color */ background-color: rgba(0,0,0,0.4); /* Black w/ opacity */ }
+    .modal-content { background-color: #fefefe; margin: 15% auto; /* 15% from the top and centered */ padding: 20px; border: 1px solid #888; width: 80%; /* Could be more or less, depending on screen size */ }
+    .modal-close { color: #aaa; float: right; font-size: 28px; font-weight: bold; }
+    .modal-close:hover, .modal-close:focus { color: black; text-decoration: none; cursor: pointer; }
+</style>
+
+<script type="text/javascript">
+    var btnSubmit;
+
+    function showVersions(show) {
+        if (show) {
+            setSubmitButton();
+            $("#versionsPnl").show();
+            $("#dataPnl").show();
+        } else {
+            $("#versionsPnl").hide();
+            $("#dataPnl").hide();
+        }
+    };
+
+    function loadDispositionData() {
+        showProgress();
+        // Get the dispotions by version
+        var versionId = $("#ddlVersions").dxSelectBox("instance").option("value");
+        Nsga.Callisto.Odm.getDispositionsByVersion(versionId,
+            function (results) {
+                // Now let's display the data
+                displayDispositions(results);
+                hideProgress();
+            },
+            function () {
+                onError();
+            }
+        );
+    }
+
+    function setSubmitButton() {
+        btnSubmit = $("#btnSubmit").dxButton({
+            text: "Submit",
+            type: "normal",
+            width: 120,
+            onClick: function () {
+                loadDispositionData();
+            }
+        }).dxButton("instance");
+    };
+
+    var showProgress = function () {
+        $("#importIndicator").dxLoadIndicator("instance").option("visible", true);
+    };
+    var hideProgress = function () {
+        $("#importIndicator").dxLoadIndicator("instance").option("visible", false);
+    };
+    var onError = function (xhr, status) {
+        hideProgress();
+        Nsga.Callisto.Messages.showError("An unexpected error occurred. If the problem persists, contact support.");
+    };
+
+    var onUploadSuccess = function (response) {
+        if (response) {
+            // Display the version of data that got created
+            //var version = response.Version;
+            if (!response.Succeeded) {
+
+                Nsga.Callisto.Messages.showWarning(response.Messages[0]);
+                hideProgress();
+                return;
+            } 
+
+            showVersions(response.Versions.length > 0);
+            var versionMessage = "The file was imported creating version " + response.Versions[0].Version + " which should now be listed.";
+            if (response.Messages && response.Messages.length > 0) {
+                var popupOptions = {
+                    width: "500",
+                    height: "auto",
+                    contentTemplate: function () {
+                        var divMessages = $("<div />");
+                        divMessages.append($("<p>" + versionMessage + "</p><br/>"));
+                        $.each(response.Messages, function (index, message) {
+                            divMessages.append($("<p>" + message + "</p>"));
+                        });
+                        return divMessages;
+                    },
+                    showTitle: true,
+                    title: "Import Results",
+                    visible: false,
+                    dragEnabled: false,
+                    shading: false,
+                    closeOnOutsideClick: true
+                };
+
+                var popupBox = $("<div />").addClass("popup").appendTo($("#popupContainer"));
+                var popup = popupBox.dxPopup(popupOptions).dxPopup("instance");
+                popup.show();
+            }
+            else {
+                Nsga.Callisto.Messages.showSuccess(versionMessage);
+            }
+
+            // Now let's display the data
+            displayDispositions(response.Dispositions);
+            // Rebind the versions dropdown list. 
+            if (response.Versions) {
+                var ddlVersions = $("#ddlVersions").dxSelectBox("instance");
+                ddlVersions.option("items", response.Versions);
+                ddlVersions.option('value', response.Versions[0].Version);
+            }            
+
+            hideProgress();
+        }
+
+    };
+
+    var displayDispositions = function (dispositions) {
+        var records = dispositions;
+        var config = Nsga.Callisto.Dx.dataGridDefaultConfig();
+        config.dataSource = records;
+        config.keyExpr = "Id";
+        config.wordWrapEnabled = true;
+        config.columns = [
+            {
+                caption: "Version",
+                dataField: "Version",
+                width: "80px"
+            },
+            {
+                caption: "S Lot",
+                dataField: "SLot",
+                width: "90px"
+            },
+            {
+                caption: "Intel Part Number",
+                dataField: "IntelPartNumber",
+                width: "100px"
+            },
+            {
+                caption: "Reason",
+                dataField: "Reason.Name",
+                width: "150px"
+            },
+            {
+                caption: "Notes",
+                dataField: "Notes",
+                width: "80px"
+            },
+            {
+                caption: "Action",
+                dataField: "Action.DisplayText"
+            },
+            {
+                caption: "CreatedBy",
+                dataField: "CreatedBy",
+                width: "90px"
+            },
+            {
+                caption: "CreatedOn",
+                dataField: "CreatedOn"
+            },
+            {
+                caption: "UpdatedBy",
+                dataField: "UpdatedBy",
+                width: "90px"
+            },
+            {
+                caption: "UpdatedOn",
+                dataField: "UpdatedOn"
+            },
+        ];
+        $("#grdRecords").dxDataGrid(config);
+    };
+
+    function onUploadError(xhr, status, errorThrown) {
+        var message = "An unexpected error occurred. If the problem persists, contact support.";
+        if (xhr && xhr.responseJSON) {
+            if (xhr.responseJSON.ExceptionMessage) message = xhr.responseJSON.ExceptionMessage;
+            else if (xhr.responseJSON.Message) message = xhr.responseJSON.Message;
+        }
+        Nsga.Callisto.Messages.showError(message);
+        hideProgress();
+    };
+
+    var validateFile = function () {
+        var fileName = $("#uploadFile").val();
+        if (!fileName) {
+            Nsga.Callisto.Messages.showError("Please select a file to upload.");
+            return false;
+        }
+        var dotIndex = fileName.lastIndexOf(".") + 1;
+        var extension = fileName.substr(dotIndex, (fileName.length - dotIndex));
+        if (extension.toUpperCase() === "XLS" || extension.toUpperCase() === "XLSX")
+            return true;
+        else {
+            Nsga.Callisto.Messages.showError("File with " + extension + " is invalid. Upload a valid file with xls/xlsx extension.");
+            return false;
+        }
+        return true;
+    };
+
+    function clearArchive() {
+        var result = DevExpress.ui.dialog.confirm("<B>This will clear and archive all the manual disposition data. <br/>Are you sure you want to continue?</B>", "Confirm Clear & Archive");
+        result.done(function (dialogResult) {
+            if (dialogResult) {
+                showProgress();
+                //blockUI("Clearing and archieving manual disposition data. Please wait...");
+                Nsga.Callisto.Odm.clearArchiveOdmManualDisposition(onClearArchiveOdmManualDispositionSuccess, onError);
+            }
+        });
+    };
+
+    function onClearArchiveOdmManualDispositionSuccess(response) {
+        hideProgress();
+
+        if (response.Succeeded) {
+            $("#versionsPnl").hide();
+            $("#dataPnl").hide();
+            Nsga.Callisto.Messages.showSuccess("All manual disposition data has been successfully cleared and archived.");
+        } else {
+            Nsga.Callisto.Messages.showError(response.Messages[0]);
+        }
+    }
+
+    // Uploads the dispositions file to the API controller
+    var uploadFile = function (e) {
+        hideProgress();
+        if (validateFile()) {
+            showProgress();
+            // Upload the file to the API
+            var formData = new FormData();
+            var file = $("#uploadFile")[0];
+            formData.append("uploadFile", file.files[0]);
+            $.ajax({
+                url: Nsga.Callisto.Constants.URL_IMPORTODMDISPOSITIONS,
+                type: "POST",
+                beforeSend: function () {
+                    showProgress();
+                },
+                success: onUploadSuccess,
+                error: onUploadError,
+                data: formData,
+                cache: false,
+                contentType: false,
+                processData: false
+            });
+        }
+    };
+
+    var versions =  @JsonHelper.Serialize(Model.GetVersions());
+    $(document).ready(function () {
+
+        $("#modalInstructions").hide();
+        $("#btnInstructions").bind("click", function (e) {
+            $("#modalInstructions").show();
+        });
+        $("#closeInstructions").bind("click", function (e) {
+            $("#modalInstructions").hide();
+        });
+        // Create a progress indicator and hide it
+        $("#importIndicator").dxLoadIndicator({ visible: false });
+
+        $("#lnkImport").bind("click", function (e) {
+            e.preventDefault();
+            uploadFile(e);
+        });
+
+        var ddlVersions = $("#ddlVersions").dxSelectBox({
+            items: versions,
+            displayExpr: "Version",
+            valueExpr: "Version",
+            searchEnabled: true,
+            width: "150px",
+            placeholder: "Select"
+        }).dxSelectBox("instance");
+
+        if (versions) {
+            ddlVersions.option('value', versions[0].Version);
+            showVersions(versions.length > 0);
+            loadDispositionData();
+        }
+    });
+
+</script>
+<div class="fixed centered bluebox">
+    <div class="rightalign padfourpixel">
+        <div class="padfourpixel">
+            <span><a title="Click here to manage Media Attributes" id="lnkMAT" href="/ODM/MAT/"><span class="imagelinkbutton bordered"><span class="fa fa-list-alt "></span><span class="margintwopixel">Manage Media Attributes</span> </span></a></span>
+            <span><a title="Click here to manage PRF" id="lnkPRF" href="/ODM/PRF/"><span class="imagelinkbutton bordered"><span class="fa fa-list-alt "></span><span class="margintwopixel">Manage PRF</span> </span></a></span>
+            <span><a title="Qual Filters Scenarios & Results" id="lnkPRF" href="/ODM/QFScenarios/"><span class="imagelinkbutton bordered"><span class="fa fa-list-alt "></span><span class="margintwopixel">Qual Filters Scenarios & Results</span> </span></a></span>
+            <span><a title="Qual Filters Historical Scenarios" id="lnkPRF" href="/ODM/QFHistoricalScenarios/"><span class="imagelinkbutton bordered"><span class="fa fa-list-alt "></span><span class="margintwopixel">Qual Filters Historical Scenarios</span> </span></a></span>
+        </div>
+    </div>
+    @{
+        if (Intel.NsgAuto.Web.Mvc.Core.Functions.IsOdmQualFilterAuthor())
+        {
+            <div style="margin:5px; vertical-align: top; padding-left:10px" class="bluebox padfourpixel ">
+                <div style="width: 45%; display: inline-block; margin-right: 30px; margin-top:6px;">
+                    <div class="subheading" style="margin-bottom: 6px;">Step 1. Download the Template &amp; Fill Details</div>
+                    <div class="">
+                        <div style="margin-bottom: 6px;">
+                            <span class="help annotate">
+                                <span>
+                                    <a id="lnkDownload" class="imagelinkbutton bordered" href="/Templates/SlotDispositions.xlsx" target="_blank" title="Click here to download the spreadsheet template">
+                                        <span>
+                                            <span class="fas fa-file-download"></span>
+                                            <span style="padding-top: 1px; padding-bottom: 1px;">Download</span>
+                                        </span>
+                                    </a>
+                                </span>the excel file template &amp; fill up.<br /><br>
+                            </span>
+                            <div>
+                                <button id="btnInstructions">Instructions</button>
+                                <div id="modalInstructions" class="modal">
+                                    <div class="modal-content">
+                                        <span id="closeInstructions" class="modal-close">&times;</span>
+                                        @Html.Partial("_ImportInstructions")
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div style="width:49%;display:inline-block;vertical-align: top; margin-top: 2px; " class="bluebox bglightblue padfourpixel">
+                    <div class="subheading" style="margin-left: 6px">Step 2. Upload the data</div>
+                    <div class="showinline">
+                        <div class="padeightpixel" style="vertical-align:top;">
+                            <div class="">
+                                <input type="file" class="fileimport" id="uploadFile" name="uploadFile" style="width: 330px; height: 28px;" />
+                                <a id="lnkImport" class="imagelinkbutton bordered padfourpixel" href="javascript:void(0);" style="vertical-align:top;" title="Click here to browse and upload the spreadsheet with pre-defined dispositions">
+                                    <span style="padding-top: 1px; padding-bottom: 1px;padding-left:1px;padding-right:1px;">
+                                        <span class="fas fa-file-upload"></span>
+                                        <span>Import</span>
+                                    </span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    <div id="versionsPnl" style="margin: 5px; vertical-align: top; display: none" class="bluebox bglightblue padeightpixel">
+        <div class="">
+            <div class="infotext">
+                <span class="fas fa-exclamation-circle" style="font-size:14px;"></span>To view existing disposition data for any version, select version &amp; click submit.
+                <span class="infotext italic">Items marked as <span class="mandatory">*</span> are required inputs</span>
+            </div>
+            <div id="divVersions" class="showinline" style="width: 100%;">
+                <!-- version -->
+                <div class="showinline" style="width: 30%; margin-top:8px;">
+                    <div class="dx-field-label">Version</div>
+                    <div class="colon floatleft" style="margin-top: 8px;"></div>
+                    <div class="inlineblock">
+                        <div id="ddlVersions" style="display:inline-block;"></div>
+                    </div>
+                </div>
+                <!--actions-->
+                <div class="showinline" style="margin-top: 10px; vertical-align: top;">
+                    <div id="btnSubmit" class="submitbutton"></div>
+                </div>
+                <div class="showinline floatright" style="margin-top: 10px; vertical-align: top;">                    
+                    <span class="marginfourpixel"><input id="btnClearArchive" type="button" value="Clear & Archive" title="Click here to clear and archive all the manual disposition data"  onclick="clearArchive()" class="submitbutton" /></span>
+                </div>
+            </div>
+            <div class="infotext">
+                <span id="spnVersion" style="margin-left:480px;"></span>
+            </div>
+            <div>
+                <div id="divValidationSummary" style="margin-left: 120px;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="importIndicator"></div>
+<div id="popupContainer" ></div>
+<div class="centeralign" id="dataPnl">
+    <div class="grid-wrapper" style="margin-top:4px;">
+        <div class="marginfourpixel">
+            <div class="gridcontainer">
+                <div id="grdRecords" style="margin-right:20px;margin-left:10px;"></div>
+                <div style="height: 20px;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+

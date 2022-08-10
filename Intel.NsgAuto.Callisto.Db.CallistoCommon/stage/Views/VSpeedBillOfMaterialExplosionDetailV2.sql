@@ -1,0 +1,1 @@
+﻿CREATE VIEW [stage].[VSpeedBillOfMaterialExplosionDetailV2] AS SELECT * FROM [stage].[BillOfMaterialExplosionDetailV2] WITH (NOLOCK);

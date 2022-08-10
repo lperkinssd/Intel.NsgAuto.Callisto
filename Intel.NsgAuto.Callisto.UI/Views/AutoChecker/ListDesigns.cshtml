@@ -1,0 +1,81 @@
+﻿@model Intel.NsgAuto.Callisto.UI.Models.AutoChecker.ListDesignsModel
+
+@{
+    ViewBag.Title = "Auto Checker - Designs";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        var records = @(JsonHelper.Serialize(Model.Products));
+        displayProducts(records);
+    });
+
+    var displayProducts = function (records){
+        // Product details grid
+        $("#grdProducts").dxDataGrid({
+            dataSource: records,
+            columnAutoWidth: true,
+            showColumnLines: true,
+            showRowLines: true,
+            rowAlternationEnabled: true,
+            showBorders: true,
+            headerFilter: { visible: true },
+            loadPanel: {
+                enabled: true
+            },
+            paging: { enabled: false },
+            editing: {
+                mode: "row",
+                allowUpdating: false,
+                allowDeleting: false,
+                allowAdding: false,
+                useIcons: true
+            },
+            columns: [
+                {
+                    dataField: "Name",
+                    caption: "Design Id",
+                    cellTemplate: function (container, options) {
+                        container.attr('style', "background-color:" + options.data['color'])
+                        $("<div class=' ' ><span class='margintwopixels'  >" + options.data['Name'] + "</span></div>")
+                                                   .appendTo(container);
+                    }
+                },
+                {
+                    dataField: "DesignFamily.Name",
+                    caption: "Family"
+                },
+                {
+                    dataField: "IsActive",
+                    caption: "Is Active?",
+                    falseText: 'N',
+                    trueText: 'Y',
+                    alignment: "center",
+                    showEditorAlways: false
+                },
+                {
+                    dataField: "CreatedBy",
+                    caption: "Created By"
+                },
+                {
+                    dataField: "UpdatedBy",
+                    caption: "Updated By"
+                },
+            ]
+        });
+    };
+</script>
+
+<div id="divContent" class="content  centered">
+    <div id="divResults" class="fixed centeralign">
+        <div class="products-wrapper" style="margin-top:4px;">
+            <div>
+                <div class="marginfourpixel">
+                    <div id="grdProducts"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

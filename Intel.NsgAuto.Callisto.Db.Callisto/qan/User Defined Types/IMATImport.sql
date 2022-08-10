@@ -1,0 +1,22 @@
+﻿CREATE TYPE [qan].[IMATImport] AS TABLE (
+    [RecordNumber]              INT           NOT NULL,
+    [SsdId]                     VARCHAR (128) NULL,
+    [DesignId]                  VARCHAR (128) NULL,
+    [Scode]                     VARCHAR (128) NULL,
+    [CellRevision]              VARCHAR (128) NULL,
+    [MajorProbeProgramRevision] VARCHAR (128) NULL,
+    [ProbeRevision]             VARCHAR (128) NULL,
+    [BurnTapeRevision]          VARCHAR (128) NULL,
+    [CustomTestingReqd]         VARCHAR (128) NULL,
+    [CustomTestingReqd2]        VARCHAR (128) NULL,
+    [ProductGrade]              VARCHAR (128) NULL,
+    [PrbConvId]                 VARCHAR (128) NULL,
+    [FabExcrId]                 VARCHAR (128) NULL,
+    [FabConvId]                 VARCHAR (128) NULL,
+    [ReticleWaveId]             VARCHAR (128) NULL,
+    [MediaIPN]                  VARCHAR (128) NULL,
+    [FabFacility]               VARCHAR (128) NULL,
+    [MediaType]                 VARCHAR (128) NULL,
+    [DeviceName]                VARCHAR (128) NULL,
+    PRIMARY KEY CLUSTERED ([RecordNumber] ASC));
+

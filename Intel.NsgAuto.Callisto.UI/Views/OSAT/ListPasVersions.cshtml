@@ -1,0 +1,325 @@
+﻿@model Intel.NsgAuto.Callisto.UI.Models.OSAT.ListPasVersionsModel
+@using System.Web.Security.AntiXss;
+@{
+    ViewBag.Title = "OSAT - PAS Versions";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style scoped>
+
+    ul.instructions > li {
+        list-style: initial;
+    }
+
+</style>
+
+<script type="text/javascript">
+
+    var entity = @(JsonHelper.Serialize(Model.Entity));
+    var versions = entity.Versions;
+    var osats = entity.Osats;
+    var designFamilies = entity.DesignFamilies;
+    var designValue = designFamilies[0].Id;
+
+    function btnInstructionsClick() {
+        $("#popInstructions").dxPopup("instance").show();
+    }
+
+    function onError(xhr, status) {
+        Nsga.Callisto.Messages.showError("An unexpected error occurred. If the problem persists, contact support.");
+    };
+
+    function beforeSendHandler() {
+        $("#importIndicator").dxLoadIndicator("instance").option("visible", true);
+    };
+
+    function onUploadSuccess(result) {
+        window.location.href = "/OSAT/PasVersionDetails/" + result.Entity.Id;
+    };
+
+    function onUploadError(xhr, status, errorThrown) {
+        var message = "An unexpected error occurred. If the problem persists, contact support.";
+        var result = null;
+        if (xhr && xhr.responseJSON) {
+            result = xhr.responseJSON;
+            if (result.ExceptionMessage) message = result.ExceptionMessage;
+            else if (result.Message) message = result.Message;
+        }
+        Nsga.Callisto.Messages.showError(message);
+        $("#importIndicator").dxLoadIndicator("instance").option("visible", false);
+    };
+
+    function validateFile() {
+        var fileName = $("#uploadFile").val();
+        if (!fileName) {
+            Nsga.Callisto.Messages.showError("Please select a file to upload.");
+            return false;
+        }
+        var dotIndex = fileName.lastIndexOf(".") + 1;
+        var extension = fileName.substr(dotIndex, (fileName.length - dotIndex));
+        if (extension.toUpperCase() === "XLS" || extension.toUpperCase() === "XLSX")
+            return true;
+        else {
+            Nsga.Callisto.Messages.showError("File with " + extension + " is invalid. Upload a valid file with xls/xlsx extension.");
+            return false;
+        }
+        return true;
+    };
+
+    function importVersion() {
+        var loadIndicator = $("#importIndicator").dxLoadIndicator("instance");
+        loadIndicator.option("visible", false);
+        if (validateFile()) {
+            loadIndicator.option("visible", true);
+            var formData = new FormData();
+            var file = $("#uploadFile")[0];
+            formData.append("uploadFile", file.files[0]);
+            formData.append("osatId", $("#ddlOsats").dxSelectBox("instance").option("value"));
+            formData.append("designFamilyId", $("#ddlDesignFamilies").dxSelectBox("instance").option("value"));
+            $.ajax({
+                url: Nsga.Callisto.Constants.URL_IMPORTOSATPASVERSION,
+                type: "POST",
+                beforeSend: beforeSendHandler,
+                success: onUploadSuccess,
+                error: onUploadError,
+                data: formData,
+                cache: false,
+                contentType: false,
+                processData: false
+            });
+        }
+    };
+
+    function refreshData() {
+        Nsga.Callisto.Osat.getPasVersions(function (result) { updateGridDataSource(result); }, onError);
+    }
+
+    function updateGridDataSource(records) {
+        var element = $("#grdRecords");
+        element.hide();
+        if (records) {
+            element.dxDataGrid("instance").option("dataSource", records);
+            element.show();
+        }
+    };
+
+    $(document).ready(function () {
+
+        $("#importIndicator").dxLoadIndicator({ visible: false });
+
+        // ddlOsats
+        $("#ddlOsats").dxSelectBox({
+            dataSource: osats,
+            displayExpr: "Name",
+            valueExpr: "Id",
+            searchEnabled: true,
+            width: "100px",
+            placeholder: "Select",
+        }).dxValidator({
+            validationRules: [{
+                type: "required",
+                message: "OSAT is required",
+            }],
+        });
+
+        // ddlDesignFamilies
+        $("#ddlDesignFamilies").dxSelectBox({
+            dataSource: designFamilies,
+            displayExpr: "Name",
+            valueExpr: "Id",
+            searchEnabled: true,
+            width: "100px",
+            value: designValue,
+            placeholder: "Select",
+        }).dxValidator({
+            validationRules: [{
+                type: "required",
+                message: "Design Family is required",
+            }],
+        });
+
+        // popInstructions
+        var config = {
+            width: 700,
+            height: 300,
+            contentTemplate: function () {
+                return $("<div />").append($("<ul class='instructions' />").append(
+                    $("<li>Each import is <b>comprehensive</b> and will create a new version containing all records without errors.</li>"),
+                    $("<li>The spreadsheet must have a worksheet named 'Data' containing all records to be imported. It can contain other worksheets but they will be ignored during import.</li>"),
+                    $("<li>Do not add or remove header rows. The import assumes a single header row with column names as shown in the template. The data to be imported must begin on row 2.</li>"),
+                    $("<li>Do not remove or alter the template column names. Those exact names are used to match the data cells to system fields.</li>"),
+                    $("<li>If helpful, you may insert additional columns with unique column names and populate their cells with data. But these columns will be ignored during import and the data will not be preserved.</li>"),
+                    $("<li>After a succesful import it will redirect you to the details for the new version which will be in a draft status. Make sure to either cancel or submit it. The (draft) version's data will not be used until it is submitted at which point it will override the previous version's data.</li>")
+                ));
+            },
+            showTitle: true,
+            title: "Instructions",
+            visible: false,
+            dragEnabled: false,
+            closeOnOutsideClick: true,
+        };
+        $("#popInstructions").dxPopup(config);
+
+        // grdRecords
+        config = Nsga.Callisto.Dx.dataGridDefaultConfig();
+        config.dataSource = versions;
+        config.columns = [
+            {
+                dataField: "Version",
+            },
+            {
+                dataField: "IsPOR",
+                caption: "Is POR?",
+                falseText: "N",
+                trueText: "Y",
+                alignment: "center",
+                showEditorAlways: false
+            },
+            {
+                dataField: "Status.Name",
+                caption: "Status",
+            },
+            {
+                dataField: "Combination.Osat.Name",
+                caption: "OSAT",
+            },
+            {
+                dataField: "Combination.DesignFamily.Name",
+                caption: "Design Family",
+            },
+            {
+                dataField: "CreatedByUserName",
+                caption: "Created By",
+                cellTemplate: function (container, options) {
+                    var cellValue = options.text ? options.text : options.data.CreatedBy;
+                    container.append("<div>" + cellValue + "</div>");
+                }
+            },
+            {
+                dataField: "CreatedOn",
+                caption: "Created On",
+                dataType: "datetime",
+                format: "MM/dd/yyyy hh:mm:ss a",
+            },
+            {
+                caption: "Details",
+                allowFiltering: false,
+                cellTemplate: function (container, options) {
+                    $("<a> View Details </a>")
+                        .attr("href", "/OSAT/PasVersionDetails/" + options.data["Id"])
+                        .appendTo(container);
+                }
+            },
+            {
+                dataField: "OriginalFileName",
+                caption: "Download",
+                allowFiltering: false,
+                cellTemplate: function (container, options) {
+                    $("<a>" + options.text + "</a>")
+                        .attr("href", "/api/Osat/DownloadPasVersion/" + options.data["Id"])
+                        .appendTo(container);
+                }
+            },
+        ];
+        config.hoverStateEnabled = true;
+        config.onRowClick = function (e) {
+            if (e.rowType == "data") {
+                window.location.href = "/OSAT/PasVersionDetails/" + @MvcHtmlString.Create("e.data.Id");
+            }
+        };
+        $("#grdRecords").dxDataGrid(config);
+
+        $("#btnImport").dxButton({
+            text: "Import",
+            onClick: function (e) {
+                var result = e.validationGroup.validate();
+                if (result.isValid) {
+                    importVersion();
+                }
+            },
+        });
+
+    });
+
+</script>
+
+<div id="popupContainer" />
+
+<div class="fixed centered">
+    @{
+        if (Intel.NsgAuto.Web.Mvc.Core.Functions.IsOsatPasAuthor())
+        {
+        <div style="margin-top:10px; vertical-align: top; padding-left:10px" class="bluebox padfourpixel ">
+            <div style="width: 45%; display: inline-block; margin-right: 30px; margin-top:6px;">
+                <div class="subheading" style="margin-bottom: 6px;">Step 1. Download the template and fill with data</div>
+                <div class="">
+                    <div style="margin-bottom: 6px;">
+                        <span class="help annotate">
+                            <span>
+                                <a id="lnkDownload" class="imagelinkbutton bordered" href="/Templates/Imports/OsatPas.xlsx" download="OsatPasTemplate.xlsx" target="_blank" title="Click here to download the spreadsheet template">
+                                    <span>
+                                        <span class="fas fa-file-download"></span>
+                                        <span style="padding-top: 1px; padding-bottom: 1px;">Download</span>
+                                    </span>
+                                </a>
+                            </span>the excel file template<br /><br>
+                        </span>
+                        <div class="showinline" style="vertical-align: top; padding-left: 5px; padding-top: 2px;">
+                            <button id="btnInstructions" onclick="btnInstructionsClick()">Instructions</button>
+                            <div id="popInstructions"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div style="width:49%;display:inline-block;vertical-align: top; margin-top: 2px; " class="bluebox bglightblue padfourpixel">
+                <div class="subheading" style="margin-left: 6px">Step 2. Choose the file with data</div>
+                <div class="showinline">
+                    <div class="padeightpixel" style="vertical-align:top;">
+                        <div class="">
+                            <input type="file" class="fileimport" id="uploadFile" name="uploadFile" style="width: 330px; height: 28px;" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div style="width: 98%; display: block; margin-right: 30px; margin-top:6px;">
+                <div class="subheading" style="margin-bottom: 6px;">Step 3. Set fields and click import</div>
+                <div class="">
+                    <div class="display formrow">
+                        <!-- osats -->
+                        <div class="showinline" style="margin-top:8px;width:225px;">
+                            <div class="dx-field-label required">OSAT</div>
+                            <div class="colon floatleft" style="margin-top: 8px;"></div>
+                            <div class="">
+                                <div id="ddlOsats" style="display:inline-block;"></div>
+                            </div>
+                        </div>
+                        <!-- design families -->
+                        <div class="showinline" style="margin-top:8px;width:300px;">
+                            <div class="dx-field-label required" style="width:125px;">Design Family</div>
+                            <div class="colon floatleft" style="margin-top: 8px;"></div>
+                            <div class="">
+                                <div id="ddlDesignFamilies" style="display:inline-block;"></div>
+                            </div>
+                        </div>
+                        <div class="showinline" style="margin-top:8px;width:225px; vertical-align: top; padding-top: 2px;">
+                            <div id="btnImport" class="submitbutton"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        }
+    }
+</div>
+
+<div id="importIndicator"></div>
+
+<div class="centeralign">
+    <div class="grid-wrapper" style="margin-top:4px;">
+        <div class="marginfourpixel">
+            <div class="gridcontainer">
+                <div id="grdRecords" style="margin-right:20px;margin-left:10px;"></div>
+            </div>
+        </div>
+    </div>
+</div>

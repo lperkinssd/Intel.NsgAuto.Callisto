@@ -1,0 +1,105 @@
+﻿@{
+    ViewBag.Title = "Speed Items";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<script type="text/javascript">
+
+    function onError(xhr, status) {
+        $("#indicator").dxLoadIndicator("instance").option("visible", false);
+        Nsga.Callisto.Messages.showError("An unexpected error occurred. If the problem persists, contact support.");
+    };
+
+    function refresh() {
+        var recordType = $("#drpRecordType").val();
+        $("#indicator").dxLoadIndicator({ visible: true });
+        Nsga.Callisto.SpeedItems.ofType(recordType, function (result) { updateGridDataSource(result); }, onError);
+    }
+
+    function updateGridDataSource(records) {
+        var element = $("#grdRecords");
+        element.hide();
+        if (records) {
+            element.dxDataGrid("instance").option("dataSource", records);
+            element.show();
+        }
+        $("#indicator").dxLoadIndicator("instance").option("visible", false);
+    };
+
+    $(document).ready(function () {
+
+        // grdRecords
+        var config = Nsga.Callisto.Dx.dataGridDefaultConfig();
+        config.columns = [
+            {
+                caption: "Item Id",
+                dataField: "ItemId",
+                cellTemplate: function (container, options) {
+                    $("<a>" + options.data["ItemId"] + "</a>")
+                        .attr("href", "/SpeedItems/Details/" + options.data["ItemId"])
+                        .appendTo(container);
+                },
+            },
+            {
+                dataField: "ItemDsc",
+            },
+            {
+                dataField: "CommodityCd",
+            },
+            {
+                dataField: "ItemClassNm",
+            },
+            {
+                dataField: "CurrentRevisionCd",
+            },
+            {
+                dataField: "ItemOwningSystemNm",
+            },
+            {
+                dataField: "MakeBuyNm",
+            },
+            {
+                dataField: "MaterialTypeCd",
+            },
+            {
+                dataField: "GlobalTradeIdentifierNbr",
+            },
+            {
+                dataField: "BusinessUnitId",
+            },
+            {
+                dataField: "BusinessUnitNm",
+            },
+        ];
+        $("#grdRecords").dxDataGrid(config);
+
+        refresh();
+
+    });
+
+</script>
+
+
+<div id="indicator"></div>
+<div id="divResults" class="centeralign">
+    Item Type:&nbsp;&nbsp;
+    <select name="drpRecordType" id="drpRecordType">
+        <option value="PRODUCT">Product</option>
+        <option value="PCODE" selected>PCode</option>
+        <option value="SCODE">SCode</option>
+        <option value="TA">TA</option>
+        <option value="SA">SA</option>
+        <option value="PBA">PBA</option>
+        <option value="AA">AA</option>
+        <option value="FW">Firmware</option>
+    </select>
+    <button id="btnRefresh" onclick="refresh()">Refresh</button>
+    <div class="grid-wrapper" style="margin-top:4px;">
+        <div class="marginfourpixel">
+            <div class="gridcontainer">
+                <div id="grdRecords"></div>
+            </div>
+        </div>
+    </div>
+</div>

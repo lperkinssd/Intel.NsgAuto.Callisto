@@ -1,0 +1,25 @@
+﻿@{
+    ViewBag.Title = "Unexpected Error";
+    Layout = "~/Views/Shared/_ErrorLayout.cshtml";
+}
+<style scoped>
+    li { padding: 6px; }
+    .infotext { font-size: 12px; }
+</style>
+<div class="fixed">
+    <div class="bluebox padtenpixel">
+        <div>
+            <div class="bglightblue bluebox padtenpixel">
+                There was an unexpected error. 
+            </div>
+        </div>
+        <div style="margin-top:20px;">
+            <div class="subheading">You may try the following:</div>
+            <ul>
+                <li><span class="infotext far fa-hand-point-right"></span>You may retry.</li>
+                <li><span class="infotext far fa-hand-point-right"></span>Navigate to <span><a title="Click here to access the home page" id="homelink" href="/"><span class="imagelinkbutton bordered"><span class="homelink "></span><span class="margintwopixel">Home</span> </span></a></span> and start over.</li>
+                <li><span class="infotext far fa-hand-point-right"></span>If the problem still persists, you may contact M&O Automation Support Team.</li>
+            </ul>
+        </div>
+    </div>
+</div>

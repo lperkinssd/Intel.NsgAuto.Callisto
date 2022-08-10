@@ -1,0 +1,1102 @@
+﻿@model Intel.NsgAuto.Callisto.UI.Models.OSAT.BulkUpdatesModel
+
+@{
+    ViewBag.Title = "OSAT - Qual Filter Bulk Updates";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var supportEmail = Intel.NsgAuto.Callisto.Business.Core.Settings.SupportEmailAddress;
+}
+
+
+@Html.Partial("_ReviewStyling")
+
+@section headScripts {
+    @System.Web.Optimization.Scripts.Render("~/bundles/scripts/handlebars")
+}
+
+<style scoped>
+
+    .table-items {
+        width: 100%;
+        border: 1px solid black;
+        border-collapse: collapse;
+    }
+
+        .table-items th, .table-items td {
+            border: 1px solid grey;
+            padding: 5px;
+        }
+
+        .table-items tr:nth-child(even) {
+            background-color: #e8e8e8;
+        }
+</style>
+
+<script type="text/javascript">
+    var model = @(JsonHelper.Serialize(Model));
+    var designs = model.Designs;
+    var versions = model.OsatMetaData.VersionNames;
+    var osats = model.OsatMetaData.Osats;
+    var optane = ("@(Html.Raw(Intel.NsgAuto.Web.Mvc.Core.Functions.IsOptaneUser()))").toLowerCase() == "true";
+    var tabQualFilter;
+    var attributeTypes = [];
+    var selectedtabQualFilterItem = {};
+    var buildCriteriaSets = [];
+    var buildCriteriaSetIds = [];
+    var buildCriteriaSetAttributeChanges = [];
+    var userId = "@(Html.Raw(Intel.NsgAuto.Web.Mvc.Core.Functions.GetCurrentUserIdSid()))";
+    var allReviews = [];
+    var currentReviewStatus = "Draft";
+    var selectedImportId = model.SelectedImportId;
+    var SelectedOsatId = model.SelectedOsatId;
+    var recordSubmitted = "";
+
+    var createdBy = model.CreatedBy;
+    var file = {};
+    var ddlVersions, btnSubmitExisting, btnReset;
+
+    var detailsTemplate = '<table style="width: 96%; padding: 2px; margin: 2px;"><tr><td style="width: 25%"><label for="spnId" class="formlabel">Id</label></td><td style="width: 25%"><span type="text" id="spnId">{{ Id }}</span></td><td style="width: 25%"><label for="spnCreatedBy" class="formlabel">Created By</label></td><td style="width: 25%"><span type="text" id="spnCreatedBy">{{ CreatedByUserName }}</span></td></tr><tr><td><label for="spnVersion" class="formlabel">Version</label></td><td><span type="text" id="spnVersion">{{ Version }}</span></td><td><label for="spnCreatedOn" class="formlabel">Created On</label></td><td><span type="text" id="spnCreatedOn">{{ CreatedOn }}</span></td></tr><tr><td><label for="spnIsActive" class="formlabel">Is Active?</label></td><td><span type="text" id="spnIsActive">{{ IsActive }}</span></td><td><label for="spnUpdatedBy" class="formlabel">Updated By</label></td><td><span type="text" id="spnUpdatedBy">{{ UpdatedByUserName }}</span></td></tr><tr><td><label for="spnIsPOR" class="formlabel">Is POR?</label></td><td><span type="text" id="spnIsPOR">{{ IsPOR }}</span></td><td><label for="spnUpdatedOn" class="formlabel">Last Updated On</label></td><td><span type="text" id="spnUpdatedOn">{{ UpdatedOn }}</span></td></tr><tr><td><label for="spnStatus" class="formlabel">Status</label></td><td><span type="text" id="spnStatus" name="statusCell">{{ Status.Name }}</span></td><td><label for="spnPartN" class="formlabel">Part Number</label></td><td><span type="text" id="spnPartN" class="status-cell"><b>{{ BuildCombination.DeviceName }}</b></span></td></tr></table>';
+
+    function beforeSendHandler() {
+        $("#importIndicator").dxLoadIndicator("instance").option("visible", true);
+    }
+
+    function cancel() {
+        if (buildCriteriaSetIds.length > 0) {
+            var result = DevExpress.ui.dialog.confirm("Are you sure you want to set " + buildCriteriaSetIds.length + " criteria set(s) status to cancel?");
+            result.done(function (dialogResult) {
+                if (!dialogResult) return;
+                Nsga.Callisto.Osat.cancelBuildCriteriaSets(createDraftDecision("Cancel"), onSuccessCancelBuildCriteriaSets, onError);
+            });
+        }
+    }
+
+    function createDraftDecision(decisionType) {
+        var decisions = [];
+        var selectedBuildCriteriaSetId = selectedtabQualFilterItem.Records[0].BuildCriteriaSetId;
+        for (var i = 0; i < buildCriteriaSetIds.length; i++) {
+            decisions.push({
+                DecisionType: decisionType,
+                VersionId: buildCriteriaSetIds[i],
+                Selected: buildCriteriaSetIds[i] === selectedBuildCriteriaSetId,
+                Override: true,
+                DesignId: $("#ddlDesigns").dxSelectBox("instance").option("value"),
+                ImportId: selectedImportId,
+                ReviewText: $('#ddlText').dxTextBox("instance").option("value")
+            });
+        }
+        return decisions;
+    }
+
+    function createReviewDecision(snapshotReviewerId, isApproved, comment) {
+        var decisions = [];
+        var selectedBuildCriteriaSetId = selectedtabQualFilterItem.Records[0].BuildCriteriaSetId;
+       // var filteredReviews = allReviews.filter(x => x.Id === parseInt(snapshotReviewerId));
+        var filteredReviews = allReviews.filter(function (x) { return x.Id === parseInt(snapshotReviewerId) });
+        var reviewGroupId = filteredReviews[0].ReviewGroupId;
+        var reviewerId = filteredReviews[0].ReviewerId;
+        for (var i = 0; i < allReviews.length; i++) {
+            var review = allReviews[i];
+
+            for (var k = 0; k < file.Sheets.length; k++) {
+                for (var l = 0; l < file.Sheets[k].Records.length; l++) {
+                    
+                    if (review.ReviewGroupId !== reviewGroupId || review.ReviewerId !== reviewerId) continue;
+                    if (file.Sheets[k].Records[l].BuildCriteriaSetId == review.VersionId && file.Sheets[k].Records[l].BuildCriteriaSetStatus.Name != "Canceled") {
+                        decisions.push({
+                            VersionId: review.VersionId,
+                            SnapshotReviewerId: review.Id,
+                            IsApproved: isApproved,
+                            Selected: review.VersionId === selectedBuildCriteriaSetId,
+                            Comment: comment
+                        });
+
+                    }
+                }
+            }
+
+
+            
+           
+        }
+        return decisions;
+    }
+
+    function disableFilters() {
+        $("#ddlDesigns").dxSelectBox("instance").option("disabled", true);
+        $("#ddlOsats").dxSelectBox("instance").option("disabled", true);
+        $("#btnImport").dxButton("instance").option("disabled", true);
+        $("#uploadFile").prop('disabled', true);
+    };
+
+    function HideReview() {
+        $("#divSubmitCancel, #accReview, #acdReview, #accCriteria, #divCriteria, #accDetails, #divDetails").hide();
+    }
+
+    function importFile() {
+        var loadIndicator = $("#importIndicator").dxLoadIndicator("instance");
+        loadIndicator.option("visible", false);
+        if (validateFile()) {
+            loadIndicator.option("visible", true);
+            var formData = new FormData();
+            var file = $("#uploadFile")[0];
+            formData.append("uploadFile", file.files[0]);
+            formData.append("designId", $("#ddlDesigns").dxSelectBox("instance").option("value"));
+            formData.append("osatId", $("#ddlOsats").dxSelectBox("instance").option("value"));
+            $.ajax({
+                url: Nsga.Callisto.Constants.URL_IMPORTOSATQUALFILTERBULKUPDATES,
+                type: "POST",
+                beforeSend: beforeSendHandler,
+                success: onUploadSuccess,
+                error: onUploadError,
+                data: formData,
+                cache: false,
+                contentType: false,
+                processData: false
+            });
+        }
+    };
+
+    function importPendingFile(pendingImportId, osatId)
+    {
+        var loadIndicator = $("#importIndicator").dxLoadIndicator("instance");
+        loadIndicator.option("visible", false);
+            $.ajax({
+                url: Nsga.Callisto.Constants.URL_PENDINGIMPORTOSATQUALFILTERBULKUPDATES + "?id=" + pendingImportId + "&osatid=" + osatId,
+                type: "GET",
+                beforeSend: beforeSendHandler,
+                success: onPendingImportSuccess,
+                error: onUploadError,
+                cache: false,
+                contentType: false,
+                processData: false
+            });
+    }
+
+    function onError(xhr, status) {
+        $("#importIndicator").dxLoadIndicator("instance").option("visible", false);
+        var message = "An unexpected error occurred. If the problem persists, contact support.";
+        if (xhr && xhr.responseJSON) {
+            if (xhr.responseJSON.ExceptionMessage) message = xhr.responseJSON.ExceptionMessage;
+            else if (xhr.responseJSON.Message) message = xhr.responseJSON.Message;
+        }
+        Nsga.Callisto.Messages.showError(message);
+    };
+
+
+
+    function onPendingImportSuccess(result) {
+        $("#importIndicator").dxLoadIndicator("instance").option("visible", false);
+        if (result.Succeeded) {
+            Nsga.Callisto.Messages.showSuccess(result.Message);
+           // window.location = `/OSAT/BulkUpdates?id=${result.Entity}`;
+            window.location = '/OSAT/BulkUpdates?id=' + result.Entity;
+            return;
+        }
+
+        Nsga.Callisto.Messages.showError(result.message);
+    };
+
+    function onSuccessApproveReject(review, status) {
+        var dataSource = null;
+        if (review && review.ReviewSteps) {
+            dataSource = review.ReviewSteps;
+            if (review.IsCompleted === true) {
+
+                recordSubmitted = "Complete";
+                status = "Complete";
+            }
+        }
+        setStatusCell(status);
+        $("#acdReview").dxAccordion("instance").option("dataSource", dataSource);
+    }
+
+    function getStatusName(id) {
+        switch (id) {
+            case 1:
+                return "Draft";
+            case 2:
+                return "Canceled";
+            case 3:
+                return "Submitted";
+            case 4:
+                return "Rejected";
+            case 5:
+                return "InReview";
+            case 6:
+                return "Complete";
+            default:
+                return "Draft";
+        }
+    }
+
+    function onSuccessBuildCriteriaSets(result) {
+        buildCriteriaSets = result;
+        if (!buildCriteriaSets || buildCriteriaSets.length < 1) return;
+
+        var status = buildCriteriaSets[0].Status;
+        currentReviewStatus = getStatusName(status.Id);
+        setStatusCell(status.Name);
+        if (currentReviewStatus.indexOf("Review") >= 0 || currentReviewStatus === "Complete" || currentReviewStatus === "Submitted" || currentReviewStatus === "Rejected") {
+            var selectedBuildCriteriaSetId = selectedtabQualFilterItem.Records[0].BuildCriteriaSetId;
+           // var filteredIds = buildCriteriaSetIds.filter(id => id !== selectedBuildCriteriaSetId);
+            var filteredIds = buildCriteriaSetIds.filter(function (id) { return id !== selectedBuildCriteriaSetId });
+            filteredIds.splice(0, 0, selectedBuildCriteriaSetId);
+            Nsga.Callisto.Osat.getAllReviews(filteredIds, onSuccessGetReviews, onError);
+        } else {
+            toggleUI();
+        }
+
+        refreshDetails();
+    };
+
+    function updateReviewStatus() {
+        if (currentReviewStatus.indexOf("Review") >= 0 || currentReviewStatus === "Complete" || currentReviewStatus === "Submitted" || currentReviewStatus === "Rejected") {
+            var selectedBuildCriteriaSetId = selectedtabQualFilterItem.Records[0].BuildCriteriaSetId;
+            // var filteredIds = buildCriteriaSetIds.filter(id => id !== selectedBuildCriteriaSetId);
+            var filteredIds = buildCriteriaSetIds.filter(function (id) { return id !== selectedBuildCriteriaSetId });
+            filteredIds.splice(0, 0, selectedBuildCriteriaSetId);
+            Nsga.Callisto.Osat.getAllReviews(filteredIds, onSuccessGetReviews, onError);
+        } else {
+            toggleUI();
+        }
+
+        refreshDetails();
+    }
+
+    function onSuccessCancelBuildCriteriaSets(result) {
+        Nsga.Callisto.Messages.showSuccess("The review was canceled.");
+        window.location = "/OSAT/BulkUpdates";
+    };
+
+    function onSuccessGetReviews(results) {
+        $("#importIndicator").dxLoadIndicator("instance").option("visible", false);
+        var dataSource = null;
+        if (results.SelectedReview && results.SelectedReview.ReviewSteps) {
+            dataSource = results.SelectedReview.ReviewSteps;
+            allReviews = results.AllReviews;
+        }
+        $("#acdReview").dxAccordion("instance").option("dataSource", dataSource);
+        toggleUI();
+    }
+
+    function onUploadError(xhr, status, errorThrown) {
+        var message = "An unexpected error occurred. If the problem persists, contact support.";
+        var result = null;
+        if (xhr && xhr.responseJSON) {
+            result = xhr.responseJSON;
+            if (result.ExceptionMessage) message = result.ExceptionMessage;
+            else if (result.Message) message = result.Message;
+        }
+        Nsga.Callisto.Messages.showError(message);
+        $("#importIndicator").dxLoadIndicator("instance").option("visible", false);
+    };
+
+    function onUploadSuccess(data) {
+        $("#importIndicator").dxLoadIndicator("instance").option("visible", false);
+        if (data.imported) {
+            Nsga.Callisto.Messages.showSuccess(data.importResult.Message);
+           // window.location = `/OSAT/BulkUpdates?id=${data.importResult.Entity}`;
+           window.location = '/OSAT/BulkUpdates?id=' + data.importResult.Entity;
+        }
+
+        if (data.result.Entity && data.result.Entity.length) {
+            let combinations = '';
+            for (var i = 0; i < data.result.Entity.length; i++) {
+              //  combinations += `<br />${data.result.Entity[i].BuildCriteriaName}|${data.result.Entity[i].DeviceName}|${data.result.Entity[i].PartNumberDecode}<br />`;
+                combinations += '<br />' + data.result.Entity[i].BuildCriteriaName + '|' + data.result.Entity[i].DeviceName + '|' + data.result.Entity[i].PartNumberDecode +  '<br />';
+            }
+            let msg = 'There is already another active process for the following combinations:<br />' + combinations + '<br />If you click yes all of them will be canceled. <br /><br />Do you want to proceed?';
+            var result = DevExpress.ui.dialog.confirm(msg, "Confirm import");
+            result.done(function(dialogResult) {
+                if (!dialogResult) return;
+                importPendingFile(data.pendingImportId, data.osatId);
+                return;
+            });
+        }
+    };
+
+    function refreshDetails() {
+        var selectedBuildCriteriaSet = [];
+        if (selectedtabQualFilterItem.Records) {
+            for (var i = 0; i < selectedtabQualFilterItem.Records.length; i++) {
+               // if (selectedBuildCriteriaSet.filter(x => x.Id === selectedtabQualFilterItem.Records[i].BuildCriteriaSetId).length > 0)
+                if (selectedBuildCriteriaSet.filter(function (x) {return x.Id === selectedtabQualFilterItem.Records[i].BuildCriteriaSetId }).length > 0)
+                    continue;;
+
+              //  var sets = buildCriteriaSets.filter(x => x.Id === selectedtabQualFilterItem.Records[i].BuildCriteriaSetId);
+                var sets = buildCriteriaSets.filter(function (x) {return x.Id === selectedtabQualFilterItem.Records[i].BuildCriteriaSetId });
+                if (!sets.length) continue;
+
+                selectedBuildCriteriaSet.push(sets[0]);
+                console.dir(selectedBuildCriteriaSet);
+            }
+        }
+        DevExpress.setTemplateEngine("handlebars");
+
+        $("#detailsList").dxList({
+            dataSource: selectedBuildCriteriaSet,
+            height: '100%',
+            itemTemplate: function(data) {
+                return detailsTemplate;
+            }
+        });
+    }
+
+    function refreshExistingBulkUpdateTabData() {
+        var requestEntity = {
+            ImportId: selectedImportId,
+            IncludePublishDisabled: true,
+            IncludeStatusInReview: true,
+            IncludeStatusSubmitted: true,
+            IncludeStatusDraft: false,
+        };
+        if (requestEntity.ImportId) {
+            Nsga.Callisto.Osat.getQualFilterFileBulkUpdate(requestEntity, function (result) {
+                if (result.error === true) {
+                    Nsga.Callisto.Messages.showError(result.msg);
+                    $("#importIndicator").dxLoadIndicator("instance").option("visible", false);
+                    return;
+                }
+                buildCriteriaSetAttributeChanges = result.buildCriteriaSetAttributeChanges;
+                updateTabDataSource(result.file);
+            }, onError);
+        }
+    };
+
+    function reviewStageTemplate (data, index, element) {
+        var reviewStageStatus = data["StatusText"];
+        var reviewGroupReviewers = data["ReviewGroupReviewers"];
+
+        // render the group(s) and reviewers with review decision
+        var groupWrapper;
+        var reviewGroupReviewer, reviewers, reviewer, group;
+        var divReviewers;
+        var reviewerNames = [];
+        for (var g = 0; g < reviewGroupReviewers.length; g++) {
+            reviewerNames = [];
+            groupWrapper = $("<div class='groupwrapper' />");
+            reviewGroupReviewer = reviewGroupReviewers[g]; // 1-1 with group (reviewer.ReviewGroup) represents one review group
+            group = reviewGroupReviewer.ReviewGroup;
+            var groupStatus;
+            if (group) {
+                groupStatus = group.ReviewStatusText;
+                groupWrapper.append($("<div class='grouptitle' />").text(@MvcHtmlString.Create("group.DisplayName")));
+                divReviewers = $("<div  class='undecided ' ></div>");
+                groupWrapper.append(divReviewers);
+            }
+            // Get the reviewers with in the current group
+            reviewers = reviewGroupReviewer.Reviewers;
+            for (var a = 0; a < reviewers.length; a++) {
+                reviewer = reviewers[a];
+                if (reviewer) {
+                    if (reviewer.ReviewStatusText === "open") {
+                        // if this group has not made a decision, then list the approver, otherwise don't as it has been approved
+                        if (reviewGroupReviewer.ReviewGroup.ReviewStatusText === "open"){
+                            reviewerNames.push(reviewer.Employee.Name);
+                        }
+                    } else {
+                        var decision = (reviewer.ReviewStatusText === "approved") ? "Approved" : "Rejected";
+                        var decisionText = decision + " by " + reviewer.Employee.Name;
+                        if (reviewer.ReviewDate) {
+                            decisionText += " on " + Nsga.Callisto.Dates.isoToLocaleString(reviewer.ReviewDate);
+                        }
+                        decisionText += " with following comments:";
+                        groupWrapper.append($("<div class='" + decision + "' />").text(@MvcHtmlString.Create("decisionText")));
+                        groupWrapper.append($("<div class='comments display' />").text('"' + @MvcHtmlString.Create("reviewer.Comment") + '"'));
+                    }
+                }
+                if (reviewStageStatus === "open") { // if review has not been completed, then render the review controls & UX
+                    if (groupStatus === "open") {
+                        // only display the voting buttons if (1) this stage has not been reviewed yet and (2) the reviewer is the currently logged in user and (3) this stage is current stage
+                        if ((reviewer.Idsid === userId) && (data["IsCurrentStage"] === true)) {
+                            var divSecond = $("<div class='reviewControls showinline' />");
+                            divSecond.append($("<div class='txtacomments showinline' />").append(
+                                $("<div class='caption' style='margin-left:1px;font-size: 12px;' >You are a reviewer for " + group.DisplayName
+                                + ". Input comments below, and provide your decision:<span class='mandatory' >*</span></div><textarea class='reviewTxt' data-idsid-txt='" + reviewer.Idsid
+                                + "' style='margin-right:8px;' rows='3' cols='50'></textarea>")));
+                            divSecond.appendTo(groupWrapper);
+                            var divReviewSection = $("<div class='reviewactions showinline'/>");
+
+                            // reject
+                            divReviewSection.append($("<span class='reject-wrapper'><span class='thumbsdown fa fa-thumbs-down' style='color:red;'></span><input class='rejectBtn showinline decision' data-snapshot-reviewer-id='" + @MvcHtmlString.Create("reviewer.Id") + "' type='button' value='Reject'/></span>")
+                                .bind("click", function(e) {
+                                    submitReviewDecision(e, this);
+                                }));
+                            // approve
+                            divReviewSection.append($("<span class='approve-wrapper'><span class='thumbsup fa fa-thumbs-up' style='color:green;'></span><input class='approveBtn showinline decision' data-snapshot-reviewer-id='" + @MvcHtmlString.Create("reviewer.Id") + "' style='margin-right:8px;' type='button' value='Approve'/></span>")
+                                .bind("click", function (e) {
+                                    submitReviewDecision(e, this);
+                                }));
+                            divReviewSection.appendTo(groupWrapper);
+                        }
+                    }
+                }
+                // append all reviewer names
+                if (reviewerNames.length > 0) {
+                    divReviewers.text("Assigned Reviewers : " + reviewerNames.join(";  "));
+                }
+            }
+            element.append(groupWrapper);
+        }
+    }
+
+    function setStatusCell(status) {
+        $("[name='statusCell']").html(status);
+        var classValue = "bglightgreen"; // Complete
+        switch (status) {
+            case "Rejected":
+                classValue = "bgred";
+                break;
+            case "Draft":
+                classValue = "bgorange";
+                break;
+            case "Submitted":
+            case "Review":
+            case "InReview":
+            case "In Review":
+                classValue = "bgyellow";
+                break;
+            case "Canceled":
+                classValue = "bglightblue1";
+                break;
+
+        }
+        $("[name='statusCell']").removeClass();
+        $("[name='statusCell']").addClass(classValue);
+        currentReviewStatus = status;
+    }
+
+    function submitForReview() {
+        if (buildCriteriaSetIds.length > 0) {
+            var result = DevExpress.ui.dialog.confirm("Are you sure you want to submit " + buildCriteriaSetIds.length + " criteria set(s) for review?", "Confirm changes");
+            result.done(function(dialogResult) {
+                if (!dialogResult) return;
+                Nsga.Callisto.Osat.submitBuildCriteriaSets(createDraftDecision("Submit"), function(results)  {
+                    currentReviewStatus = "Submitted";
+                    recordSubmitted = "Submitted";
+                    setStatusCell(currentReviewStatus);
+                    onSuccessGetReviews(results);
+                }, onError);
+            });
+        }
+    }
+
+    function submitReviewDecision(e, element) {
+        var button = $(element);
+
+        if (button) {
+            var divButton = button.closest(".groupwrapper");
+            if (divButton) {
+                var txtComment = divButton.find(".reviewTxt");
+
+                if (txtComment) {
+                    if (validateComment(txtComment)) {
+                        var reviewButton = button.find(".decision");
+                        var snapshotReviewerId = reviewButton.attr('data-snapshot-reviewer-id');
+                        var comment = txtComment.val().trim();
+                        if (reviewButton.val() === 'Approve') {
+                            Nsga.Callisto.Osat.approveBuildCriteriaSets(createReviewDecision(snapshotReviewerId, true, comment), function (review) { onSuccessApproveReject(review, "Review") }, onError);
+                        } else if (reviewButton.val() === 'Reject') {
+                            Nsga.Callisto.Osat.rejectBuildCriteriaSets(createReviewDecision(snapshotReviewerId, false, comment), function (review) { onSuccessApproveReject(review, "Rejected") }, onError);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
+
+    function toggleUI() {
+
+        if ($('#importIndicator').length)         // use this if you are using id to check
+        {
+
+            $("#importIndicator").dxLoadIndicator("instance").option("visible", false);       }
+
+        if (currentReviewStatus.indexOf("Review") >= 0 || currentReviewStatus === "Complete" || currentReviewStatus === "Submitted" || currentReviewStatus === "Rejected") {
+            $("#divSubmitCancel, #accReview, #accCriteria, #divCriteria, #accDetails, #divDetails, #divReview").show();
+            $("#acdReview").show();
+            $("#divSubmitCancel").hide();
+            return;
+        }
+
+        if (currentReviewStatus === "Canceled") {
+            $("#divSubmitCancel, #accReview, #accCriteria, #divCriteria, #accDetails, #divDetails, #divReview").show();
+            $("#acdReview").hide();
+            $("#divSubmitCancel").hide();
+            return;
+        }
+
+        if (currentReviewStatus === "Draft") {
+            $("#divSubmitCancel, #accReview, #accCriteria, #divCriteria, #accDetails, #divDetails").show();
+            $("#acdReview").hide();
+            $("#divSubmitCancel").show();
+        }
+    };
+
+    function tryLoadExistingBulkUpdate() {
+        if (selectedImportId <= 0) return;
+
+
+        disableFilters();
+        $("#importIndicator").dxLoadIndicator("instance").option("visible", true);
+        refreshExistingBulkUpdateTabData();
+    };
+
+    function updateTabDataSource(result) {
+        var dataSource = null;
+        file = result;
+        if (file && file.Sheets && file.Sheets.length > 0 && file.Sheets[0].Records && file.Sheets[0].Records.length > 0) {
+            attributeTypes = [];
+            for (var property in file.Sheets[0].Records[0].AttributeValues) {
+                attributeTypes.push({ Name: property });
+            }
+            dataSource = file.Sheets;
+            for (var i = 0; i < file.Sheets.length; i++) {
+                for (var j = 0; j < file.Sheets[i].Records.length; j++) {
+                    buildCriteriaSetIds.push(file.Sheets[i].Records[j].BuildCriteriaSetId);
+                }
+            }
+            tabQualFilter.option("dataSource", dataSource);
+            Nsga.Callisto.Osat.getBuildCriteriaSets(buildCriteriaSetIds, onSuccessBuildCriteriaSets, onError);
+        };
+        toggleUI();
+    }
+
+    function validateComment(txtComment) {
+        var result = true;
+        if (txtComment.val().trim().length === 0) {
+            Nsga.Callisto.Messages.showError("Please provide a comment");
+            txtComment.focus();
+            result = false;
+        }
+        return result;
+    }
+
+    function validateFile() {
+        var fileName = $("#uploadFile").val();
+        if (!fileName) {
+            Nsga.Callisto.Messages.showError("Please select a file to upload.");
+               return false;
+        }
+        var dotIndex = fileName.lastIndexOf(".") + 1;
+        var extension = fileName.substr(dotIndex, (fileName.length - dotIndex));
+        if (extension.toUpperCase() === "XLS" || extension.toUpperCase() === "XLSX") {
+           // var tdesign = $("#ddlDesigns").dxSelectBox("instance").option("value");
+           var tdesign = DevExpress.data.query(designs).filter([["Key", $("#ddlDesigns").dxSelectBox("instance").option("value")]]).toArray();
+            if ($("#uploadFile").val().toLowerCase().includes(tdesign[0].Value.toLowerCase())) {
+               // var tosat = $("#ddlOsats").dxSelectBox("instance").option("value");
+                var tosat = DevExpress.data.query(osats).filter([["Id", $("#ddlOsats").dxSelectBox("instance").option("value")]]).toArray();
+                if ($("#uploadFile").val().toLowerCase().includes(tosat[0].Name.toLowerCase())) {
+
+                    return true;
+                }
+                else {
+                    Nsga.Callisto.Messages.showError("File name does not match selected OSAT filter.");
+                    return false;
+                }
+            }
+            else {
+                Nsga.Callisto.Messages.showError("File name does not match selected Design filter.");
+                return false;
+            }
+        }
+        else {
+            Nsga.Callisto.Messages.showError("File with " + extension + " is invalid. Upload a valid file with xls/xlsx extension.");
+              return false;
+        }
+
+
+
+    };
+
+    $("document").ready(function () {
+
+        HideReview();
+        debugger;
+        $("#importIndicator").dxLoadIndicator({ visible: false });
+
+        var selectedVersionArr = versions.filter((function (x) { return x.ImportId === selectedImportId }));
+        var selectedVersion = selectedVersionArr && selectedVersionArr.length === 1 ? selectedVersionArr[0] : {};
+
+
+        var designId = 0;
+        if (selectedVersion.Id) {
+            designId = selectedVersion.Id;
+        }
+
+        var osatId = 0;
+        if (selectedVersion.Osatid) {
+            osatId = selectedVersion.Osatid;
+        }
+
+        $("#ddlText").dxTextBox({
+            //   dataSource: contacts,
+            placeholder: "AlternateText",
+            showClearButton: true,
+
+        })
+
+        $("#ddlOsats").dxSelectBox({
+            items: osats,
+            displayExpr: "Name",
+            valueExpr: "Id",
+            value: osatId,
+            width: "100px",
+            onValueChanged: function (e) {
+                $("#ddlDesigns").dxSelectBox("instance").option("disabled", false);
+                if ($("#ddlDesigns").dxSelectBox("instance").option("value") != 0) {
+                    ddlVersions.getDataSource().filter(["Id", "=", e.value], 'and', ["Osatid", "=", $("#ddlOsats").dxSelectBox("instance").option("value")]);
+                    ddlVersions.getDataSource().reload();
+                    ddlVersions.option("value", null);
+                    //var validator = $("#ddlVersions").dxValidator("instance");
+                    //validator.reset();
+                    var tversions = DevExpress.data.query(versions).filter([["Id", e.value]]).toArray();
+                    if (tversions.length > 0) {
+                        btnSubmitExisting.option("visible", true);
+                        btnReset.option("visible", true);
+                    }
+                    else {
+                        btnSubmitExisting.option("visible", false);
+                        btnReset.option("visible", false);
+                    }
+                }
+
+            }
+        }).dxValidator({
+            validationRules: [{
+                type: "required",
+                message: "OSAT is required",
+            }]
+        });
+
+        $("#ddlDesigns").dxSelectBox({
+            items: designs,
+            displayExpr: "Value",
+            valueExpr: "Key",
+            value: designId,
+            width: "100px",
+            disabled: true,
+            onValueChanged: function (e) {
+                ddlVersions.getDataSource().filter(["Id", "=", e.value], 'and', ["Osatid", "=", $("#ddlOsats").dxSelectBox("instance").option("value")]) ;
+                ddlVersions.getDataSource().reload();
+                ddlVersions.option("value", null);
+                //var validator = $("#ddlVersions").dxValidator("instance");
+                //validator.reset();
+                var tversions = DevExpress.data.query(versions).filter([["Id", e.value]]).toArray();
+                if (tversions.length > 0) {
+                    btnSubmitExisting.option("visible", true);
+                    btnReset.option("visible", true);
+                }
+                else {
+                    btnSubmitExisting.option("visible", false);
+                    btnReset.option("visible", false);
+                }
+
+            },
+        }).dxValidator({
+            validationRules: [{
+                type: "required",
+                message: "Design is required",
+            }]
+        });
+
+
+        btnSubmitExisting = $("#btnSubmitExisting").dxButton({
+            text: "Submit",
+            visible: false,
+            onClick: function (e) {
+                var version = ddlVersions.option("selectedItem");
+                if (!version || !version.Id) return;
+             //   window.location = `/OSAT/BulkUpdates?id=${version.ImportId}&osatid=${version.Osatid}`;
+                window.location = '/OSAT/BulkUpdates?id=' + version.ImportId + '&osatid=' + version.Osatid;
+            }
+        }).dxButton("instance");
+
+
+        btnReset = $("#btnReset").dxButton({
+            text: "Reset",
+            visible: false,
+            onClick: function (e) {
+                window.location = "/OSAT/BulkUpdates";
+            }
+        }).dxButton("instance");
+
+        var ddlVersionsDisabled = selectedImportId > 0;
+
+        if (ddlVersionsDisabled) {
+            btnReset.option("visible", true);
+        }
+
+        ddlVersions = $("#ddlVersions").dxSelectBox({
+            items: versions,
+            displayExpr: "VName",
+            value: selectedVersion,
+            width: "300px",
+            disabled: ddlVersionsDisabled,
+        }).dxSelectBox("instance");
+
+        //Initialize
+        ddlVersions.getDataSource().filter(["Id", "=", 0]);
+        ddlVersions.getDataSource().reload();
+
+        $("#btnImport").dxButton({
+            text: "Import",
+            onClick: function (e) {
+                var result = e.validationGroup.validate();
+                if ($("#ddlDesigns").dxSelectBox("instance").option("value") =="") {
+                    Nsga.Callisto.Messages.showError("Please select Design and then click Import.")
+                }
+                if ($("#ddlOsats").dxSelectBox("instance").option("value") == "") {
+                    Nsga.Callisto.Messages.showError("Please select Osat and then click Import.")
+                }
+                if (result.isValid) {
+                    let designId = $("#ddlDesigns").dxSelectBox("instance").option("value");
+                    if (designId) {
+                        importFile();
+                    }
+                }
+            },
+        });
+
+        $("#divExplorerDetails").show();
+        $("#divVersionDetails").show();
+
+
+        tabQualFilter = $("#tabQualFilter").dxTabPanel({
+            selectedIndex: 0,
+            swipeEnabled: false,
+            loop: false,
+            itemTitleTemplate: function (data) {
+                return $("<span>" + data.Name + "</span>");
+            },
+            itemTemplate: function (data) {
+                var records = data.Records;
+
+                var classValue;
+                var container = $("<div style='padding: 5px;' />");
+                var isPublishable;
+                var statusId;
+                var statusName;
+                var table = $("<table class='table-items' />");
+                container.append(table);
+                var row;
+                var i;
+
+                //Is Publishable
+                row = $("<tr>");
+                row.append($("<td>Is Publishable</td>"));
+                for (i = 0; i < records.length; i++) {
+                    statusId = null;
+                    statusName = "";
+                    classValue = "";
+                    if (records[i].BuildCombinationIsPublishable) {
+                        isPublishable = "Y";
+                        classValue = "bglightgreen";
+                    }
+                    else {
+                        isPublishable = "N";
+                        classValue = "bgred";
+                    }
+                    row.append($("<td class='" + classValue + "'>" + isPublishable + "</td>"));
+                };
+                table.append(row);
+
+                //Status
+                row = $("<tr>");
+                row.append($("<td>Status</td>"));
+                for (i = 0; i < records.length; i++) {
+                    statusId = null;
+                    statusName = "";
+                    classValue = "";
+                    if (records[i].BuildCriteriaSetStatus) {
+                        statusId = records[i].BuildCriteriaSetStatus.Id;
+                        statusName = records[i].BuildCriteriaSetStatus.Name;
+                        if (statusId == 6) classValue = "bglightgreen"; // Complete
+                        else if (statusId == 3 || statusId == 5) classValue = "bgyellow"; // Submitted or In Review
+                        else if (statusId == 1) classValue = "bgorange"; // Draft
+                    }
+                    row.append($("<td name='statusCell' class='" + classValue + "'>" + statusName + "</td>"));
+                };
+                table.append(row);
+
+                //Separator
+                row = $("<tr>");
+                row.append($("<td style='background-color:#666666;'></td>"));
+                for (i = 0; i < records.length; i++) { row.append($("<td style='background-color:#666666;'></td>")); };
+                table.append(row);
+
+                //FilterDescription
+                row = $("<tr>");
+                row.append($("<td>Description</td>"));
+                for (i = 0; i < records.length; i++) { row.append($("<td>" + records[i].FilterDescription + "</td>")); };
+                table.append(row);
+
+                //DeviceName
+                row = $("<tr>");
+                row.append($("<td>Device name</td>"));
+                for (i = 0; i < records.length; i++) { row.append($("<td>" + records[i].DeviceName + "</td>")); };
+                table.append(row);
+
+                //PartNumberDecode
+                row = $("<tr>");
+                row.append($("<td>Part number decode</td>"));
+                for (i = 0; i < records.length; i++) { row.append($("<td>" + records[i].PartNumberDecode + "</td>")); };
+                table.append(row);
+
+                if (!file.Osat || file.Osat.Id != 1) { // not included for Amkor
+                    //EngineeringSample
+                    row = $("<tr>");
+                    row.append($("<td>ES</td>"));
+                    for (i = 0; i < records.length; i++) { row.append($("<td>" + (records[i].IsEngineeringSample ? "Y" : "N") + "</td>")); };
+                    table.append(row);
+                }
+
+                //Separator
+                row = $("<tr>");
+                row.append($("<td colspan='" + (records.length + 1) + "'><u>Required attribute conditions for shipment of that production part number</u></td>"));
+                table.append(row);
+
+                for (var j = 0; j < attributeTypes.length; j++) {
+                    var attributeType = attributeTypes[j];
+                    row = $("<tr>");
+                    row.append($("<td>" + attributeType.Name + "</td>"));
+                    for (i = 0; i < records.length; i++) {
+                        var value = records[i].AttributeValues[attributeType.Name];
+                        if (!value) value = "";
+                      //  var changes = buildCriteriaSetAttributeChanges.filter(x => x.BuildCriteriaSetId === records[i].BuildCriteriaSetId && x.AttributeName === attributeType.Name);
+                        var changes = buildCriteriaSetAttributeChanges.filter(function (x) {return x.BuildCriteriaSetId === records[i].BuildCriteriaSetId && x.AttributeName === attributeType.Name });
+                        if (changes.length > 0) {
+                            row.append($("<td class='bgorange'>" + value + " (<span style='text-decoration: line-through;'>" + changes[0].OldValue + "</span>)</td>"));
+                            continue;
+                        }
+                        row.append($("<td>" + value + "</td>"));
+                    };
+                    table.append(row);
+                }
+
+                container.dxScrollView({
+                    direction: 'horizontal',
+                });
+
+                return container;
+            },
+            onSelectionChanged: function(e) {
+                if (e.addedItems && e.addedItems.length > 0) {
+                    selectedtabQualFilterItem = e.addedItems[0];
+                    if (e.addedItems.length > 0) {
+                        currentReviewStatus = e.addedItems[0].Records[0].BuildCriteriaSetStatus.Name;
+                    }
+                    if (e.removedItems.length > 0)
+                        updateReviewStatus();
+                    if (recordSubmitted != "") {
+                        setStatusCell(recordSubmitted);
+                    }
+                    else {
+                        setStatusCell(currentReviewStatus);
+                    }
+
+                    
+                    
+                    refreshDetails();
+                    toggleUI();
+
+                }
+            }
+        }).dxTabPanel("instance");
+
+        $("#acdReview").dxAccordion({
+            multiple: true,
+            collapsible: false,
+            itemTitleTemplate:
+                function (itemData, itemIndex, itemElement) {
+                    var status = (itemData.StatusText) ? itemData.StatusText : 'open';
+                    itemElement.addClass('bg-' + status);
+                    itemElement.append($("<div class='accordiontitle " + status + " ' >" + itemData.ReviewStage.DisplayName + "</div>"));
+                },
+            itemTemplate:
+                function (itemData, itemIndex, itemElement) {
+                    var childSteps = itemData['ChildSteps'];
+                    // if we have child steps, no approval and no groups at the parent level
+                    if (childSteps && childSteps.length > 0) {
+                        $("<div class='childstepwrapper childstepaccordion bglightergray' />")
+                            .dxAccordion({
+                                dataSource: childSteps,
+                                multiple: true,
+                                collapsible: true,
+                                itemTitleTemplate:
+                                    function (childStepData, childItemIndex, childItemElement) {
+                                        var status = (childStepData.StatusText) ? childStepData.StatusText : 'open';
+                                        childItemElement.append($("<div class='childaccordiontitle " + status + " ' >" + childStepData.ReviewStage.DisplayName + "</div>"));
+                                    },
+                                itemTemplate:
+                                    function (childItemData, childItemIndex, childItemElement) {
+                                        reviewStageTemplate(childItemData, childItemIndex, childItemElement);
+                                    },
+                                onItemRendered: function (dataItem) {
+                                    var i = dataItem.itemIndex;
+                                    var el = this;
+                                    el.expandItem(i);
+                                }
+                            }).appendTo(itemElement);
+                    }
+                    else {
+                        reviewStageTemplate(itemData, itemIndex, itemElement);
+                    }
+                },
+            onItemRendered: function (dataItem) {
+                var i = dataItem.itemIndex;
+                var container = this;
+                container.collapseItem(i);
+                var isCurrent = dataItem.itemData["IsCurrentStage"];
+                if (isCurrent && isCurrent === true)
+                    container.expandItem(i);
+            },
+            noDataText: "<div class='noreviewsetup'>No review data is available. If you believe this represents an issue, please contact <a href='mailto:@(supportEmail)?Subject=No OSAT build criteria review data for id = " + model.Id + "' target='_top'>Callisto Support Team</a> for assistance.</div>",
+        });
+
+        tryLoadExistingBulkUpdate();
+
+    });
+
+</script>
+
+<div id="divContent" class="content  centered">
+    <div class="fixed centered">
+        <div>
+            <div class=" padsixpixel">
+                <div class="showinline">
+                    <table class="table-legend">
+                        <tr>
+                            <td><br /></td>
+                            <td><br /></td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="showinline floatright">
+                    <span><a title="Click here to Qual Filter Preview" id="lnkAccountOwnerships" href="/OSAT/QualFilter"><span class="imagelinkbutton bordered"><span class="fa fa-list-alt "></span><span class="margintwopixel">Qual Filter Preview</span> </span></a></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div style="vertical-align: top;">
+        <div id="divExplorerDetails" class="" style="display: none">
+            <div class="bordered padfourpixel marginfourpixel bluebox bglightblue" style="display:inline-block;vertical-align: top;width:940px;">
+                <div id="divForm" class="formwrapper ">
+                    <div class="formcontent display ">
+                        <div>
+                            <div class="infotext">
+                                <span class="infotext italic" style="font-size: 14px;">Items marked as <span class="mandatory">*</span> are required inputs</span>
+                            </div>
+                            <div class="padtwopixel margintwopixel" style="display:block;">
+                                <div class="padtwopixel">
+                                    <div class="form">
+
+                                        <div class="dx-fieldset" style="width:100%;display:inline-block;">
+                                            <div class="dx-field-label required" style="width: 300px; font-size: 16px;">OSAT</div>
+                                            <div class="dx-field-value" id="ddlOsats"></div>
+
+                                            <div class="dx-fieldset" style="width:100%;display:inline-block; padding-top:10px;">
+                                                <div class="dx-field-label required" style="width: 300px; font-size: 16px;">Design</div>
+                                                <div class="dx-field-value" id="ddlDesigns"></div>
+                                            </div>
+                                            <div class="dx-field" style="float: left; padding-top: 10px;">
+                                                <div class="dx-field-label" style="width: 300px; font-size: 16px;">Import File <br /><div class='infotext'>* please upload the file to Import </div></div>
+                                                @*<div style="vertical-align: top; padding-left:10px" class="bluebox padfourpixel">*@
+                                                @*<div class="showinline">*@
+                                                <input type="file" class="fileimport" id="uploadFile" name="uploadFile" style="width: 330px; height: 35px;" accept=".xlsx, .xls">
+                                                <div id="btnImport" class="submitbutton"></div>
+                                                @*</div>*@
+                                                @*</div>*@
+                                            </div>
+                                            <div class="dx-field" style="float: left; ">
+                                                <div class="dx-field-label" style="width: 300px; font-size: 16px;">File Import Version<br /><div class='infotext'>* please select , the version you want to review </div></div>
+                                                <div class="dx-field-value" id="ddlVersions"></div>
+                                                <div id="btnSubmitExisting" class="submitbutton" style="margin-left: 9px; margin-right: 3px;"></div>
+                                                <div id="btnReset" class="submitbutton" style="margin: 5px;"></div>
+                                            </div>
+                                            <!--<div class="dx-field" style="float: left;">
+                                                <div class="dx-field-label" style="width: 300px; font-size: 16px;">Import File <br /><div class='infotext'>* please upload the file to Import </div></div>-->
+                                                @*<div style="vertical-align: top; padding-left:10px" class="bluebox padfourpixel">*@
+                                                @*<div class="showinline">*@
+                                                <!--<input type="file" class="fileimport" id="uploadFile" name="uploadFile" style="width: 330px; height: 35px;" accept=".xlsx, .xls">
+                                                <div id="btnImport" class="submitbutton"></div>-->
+                                                @*</div>*@
+                                                @*</div>*@
+                                            <!--</div>-->
+                                            @*<div class="dx-fieldset" style="width:100%;display:inline-block;">*@
+
+                                            @*</div>*@
+                                        </div>
+                                   
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @*<div id="divVersionDetails" class="" style="display: none">
+            <div class="bordered padfourpixel marginfourpixel bluebox bglightblue" style="display:inline-block;vertical-align: top;width:940px;">
+                <div id="divForm" class="formwrapper ">
+                    <div class="formcontent display ">
+                        <div>
+                            <div class="infotext">
+                                <span class="infotext italic" style="font-size: 14px;">Items marked as <span class="mandatory">*</span> are required inputs</span>
+                            </div>
+                            <div class="padtwopixel margintwopixel" style="display:block;">
+                                <div class="padtwopixel">
+                                    <div class="form">
+                                        <div class="dx-fieldset" style="width:100%;display:inline-block;">
+                                            <div class="dx-field" style="float: left">
+                                                <div class="dx-field-label required" style="width: 300px; font-size: 16px;">File Import Version</div>
+                                                <div class="dx-field-value" id="ddlVersions"></div>
+                                                <div id="btnSubmitExisting" class="submitbutton" style="margin-left: 9px; margin-right: 3px;"></div>
+                                                <div id="btnReset" class="submitbutton" style="margin: 5px;"></div>
+                                            </div>
+                                        </div>
+                                        <div class="" style="display:inline-block;margin-left:8px;width:30%;text-align:right;vertical-align:middle;">
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>*@
+                                        </div>
+    </div>
+</div>      
+   
+
+<div class="centeralign">
+    <div id="importIndicator"></div>
+</div>
+
+<div id="accDetails" class="accordion-label open" style="display: none">Details</div>
+<div id="divDetails" class="accordion-panel" style="padding: 8px;display: none">
+    <div id="detailsList"></div>
+</div>
+
+<div id="accCriteria" class="accordion-label open" style="display: none">Qual Filter</div>
+<div id="divCriteria" class="accordion-panel" style="display: none">
+    <div id="tabQualFilter"></div>
+</div>
+<div id="accReview" class="accordion-label open" style="display: none">Review</div>
+<div id="divReview" class="accordion-panel">
+    <div id="divSubmitCancel" style="padding: 8px; width: 100%; text-align: center; display: none;">
+        <div class="dx-fieldset" style="width:100%;display:inline-block;">
+            <div class="dx-field-label" style="width: 300px; font-size: 16px;">Message for Approver(s):</div>
+            <div class="dx-field-value" id="ddlText"></div>
+        </div>
+            <button id="btnCancel" onclick="cancel()">Cancel</button>&nbsp;&nbsp;
+            <button id="btnSubmit" onclick="submitForReview()">Submit For Review</button>
+        </div>
+        <div id="acdReview" style="padding: 8px; width: 100%;display: none"></div>
+    </div>
+

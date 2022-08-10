@@ -1,0 +1,104 @@
+﻿using System;
+
+namespace Intel.NsgAuto.Callisto.Business.Entities.ODM
+{
+    public class LotShip
+    {
+        public int Version { get; set; }
+        public string Id { get; set; }
+        public string LocationType { get; set; }
+        public string WayBill { get; set; }
+        public string MmNumber { get; set; }
+        public string Description { get; set; }
+        public string ToFacility { get; set; }
+        public string Invoice { get; set; }
+        public string DeliveryNote { get; set; }
+        public string IntelBox { get; set; }
+        public int UnitQty { get; set; }
+        public string Po { get; set; }
+        public string IntelUpi { get; set; }
+        public string DesignId { get; set; }
+        public string Device { get; set; }
+        public int NumberOfDieInPkg { get; set; }
+        public string ProbeProgramRev { get; set; }
+        public string MajorProbeProgramRev { get; set; }
+        public string FabricationFacility { get; set; }
+        public string AppRestriction { get; set; }
+        public string ApoNumber { get; set; }
+        public int DieQty { get; set; }
+        public string CustomTested { get; set; }
+        public string IntelReclaim { get; set; }
+        public string AlternateSpeedSort { get; set; }
+        public string AteTapeRevision { get; set; }
+        public string BurnExperiment { get; set; }
+        public string BurnFlow { get; set; }
+        public string BurnTapeRevision { get; set; }
+        public int WaferQty { get; set; }
+        public string CustomTestingReqd { get; set; }
+        public string DdpIneligible { get; set; }
+        public string DisallowMerging { get; set; }
+        public string EngMasterVersion { get; set; }
+        public string FabExcrId { get; set; }
+        public string FutureHoldLocation { get; set; }
+        public string HdpIneligible { get; set; }
+        public string HoldForWhom { get; set; }
+        public string HoldLot { get; set; }
+        public string HoldNotes { get; set; }
+        public string HoldReason { get; set; }
+        public string HotLotPriority { get; set; }
+        public int IntelShipPass1Qty { get; set; }
+        public int IntelShipPass2Qty { get; set; }
+        public int IntelShipPass3Qty { get; set; }
+        public int IntelShipPass4Qty { get; set; }
+        public string InventoryLocation { get; set; }
+        public string LotHasBeenMarked { get; set; }
+        public string LotHasRejects { get; set; }
+        public string LotId { get; set; }
+        public string MarketingSpeed { get; set; }
+        public string NonShippable { get; set; }
+        public int NumArrayDecks { get; set; }
+        public string OdpIneligible { get; set; }
+        public string PlannedLaserScribe { get; set; }
+        public string PlannedTestSite { get; set; }
+        public string ProductGradeSorted { get; set; }
+        public string ProdGradeSortReqd { get; set; }
+        public string ProductGrade { get; set; }
+        public string QaAsmConvHold { get; set; }
+        public string QaAsmExcrHold { get; set; }
+        public string QaAsmSwrHold { get; set; }
+        public string QaDispositionHold { get; set; }
+        public string QaFabConvHold { get; set; }
+        public string QaFabExcrHold { get; set; }
+        public string QaFabSwrHold { get; set; }
+        public string QaPrbConvHold { get; set; }
+        public string QaPrbExcrHold { get; set; }
+        public string QaReticleWaveHold { get; set; }
+        public string QaWorkRequestDesc { get; set; }
+        public string QdpIneligible { get; set; }
+        public string TestDataReqd { get; set; }
+        public string PrbConvId { get; set; }
+        public int NumIoChannels { get; set; }
+        public string ReticleWaveId { get; set; }
+        public string CellRevision { get; set; }
+        public string CmosRevision { get; set; }
+        public string ColdFinalReqd { get; set; }
+        public string ExcrContainment { get; set; }
+        public string LeadCount { get; set; }
+        public string NumFlashCePins { get; set; }
+        public string CountryOfAssembly { get; set; }
+        public DateTime LastUpdatedDateTime { get; set; }
+        public string LastTrackedSource { get; set; }
+        public DateTime LoadFileDateTime { get; set; }
+        public string CurrentLocation { get; set; }
+        public DateTime ShippmentDate { get; set; }
+        public string ShippingLabelLot { get; set; }
+        public string FabConvId { get; set; }
+        public string Unqualified { get; set; }
+        public string ElecSpecialTest { get; set; }
+        public string RmaLot { get; set; }
+        public string CibrLotNumber { get; set; }
+        public int IntelShipPass5Qty { get; set; }
+        public int IntelShipPass6Qty { get; set; }
+
+    }
+}

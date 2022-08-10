@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Intel.NsgAuto.Callisto.UI.Controllers.ProductLabelSetVersionsController">
+    <Position X="1" Y="0.75" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAI=</HashCode>
+      <FileName>Controllers\ProductLabelSetVersionsController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.UI.Controllers.ProductLabelSetVersionsApiController">
+    <Position X="4.25" Y="0.75" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAgAAgAAQAAAAAAAIAAAAAAAAAAAAAAgAgAAAQAAAIA=</HashCode>
+      <FileName>Controllers\ProductLabelSetVersionsApiController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Services.ProductLabelSetVersionsService">
+    <Position X="7.5" Y="0.75" Width="2.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.DataContexts.ProductLabelSetVersionsDataContext">
+    <Position X="10.5" Y="2.25" Width="2.75" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.ProductLabels.ProductLabelSetVersions">
+    <Position X="1" Y="3.75" Width="2" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.ProductLabels.ProductLabelSetVersion">
+    <Position X="3.5" Y="6.75" Width="2" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.Status">
+    <Position X="6.25" Y="6" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" />
+  </Class>
+  <Interface Name="Intel.NsgAuto.Callisto.Business.DataContexts.IProductLabelSetVersionsDataContext">
+    <Position X="10.5" Y="0.75" Width="2.75" />
+    <TypeIdentifier />
+  </Interface>
+  <Interface Name="Intel.NsgAuto.Callisto.Business.Entities.ProductLabels.IProductLabelSetVersion">
+    <Position X="3.5" Y="3.75" Width="2" />
+    <TypeIdentifier />
+  </Interface>
+  <Interface Name="Intel.NsgAuto.Callisto.Business.Entities.IStatus">
+    <Position X="6.25" Y="4.25" Width="1.5" />
+    <TypeIdentifier />
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

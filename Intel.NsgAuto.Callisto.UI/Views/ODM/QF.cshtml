@@ -1,0 +1,72 @@
+﻿@model Intel.NsgAuto.Callisto.UI.Models.ODMModel
+
+@{
+    ViewBag.Title = "ODM - QF";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+</style>
+<script type="text/javascript">
+
+    var beforeSendHandler = function () {
+        $("#importIndicator").dxLoadIndicator("instance").option("visible", true);
+    };
+
+    var runQuery = function (e) {
+        var formData = new FormData($('form')[0]);
+        $.ajax({
+            url: Nsga.Callisto.Constants.URL_RUNQUALFILTER,
+            type: "POST",
+            beforeSend: beforeSendHandler,
+            success: onUploadSuccess,
+            error: onUploadError,
+            data: formData,
+            cache: false,
+            contentType: false,
+            processData: false
+        });
+    };
+
+    var onUploadSuccess = function (response) {
+        $("#importIndicator").dxLoadIndicator("instance").option("visible", false);
+        Nsga.Callisto.Messages.showSuccess(response.Messages[0]);
+    };
+
+    var onUploadError = function (xhr, status, errorThrown) {
+        var message = "An unexpected error occurred. If the problem persists, contact support.";
+        if (xhr && xhr.responseJSON && xhr.responseJSON.Message) message = xhr.responseJSON.Message;
+        Nsga.Callisto.Messages.showError(message);
+        $("#importIndicator").dxLoadIndicator("instance").option("visible", false);
+    };
+
+    $(document).ready(function () {
+        $("#importIndicator").dxLoadIndicator({ visible: false });
+
+        $('#lnkRunQuery').bind('click', function (e) {
+            e.preventDefault();
+            runQuery(e);
+        });
+    });
+
+</script>
+
+<div id="divContent" class="content centered">
+    <div style="display:inline-block;vertical-align: top;width:960px;">
+        <div class="margintwopixel bluebox padeightpixel" style="">
+            <div style="width:100%;display:inline-block;vertical-align: top;" class="bluebox bglightblue padfourpixel ">
+                <div class="subheading">Run QualFilter Query</div>
+                <div class="">
+                    <div class="padeightpixel" style="vertical-align:top;">
+                        <div class="">
+                            <button class="w3-button w3-large" id="lnkRunQuery" type="button" value="Run Query" name="Run Query" href="javascript:void(0);" title="Run QualFilter Query">Run Query</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="importIndicator"></div>
+</div>
+

@@ -1,0 +1,254 @@
+﻿@model Intel.NsgAuto.Callisto.UI.Models.OSAT.QualFilterImportDetailsModel
+
+@{
+    ViewBag.Title = "OSAT - Qual Filter Import Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script type="text/javascript">
+
+    var entity = null;
+    var model = null;
+    var messages = null;
+    var records = null;
+    var userId = "@(Html.Raw(Intel.NsgAuto.Web.Mvc.Core.Functions.GetCurrentUserIdSid()))";
+    var isSuperUser = @(Intel.NsgAuto.Web.Mvc.Core.Functions.IsSuperUser() ? "true" : "false");
+
+    updateFromEntity(@(JsonHelper.Serialize(Model.Entity)));
+
+    function updateFromEntity(entityNew) {
+        entity = entityNew;
+        model = entity.Import;
+        messages = entity.Messages;
+        records = entity.BuildCriterias;
+    }
+
+    function refreshFields() {
+        $("#spnId").text(model.Id);
+        $("#spnCreatedBy").text(model.CreatedByUserName ? model.CreatedByUserName : model.CreatedBy);
+        $("#spnCreatedOn").text(Nsga.Callisto.Dates.isoToLocaleString(model.CreatedOn));
+        $("#spnUpdatedBy").text(model.UpdatedByUserName ? model.UpdatedByUserName : model.UpdatedBy);
+        $("#spnUpdatedOn").text(Nsga.Callisto.Dates.isoToLocaleString(model.UpdatedOn));
+        $("#lnkFileName").text(model.FileName);
+    }
+
+    function refreshRecordsDataSource() {
+        $("#grdRecords").dxDataGrid("instance").option("dataSource", records);
+    };
+
+    function refreshMessagesDataSource() {
+        $("#grdMessages").dxDataGrid("instance").option("dataSource", messages);
+    };
+
+    function refreshMessages() {
+        var accMessages = $("#accMessages");
+        var divMessages = $("#divMessages");
+        if (messages && messages.length > 0) {
+            accMessages.show();
+            divMessages.show();
+        }
+        else {
+            accMessages.hide();
+            divMessages.hide();
+        }
+        refreshMessagesDataSource();
+    }
+
+    function refreshCriteriaActions() {
+        var accCriteriaActions = $("#accCriteriaActions");
+        var divCriteriaActions = $("#divCriteriaActions");
+        if (isSuperUser && model && model.AllowBuildCriteriaActions) {
+            accCriteriaActions.show();
+            divCriteriaActions.show();
+        }
+        else {
+            accCriteriaActions.hide();
+            divCriteriaActions.hide();
+        }
+    }
+
+    function refreshUi() {
+        refreshFields();
+        refreshCriteriaActions();
+        refreshMessages();
+        refreshRecordsDataSource();
+    }
+
+    function refreshFromEntity(entityNew) {
+        updateFromEntity(entityNew);
+        refreshUi();
+    }
+
+    function onSuccess(result) {
+        refreshFromEntity(result.Entity);
+    }
+
+    function onError(xhr, status) {
+        var message = "An unexpected error occurred. If the problem persists, contact support.";
+        var result = null;
+        if (xhr && xhr.responseJSON) {
+            result = xhr.responseJSON;
+            if (xhr.responseJSON.ExceptionMessage) message = xhr.responseJSON.ExceptionMessage;
+            else if (xhr.responseJSON.Message) message = xhr.responseJSON.Message;
+        }
+        Nsga.Callisto.Messages.showError(message);
+        if (result && result.Entity) {
+            refreshFromEntity(result.Entity);
+        }
+    };
+
+    function cancel() {
+        Nsga.Callisto.Osat.updateQualFilterImportCanceled(model.Id, onSuccess, onError);
+    }
+
+    function por() {
+        Nsga.Callisto.Osat.updateQualFilterImportPor(model.Id, onSuccess, onError);
+    }
+
+    $("document").ready(function () {
+
+        // grdMessages
+        var config = Nsga.Callisto.Dx.dataGridDefaultConfig();
+        config.keyExpr = "Id";
+        config.columns = [
+            {
+                caption: "Worksheet",
+                calculateCellValue: function (rowData) {
+                    return (rowData.GroupSourceIndex !== null) ? rowData.GroupSourceIndex + 1 : null;
+                },
+            },
+            {
+                caption: "Column",
+                calculateCellValue: function (rowData) {
+                    return (rowData.CriteriaSourceIndex !== null) ? rowData.CriteriaSourceIndex + 1 : null;
+                },
+            },
+            {
+                caption: "Row",
+                calculateCellValue: function (rowData) {
+                    return (rowData.GroupFieldSourceIndex != null) ? rowData.GroupFieldSourceIndex + 1 : null;
+                },
+            },
+            {
+                caption: "Field Name",
+                dataField: "GroupFieldName",
+            },
+            {
+                caption: "Message Type",
+                dataField: "MessageType",
+            },
+            {
+                caption: "Message",
+                dataField: "Message",
+            },
+        ];
+        $("#grdMessages").dxDataGrid(config);
+
+        // grdRecords
+        config = Nsga.Callisto.Dx.dataGridDefaultConfig();
+        config.keyExpr = "Id";
+        config.columns = [
+            {
+                caption: "Worksheet",
+                calculateCellValue: function (rowData) {
+                    return rowData.GroupSourceIndex !== null ? rowData.GroupSourceIndex + 1 : null;
+                },
+            },
+            {
+                caption: "Column",
+                calculateCellValue: function (rowData) {
+                    return rowData.CriteriaSourceIndex !== null ? rowData.CriteriaSourceIndex + 1 : null;
+                },
+            },
+            {
+                caption: "Build Criteria Name",
+                dataField: "BuildCriteria.Name",
+            },
+            {
+                caption: "Intel Level 1 Part Number",
+                dataField: "BuildCriteriaSet.BuildCombination.IntelLevel1PartNumber",
+            },
+            {
+                caption: "Intel Product Name",
+                dataField: "BuildCriteriaSet.BuildCombination.IntelProdName",
+            },
+            {
+                caption: "MM Number",
+                dataField: "BuildCriteriaSet.BuildCombination.MaterialMasterField",
+            },
+            {
+                caption: "Intel Part Name",
+                dataField: "BuildCriteriaSet.BuildCombination.IntelMaterialPn",
+            },
+            {
+                caption: "Device Name",
+                dataField: "BuildCriteriaSet.BuildCombination.DeviceName",
+            },
+            {
+                caption: "Assembly UPI",
+                dataField: "BuildCriteriaSet.BuildCombination.AssyUpi",
+            },
+            {
+                caption: "ES/Prod",
+                dataField: "BuildCriteriaSet.BuildCombination.PartUseType.Abbreviation",
+            },
+        ];
+        config.hoverStateEnabled = true;
+        config.onRowClick = function (e) {
+            if (e.rowType == "data") {
+                window.location.href = "/OSAT/BuildCriteriaSetDetails/" + e.data.BuildCriteriaSet.Id;
+            }
+        };
+        $("#grdRecords").dxDataGrid(config);
+
+        refreshUi();
+
+    });
+
+</script>
+
+<div class="padeightpixel">
+    <div class="rightalign">
+        <div class="padeightpixel">
+            <span><a title="Click here to download file" id="lnkDownload" href="/api/OSAT/DownloadQualFilterImport/@(Model?.Entity.Import.Id)"><span class="imagelinkbutton bordered"><span class="margintwopixel">Download</span></span></a></span>
+            <span><a title="Click here to view all imports" id="lnkAllImports" href="/OSAT/ListQualFilterImports/"><span class="imagelinkbutton bordered"><span class="fa fa-list-alt "></span><span class="margintwopixel">All Imports</span></span></a></span>
+        </div>
+    </div>
+    <div id="accDetails" class="accordion-label open">Details</div>
+    <div id="divDetails" class="accordion-panel" style="padding: 8px;">
+        <table style="width:96%; padding:2px;margin:2px;">
+            <tr>
+                <td style="width:25%"><label for="spnId" class="formlabel">Id</label></td>
+                <td style="width:25%"><span type="text" id="spnId"></span></td>
+                <td style="width:25%"><label for="lnkFileName" class="formlabel">File Name</label></td>
+                <td style="width:25%"><a title="Click here to download file" id="lnkFileName" href="/api/Osat/DownloadQualFilterImport/@(Model?.Entity.Import.Id)" /></td>
+            </tr>
+            <tr>
+                <td><label for="spnCreatedBy" class="formlabel">Created By</label></td>
+                <td><span type="text" id="spnCreatedBy"></span></td>
+                <td><label for="spnCreatedOn" class="formlabel">Created On</label></td>
+                <td><span type="text" id="spnCreatedOn"></span></td>
+            </tr>
+            <tr>
+                <td><label for="spnUpdatedBy" class="formlabel">Updated By</label></td>
+                <td><span type="text" id="spnUpdatedBy"></span></td>
+                <td><label for="spnUpdatedOn" class="formlabel">Last Updated On</label></td>
+                <td><span type="text" id="spnUpdatedOn"></span></td>
+            </tr>
+        </table>
+    </div>
+    <div id="accCriteriaActions" class="accordion-label open">Build Criteria Actions</div>
+    <div id="divCriteriaActions" class="accordion-panel">
+        <div style="padding: 8px; width: 100%; text-align: center;"><button id="btnCancel" onclick="cancel()">Cancel</button>&nbsp;&nbsp;<button id="btnPor" onclick="por()">Set POR</button></div>
+    </div>
+    <div id="accMessages" class="accordion-label open">Messages</div>
+    <div id="divMessages" class="accordion-panel">
+        <div id="grdMessages"></div>
+    </div>
+    <div id="accRecords" class="accordion-label open">Build Criterias</div>
+    <div id="divRecords" class="accordion-panel">
+        <div id="grdRecordsContainer" style="height: 100%; width: 98%; position: absolute; box-sizing: border-box;">
+            <div id="grdRecords"></div>
+        </div>
+    </div>
+</div>

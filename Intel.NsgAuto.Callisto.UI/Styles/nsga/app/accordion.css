@@ -1,0 +1,39 @@
+﻿.accordion-label {
+    background-color: #eee;
+    color: #444;
+    cursor: pointer;
+    padding: 10px 0px;
+    width: 100%;
+    text-align: center;
+    border: none;
+    outline: none;
+    transition: 0.4s;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+    .accordion-label::after {
+        content: "\276F";
+        width: 1em;
+        height: 1em;
+        text-align: center;
+        -webkit-transition: all .35s;
+        transition: all .35s;
+        float: right;
+    }
+
+    .accordion-label.open::after {
+        -webkit-transform: rotate(90deg);
+        transform: rotate(90deg);
+    }
+
+    .accordion-label.open, .accordion-label:hover {
+        background-color: #ccc;
+    }
+
+.accordion-panel {
+    padding: 10px;
+    background-color: white;
+    display: block;
+}

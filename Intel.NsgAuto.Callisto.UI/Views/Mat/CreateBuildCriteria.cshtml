@@ -1,0 +1,940 @@
+﻿@model Intel.NsgAuto.Callisto.UI.Models.Mat.CreateBuildCriteriaModel
+
+@{
+    ViewBag.Title = "Create Build Criteria";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    long Id = (long)ViewData["Id"];
+}
+
+<script>
+    var buildCriteriaId = @(Id);
+    var initialized = false;
+    var ddlDesigns;
+    var ddlFabricationFacilities;
+    var ddlProbeConversions;
+    var ddlStartFrom;
+    var ddlTestFlows;
+    var ddlVersions;
+    var fbBuildCriteria;
+    var txtComments;
+    // dictionaries for fast/easy lookups
+    var dictDesigns = {}; // { Design.Id: Design }
+    var dictTemplates = {}; // { BuildCriteriaTemplate.DesignFamilyId: BuildCriteriaTemplate }
+    var dictVersions = {}; // { BuildCriteria.Id: BuildCriteria }
+
+    var attributeDataTypes = [
+        {
+            "Id": 1, "Name": "string", "NameDisplay": "String", "ComparisonOperations": [
+                { "Id": 1, "Key": "=", "KeyTreadstone": "=", "Name": "Equals", "OperandType": { "Id": 2, "Name": "Single Value" } },
+                { "Id": 6, "Key": ">=", "KeyTreadstone": ">=", "Name": "Is greater than or equal to", "OperandType": { "Id": 2, "Name": "Single Value" } },
+                { "Id": 7, "Key": "contains", "KeyTreadstone": "contains", "Name": "Contains", "OperandType": { "Id": 2, "Name": "Single Value" } },
+                { "Id": 8, "Key": "does not contain", "KeyTreadstone": "does not contain", "Name": "Does not contain", "OperandType": { "Id": 2, "Name": "Single Value" } },
+                { "Id": 13, "Key": "in", "KeyTreadstone": "in", "Name": "Is in", "OperandType": { "Id": 3, "Name": "List" } },
+                { "Id": 15, "Key": "not in", "KeyTreadstone": "not in", "Name": "Is not in", "OperandType": { "Id": 3, "Name": "List" } },
+            ]
+        },
+        {
+            "Id": 2, "Name": "number", "NameDisplay": "Number", "ComparisonOperations": [
+                { "Id": 1, "Key": "=", "KeyTreadstone": "=", "Name": "Equals", "OperandType": { "Id": 2, "Name": "Single Value" } },
+                { "Id": 6, "Key": ">=", "KeyTreadstone": ">=", "Name": "Is greater than or equal to", "OperandType": { "Id": 2, "Name": "Single Value" } },
+                { "Id": 13, "Key": "in", "KeyTreadstone": "in", "Name": "Is in", "OperandType": { "Id": 3, "Name": "List" } },
+                { "Id": 15, "Key": "not in", "KeyTreadstone": "not in", "Name": "Is not in", "OperandType": { "Id": 3, "Name": "List" } },
+            ]
+        },
+    ];
+
+    var dataTypeString = attributeDataTypes[0];
+    var dataTypeNumber = attributeDataTypes[1];
+
+    var attributeTypes = [
+        { "Id": 1, "Name": "cell_revision", "NameDisplay": "Cell Revision", "DataType": dataTypeNumber },
+        { "Id": 2, "Name": "major_probe_prog_rev", "NameDisplay": "Major Prove Program Revision", "DataType": dataTypeNumber },
+        { "Id": 3, "Name": "probe_revision", "NameDisplay": "Probe Revision", "DataType": dataTypeString },
+        { "Id": 4, "Name": "burn_tape_revision", "NameDisplay": "Burn Tape Revision", "DataType": dataTypeNumber },
+        { "Id": 5, "Name": "custom_testing_required", "NameDisplay": "Custom Testing Required", "DataType": dataTypeString },
+        { "Id": 6, "Name": "custom_testing_required2", "NameDisplay": "Custom Testing Required2", "DataType": dataTypeString },
+        { "Id": 7, "Name": "product_grade", "NameDisplay": "Product Grade", "DataType": dataTypeString },
+        { "Id": 8, "Name": "prb_conv_id", "NameDisplay": "Prb Conv Id", "DataType": dataTypeString },
+        { "Id": 9, "Name": "fab_conv_id", "NameDisplay": "Fab Conv Id", "DataType": dataTypeString },
+        { "Id": 10, "Name": "fab_excr_id", "NameDisplay": "Fab Excr Id", "DataType": dataTypeString },
+        { "Id": 11, "Name": "media_type", "NameDisplay": "Media Type", "DataType": dataTypeString },
+        { "Id": 12, "Name": "reticle_wave_id", "NameDisplay": "Reticle Wave Id", "DataType": dataTypeString },
+    ];
+
+    var buildCombinations = [
+
+    ];
+
+    //var buildCriteria = {};
+    var getBuildCriteriaById = function (id) {
+        for (var i = 0; i < buildCombinations.length; i++) {
+            if (buildCombinations[i].Id == id) {
+                return buildCombinations[i];
+            }
+        }
+        return null;
+    }
+
+    var buildCriteria = getBuildCriteriaById(buildCriteriaId); //buildCombinations.filter(bc => bc.Id = buildCriteriaId);
+
+    var templates = [
+        {
+            "Id": 1,
+            "Name": "NAND",
+            "DesignFamily": { "Id": 1, "Name": "NAND" },
+            "Conditions": [
+                {
+                    "Id": 1,
+                    "TemplateId" : 1,
+                    "AttributeType": { "Id": 1, "Name": "cell_revision", "NameDisplay": "Cell Revision", "DataType": { "Id": 2, "Name": "number", "NameDisplay": "Number" } },
+                    "ComparisonOperation": { "Id": 13, "Key": "in", "KeyTreadstone": "in", "Name": "Is in", "OperandType": { "Id": 3, "Name": "List" } },
+                    "Value" : ""
+                },
+                {
+                    "Id": 2,
+                    "TemplateId": 1,
+                    "AttributeType": { "Id": 2, "Name": "major_probe_prog_rev", "NameDisplay": "Major Prove Program Revision", "DataType": { "Id": 2, "Name": "number", "NameDisplay": "Number" } },
+                    "ComparisonOperation": { "Id": 6, "Key": ">=", "KeyTreadstone": ">=", "Name": "Is greater than or equal to", "OperandType": { "Id": 2, "Name": "Single Value" } },
+                    "Value": ""
+                },
+                {
+                    "Id": 3,
+                    "TemplateId": 1,
+                    "AttributeType": { "Id": 4, "Name": "burn_tape_revision", "NameDisplay": "Burn Tape Revision", "DataType": { "Id": 2, "Name": "number", "NameDisplay": "Number" } },
+                    "ComparisonOperation": { "Id": 6, "Key": ">=", "KeyTreadstone": ">=", "Name": "Is greater than or equal to", "OperandType": { "Id": 2, "Name": "Single Value" } },
+                    "Value": ""
+                },
+                {
+                    "Id": 4,
+                    "TemplateId": 1,
+                    "AttributeType": { "Id": 5, "Name": "custom_testing_required", "NameDisplay": "Custom Testing Required", "DataType": { "Id": 2, "Name": "number", "NameDisplay": "Number" } },
+                    "ComparisonOperation": { "Id": 13, "Key": "in", "KeyTreadstone": "in", "Name": "Is in", "OperandType": { "Id": 3, "Name": "List" } },
+                    "Value": ""
+                },
+                {
+                    "Id": 5,
+                    "TemplateId": 1,
+                    "AttributeType": { "Id": 7, "Name": "product_grade", "NameDisplay": "Product Grade", "DataType": { "Id": 2, "Name": "number", "NameDisplay": "Number" } },
+                    "ComparisonOperation": { "Id": 1, "Key": "=", "KeyTreadstone": "=", "Name": "Equals", "OperandType": { "Id": 2, "Name": "Single Value" } },
+                    "Value": ""
+                },
+                {
+                    "Id": 6,
+                    "TemplateId": 1,
+                    "AttributeType": { "Id": 8, "Name": "prb_conv_id", "NameDisplay": "Prb Conv Id", "DataType": { "Id": 2, "Name": "number", "NameDisplay": "Number" } },
+                    "ComparisonOperation": { "Id": 13, "Key": "in", "KeyTreadstone": "in", "Name": "Is in", "OperandType": { "Id": 3, "Name": "List" } },
+                    "Value": ""
+                },
+                {
+                    "Id": 7,
+                    "TemplateId": 1,
+                    "AttributeType": { "Id": 9, "Name": "fab_conv_id", "NameDisplay": "Fab Conv Id", "DataType": { "Id": 2, "Name": "number", "NameDisplay": "Number" } },
+                    "ComparisonOperation": { "Id": 13, "Key": "in", "KeyTreadstone": "in", "Name": "Is in", "OperandType": { "Id": 3, "Name": "List" } },
+                    "Value": ""
+                },
+                {
+                    "Id": 8,
+                    "TemplateId": 1,
+                    "AttributeType": { "Id": 10, "Name": "fab_excr_id", "NameDisplay": "Fab Excr Id", "DataType": { "Id": 2, "Name": "number", "NameDisplay": "Number" } },
+                    "ComparisonOperation": { "Id": 13, "Key": "in", "KeyTreadstone": "in", "Name": "Is in", "OperandType": { "Id": 3, "Name": "List" } },
+                    "Value": ""
+                },
+            ],
+        },
+       
+    ];
+
+    var capacities = [
+        { "Id": 1, "Name": "16GB 256GB" },
+        { "Id": 2, "Name": "32GB 512GB" },
+        { "Id": 3, "Name": "32GB 1024GB" },
+        { "Id": 5, "Name": "128GB" },
+        { "Id": 6, "Name": "256GB" },
+        { "Id": 7, "Name": "512GB" },
+        { "Id": 8, "Name": "800GB" },
+        { "Id": 9, "Name": "960GB" },
+        { "Id": 10, "Name": "1024GB" },
+        { "Id": 11, "Name": "1600GB" },
+        { "Id": 12, "Name": "1920GB" },
+        { "Id": 13, "Name": "2048GB" },
+        { "Id": 14, "Name": "3200GB" },
+        { "Id": 15, "Name": "3840GB" },
+        { "Id": 16, "Name": "6400GB" },
+        { "Id": 17, "Name": "7680GB" },
+        { "Id": 18, "Name": "7.68TB" },
+        { "Id": 19, "Name": "15TB" },
+        { "Id": 20, "Name": "15.36TB" },
+    ];
+
+    var comparisonOperations = [
+        { "Id": 1, "Key": "=", "KeyTreadstone": "=", "Name": "Equals", "OperandType": { "Id": 2, "Name": "Single Value" } },
+        { "Id": 6, "Key": ">=", "KeyTreadstone": ">=", "Name": "Is greater than ore equal to", "OperandType": { "Id": 2, "Name": "Single Value" } },
+        { "Id": 7, "Key": "contains", "KeyTreadstone": "contains", "Name": "Contains", "OperandType": { "Id": 2, "Name": "Single Value" } },
+        { "Id": 8, "Key": "does not contain", "KeyTreadstone": "does not contain", "Name": "Does not contain", "OperandType": { "Id": 2, "Name": "Single Value" } },
+        { "Id": 13, "Key": "in", "KeyTreadstone": "in", "Name": "Is in", "OperandType": { "Id": 3, "Name": "List" } },
+        { "Id": 15, "Key": "not in", "KeyTreadstone": "not in", "Name": "Is not in", "OperandType": { "Id": 3, "Name": "List" } },
+    ];
+
+    var dataTypeOperations = [
+        { "AttributeDataTypeId": 1, "ComparisonOperationId": 1 },
+        { "AttributeDataTypeId": 1, "ComparisonOperationId": 6 },
+        { "AttributeDataTypeId": 1, "ComparisonOperationId": 7 },
+        { "AttributeDataTypeId": 1, "ComparisonOperationId": 8 },
+        { "AttributeDataTypeId": 1, "ComparisonOperationId": 13 },
+        { "AttributeDataTypeId": 1, "ComparisonOperationId": 15 },
+        { "AttributeDataTypeId": 2, "ComparisonOperationId": 1 },
+        { "AttributeDataTypeId": 2, "ComparisonOperationId": 6 },
+        { "AttributeDataTypeId": 2, "ComparisonOperationId": 13 },
+        { "AttributeDataTypeId": 2, "ComparisonOperationId": 15 },
+    ];
+
+    var designs = [
+        { "Id": 1, "Name": "B16A", "DesignFamily": { "Id" : 1, "Name" : "NAND"} },
+        { "Id": 2, "Name": "B17A", "DesignFamily": { "Id": 1, "Name": "NAND" } },
+        { "Id": 3, "Name": "B27A", "DesignFamily": { "Id" : 1, "Name" : "NAND"} },
+        { "Id": 4, "Name": "N18A", "DesignFamily": { "Id" : 1, "Name" : "NAND"} },
+        { "Id": 5, "Name": "N28A", "DesignFamily": { "Id" : 1, "Name" : "NAND"} },
+    ];
+
+    var devices = [
+        { "Id": 1, "Name": "29F01T2AMCTJ1" },
+        { "Id": 2, "Name": "29F02T2AMCQH1" },
+        { "Id": 3, "Name": "29F02T2AMCQH2" },
+        { "Id": 4, "Name": "29F02T2ANCTJ1" },
+        { "Id": 5, "Name": "29F02T4AMCQH1" },
+        { "Id": 6, "Name": "29F04T2ANCQH1" },
+        { "Id": 7, "Name": "29F04T2ANCQH2" },
+        { "Id": 8, "Name": "29F04T2AOCTJ1" },
+        { "Id": 9, "Name": "29F04T4ANCQH1" },
+        { "Id": 10, "Name": "29F08T2AOCQH1" },
+        { "Id": 11, "Name": "29F08T2AOCQH2" },
+        { "Id": 12, "Name": "29F08T2AWCTJ1" },
+        { "Id": 13, "Name": "29F08T4AOCQH1" },
+        { "Id": 14, "Name": "29F64B2ALCTJ1" },
+        { "Id": 15, "Name": "29P16B1ALDNF2" },
+        { "Id": 16, "Name": "29P16B1ALDNFA" },
+        { "Id": 17, "Name": "29P32B2AMDNF2" },
+    ];
+
+    var dictTemplates = {};
+
+    var fabricationFacilitiesInitial = [
+        { "Id": 1, "Name": "FAB 2" },
+        { "Id": 2, "Name": "FAB 10" },
+        { "Id": 3, "Name": "FAB 68" },
+        { "Id": 4, "Name": "FAB 68A" },
+        { "Id": 5, "Name": "FAB68A" },
+    ];
+
+    var mediaIPNs = [
+        { "Id": 1, "Name": "H36854-003" },
+        { "Id": 2, "Name": "J23297-002" },
+        { "Id": 3, "Name": "J63669-002" },
+        { "Id": 4, "Name": "J63675-002" },
+        { "Id": 5, "Name": "J63678-002" },
+        { "Id": 6, "Name": "J76530-004" },
+        { "Id": 7, "Name": "J76531-004" },
+        { "Id": 8, "Name": "J76532-004" },
+        { "Id": 9, "Name": "J76533-004" },
+        { "Id": 10, "Name": "J76534-004" },
+        { "Id": 11, "Name": "K20263-002" },
+        { "Id": 12, "Name": "K20264-002" },
+        { "Id": 13, "Name": "K20273-002" },
+        { "Id": 14, "Name": "K24998-001" },
+        { "Id": 15, "Name": "K36451-002" },
+        { "Id": 16, "Name": "K36455-002" },
+        { "Id": 17, "Name": "K36458-002" },
+        { "Id": 18, "Name": "J23297-002" },
+        { "Id": 19, "Name": "K24998-001" },
+    ];
+
+    var productFamilies = [
+        { "Id": 1, "Name": "BEAR COVE QUANTUM 15TB 2.5 SAS RI SSD" },
+        { "Id": 2, "Name": "BEAR COVE QUANTUM 1600GB 2.5 SAS RI SSD" },
+        { "Id": 3, "Name": "BEAR COVE QUANTUM 1920GB 2.5 SAS RI SSD" },
+        { "Id": 4, "Name": "BEAR COVE QUANTUM 3200GB 2.5 SAS RI SSD" },
+        { "Id": 5, "Name": "BEAR COVE QUANTUM 3840GB 2.5 SAS RI SSD" },
+        { "Id": 6, "Name": "BEAR COVE QUANTUM 6400GB 2.5 SAS RI SSD" },
+        { "Id": 7, "Name": "BEAR COVE QUANTUM 7680GB 2.5 SAS RI SSD" },
+        { "Id": 8, "Name": "BEAR COVE QUANTUM 800GB 2.5 SAS RI SSD" },
+        { "Id": 9, "Name": "BEAR COVE QUANTUM 960GB 2.5 SAS RI SSD" },
+        { "Id": 10, "Name": "CLIFFDALE REFRESH VE 15.36TB 2.5 PCIE SSD" },
+        { "Id": 11, "Name": "CLIFFDALE REFRESH VE 15.36TB EDSFF18 PCIE SSD" },
+        { "Id": 12, "Name": "CLIFFDALE REFRESH VE 15.36TB EDSFF9 PCIE SSD" },
+        { "Id": 13, "Name": "CLIFFDALE REFRESH VE 7.68TB 2.5 PCIE SSD" },
+        { "Id": 14, "Name": "NEPTUNE HARBOR 1024GB M.2 80MM PCIE CLIENT SSD" },
+        { "Id": 15, "Name": "NEPTUNE HARBOR 2048GB M.2 80MM PCIE CLIENT SSD" },
+        { "Id": 16, "Name": "NEPTUNE HARBOR 256GB M.2 80MM PCIE CLIENT SSD" },
+        { "Id": 17, "Name": "NEPTUNE HARBOR 512GB M.2 80MM PCIE CLIENT SSD" },
+    ];
+
+    var scodes = [
+        { "Id": 1, "Name": "976805" },
+        { "Id": 2, "Name": "976806" },
+        { "Id": 3, "Name": "976807" },
+        { "Id": 4, "Name": "979156" },
+        { "Id": 5, "Name": "979183" },
+        { "Id": 6, "Name": "980318" },
+        { "Id": 7, "Name": "980904" },
+        { "Id": 8, "Name": "980941" },
+        { "Id": 9, "Name": "980942" },
+        { "Id": 10, "Name": "983541" },
+        { "Id": 11, "Name": "985250" },
+        { "Id": 12, "Name": "999HAD" },
+        { "Id": 13, "Name": "999HAF" },
+        { "Id": 14, "Name": "999HAG" },
+        { "Id": 15, "Name": "999HAH" },
+        { "Id": 16, "Name": "999HAJ" },
+        { "Id": 17, "Name": "999HAL" },
+        { "Id": 18, "Name": "999HAN" },
+        { "Id": 19, "Name": "999HAP" },
+        { "Id": 20, "Name": "999HAR" },
+        { "Id": 21, "Name": "999AVV" },
+        { "Id": 22, "Name": "999AVX" },
+    ];
+
+    var startFromItems = [
+        { Id: 1, Name: "Existing Version" },
+        { Id: 2, Name: "Template" },
+        { Id: 3, Name: "Scratch" },
+    ];
+
+    var versions = [
+        {
+            "Id": 1,
+            "Version": 1,
+            "Name" : "Version 1; Complete; TEST",
+            "IsPOR": "true",
+            "IsActive": "true",
+            "Status": { "Id": 6, "Name": "Complete" },
+            "CreatedBy": "TEST",
+            "CreatedByUserName": "TEST",
+            "CreatedOn": "2021-01-22",
+            "UpdatedBy": "TEST",
+            "UpdatedByUserName": "TEST",
+            "UpdatedOn": "2021-01-22",
+        }
+    ];
+
+    var updateDictDesigns = function () {
+        dictDesigns = {};
+        for (var i = 0; i < designs.length; i++) {
+            dictDesigns[designs[i].Id] = designs[i];
+        }
+    }
+
+    var updateDictTemplates = function () {
+        dictTemplates = {};
+        for (var i = 0; i < templates.length; i++) {
+            dictTemplates[templates[i].DesignFamily.Id] = templates[i];
+        }
+    }
+
+    var updateDictVersions = function () {
+        dictVersions = {};
+        for (var i = 0; i < versions.length; i++) {
+            dictVersions[versions[i].Id] = versions[i];
+        }
+    }
+
+    // populate dictionaries
+    updateDictDesigns();
+    updateDictTemplates();
+    updateDictVersions();
+
+
+    var cancel = function () {
+        window.location.href = "/Mat/ListBuildCriterias/";
+    }
+
+    var create = function () {
+        window.location.href = "/Mat/BuildCriteriaDetails/1"; // + result.Entity;
+    }
+
+    var getBuildCriteria = function(desId, prodFamId, capId, fabFacId, devId, scoId, medId) {
+        for (var i = 0; i < buildCombinations.length; i++) {
+            if (buildCombinations[i].Capacity.Id == capId &&
+                buildCombinations[i].Design.Id == desId &&
+                buildCombinations[i].Device.Id == devId &&
+                buildCombinations[i].FabricationFacility.Id == fabFacId &&
+                buildCombinations[i].MediaIPN.Id == medId &&
+                buildCombinations[i].ProductFamily.Id == prodFamId &&
+                buildCombinations[i].Scode.Id == scoId)
+                return buildCombinations[i];
+        }
+        return null;
+    }
+
+    var updateDictTemplates = function() {
+        dictTemplates = {};
+        for (var i = 0; i < templates.length; i++) {
+            dictTemplates[templates[i].DesignFamily.Id] = templates[i];
+        }
+    }
+
+    var updateUiFromSelections = function() {
+        if (initialized) {
+            var sufficientSelections = false;
+
+            var designId = ddlDesigns.option("value");
+            var fabricationFacilityId = ddlFabricationFacilities.option("value");
+            var capacityId = ddlCapacities.option("value");
+            var deviceId = ddlDevices.option("value");
+            var productFamilyId = ddlProductFamilies.option("value");
+            var scodeId = ddlScodes.option("value");
+            var mediaIPNId = ddlMediaIPNs.option("value");
+            var startFromId = ddlStartFrom.option("value");
+
+            if ((designId && designId > 0) &&
+                (fabricationFacilityId && fabricationFacilityId > 0) &&
+                (capacityId && capacityId > 0) &&
+                (deviceId && deviceId > 0) &&
+                (productFamilyId && productFamilyId > 0) &&
+                (scodeId && scodeId > 0) &&
+                (mediaIPNId && mediaIPNId > 0)) {
+                //if (design.DesignFamily) designFamilyId = design.DesignFamily.Id;
+                sufficientSelections = true;
+            }
+
+            var clearFilter = true;
+            var clearVersions = true;
+            var design = null;
+            var designFamilyId = null;
+
+           if (designId && designId > 0){
+                design = design = dictDesigns[designId];
+                designFamilyId = design.DesignFamily.Id;
+            }
+
+            if (startFromId == 1) { // Existing Version
+                if (sufficientSelections) {
+                    clearFilter = false;
+                    clearVersions = false;
+                    buildCriteria = getBuildCriteria(designId, productFamilyId, capacityId, fabricationFacilityId, deviceId, scodeId, mediaIPNId);
+                    if (buildCriteria) {
+                        updateFilterFrom(buildCriteria);
+                        updateVersionsDataSource(versions, 1);
+                    }
+                    //Nsga.Callisto.Mat.getBuildCriteriaAndVersions(designId, fabricationFacilityId, testFlowId, probeConversionId, onSuccessBuildCriteriaAndVersions, onError);
+                }
+            }
+            else if (startFromId == 2) { // Template
+                if (designFamilyId) {
+                    clearFilter = false;
+                    updateFilterFrom(dictTemplates[designFamilyId]);
+                }
+            }
+            if (clearVersions) {
+                ddlVersions.option("dataSource", []);
+                ddlVersions.option("value", null);
+            }
+            if (clearFilter) {
+                updateFilterFrom(null);
+            }
+        }
+    }
+
+    var updateUiFromDesign = function (id) {
+        updateUiFromSelections();
+    }
+
+    var updateFilterFrom = function(item) {
+        var filterValue = null;
+        if (item && item.Conditions) {
+            filterValue = [];
+            var condition;
+            var conditionValue;
+            for (var i = 0; i < item.Conditions.length; i++) {
+                condition = item.Conditions[i];
+                conditionValue = condition.Value;
+                if (condition.ComparisonOperation.OperandType.Id === 3) { // 3 = List
+                    if (conditionValue.includes(",")) {
+                        conditionValue = conditionValue.split(",");
+                    }
+                    else {
+                        conditionValue = [conditionValue];
+                    }
+                }
+                if (i > 0) filterValue.push("and");
+                filterValue.push([condition.AttributeType.Name, condition.ComparisonOperation.Key, conditionValue]);
+            }
+        }
+        fbBuildCriteria.option("value", filterValue);
+    }
+
+    function updateUiFromStartFrom(id) {
+        var item = null;
+        var divVersions = $("#divVersions");
+        if (id == 1) { // Existing Version
+            divVersions.show();
+            item = buildCriteria;
+        }
+        else {
+            divVersions.hide();
+            if (id == 2) { // Template
+                var designId = ddlDesigns.option("value");
+                if (designId) {
+                    var design = dictDesigns[designId];
+                    if (design && design.DesignFamily) {
+                        item = dictTemplates[design.DesignFamily.Id];
+                    }
+                }
+            }
+        }
+        updateFilterFrom(item);
+    }
+
+    var updateVersionsDataSource = function (records, id) {
+        ddlVersions.option("dataSource", versions);
+        if (id) {
+            ddlVersions.option("value", id);
+        }
+    }
+
+    $("document").ready(function () {
+        var capacityId = null;
+        var designId = null;
+        var deviceId = null;
+        var fabricationFacilityId = null;
+        var mediaIPNId = null;
+        var productFamilyId = null;
+        var scodeId = null;
+        var versionIdInitial = null;
+
+        ddlCapacities = $("#ddlCapacities").dxSelectBox({
+            items: capacities,
+            value: capacityId,
+            displayExpr: "Name",
+            valueExpr: "Id",
+            searchEnabled: true,
+            width: "120px",
+            placeholder: "Select",
+            onValueChanged: function (e) {
+                if (e.event !== undefined) { // only enter this block if the value was changed by the user (not programatically)
+                    //updateUiFromFabricationFacility(e.value);
+                }
+            }
+        }).dxValidator({
+            validationRules: [{
+                type: "required",
+                message: "Capacity is required"
+            }],
+        }).dxSelectBox("instance");
+
+        ddlDesigns = $("#ddlDesigns").dxSelectBox({
+            items: designs,
+            value: designId,
+            displayExpr: "Name",
+            valueExpr: "Id",
+            searchEnabled: true,
+            width: "100px",
+            placeholder: "Select",
+            onValueChanged: function (e) {
+                if (e.event !== undefined) { // only enter this block if the value was changed by the user (not programatically)
+                    updateUiFromDesign(e.value);
+                }
+            }
+        }).dxValidator({
+            validationRules: [{
+                type: "required",
+                message: "Design is required",
+            }],
+        }).dxSelectBox("instance");
+
+
+        ddlDevices = $("#ddlDevices").dxSelectBox({
+            items: devices,
+            value: deviceId,
+            displayExpr: "Name",
+            valueExpr: "Id",
+            searchEnabled: true,
+            width: "130px",
+            placeholder: "Select",
+            onValueChanged: function (e) {
+                if (e.event !== undefined) { // only enter this block if the value was changed by the user (not programatically)
+                    //updateUiFromFabricationFacility(e.value);
+                }
+            }
+        }).dxValidator({
+            validationRules: [{
+                type: "required",
+                message: "Device is required"
+            }],
+        }).dxSelectBox("instance");
+
+        ddlFabricationFacilities = $("#ddlFabricationFacilities").dxSelectBox({
+            items: fabricationFacilitiesInitial,
+            value: fabricationFacilityId,
+            displayExpr: "Name",
+            valueExpr: "Id",
+            searchEnabled: true,
+            width: "100px",
+            placeholder: "Select",
+            onValueChanged: function (e) {
+                if (e.event !== undefined) { // only enter this block if the value was changed by the user (not programatically)
+                    //updateUiFromFabricationFacility(e.value);
+                }
+            }
+        }).dxValidator({
+            validationRules: [{
+                type: "required",
+                message: "Fabrication Facility is required"
+            }],
+        }).dxSelectBox("instance");
+
+        ddlProductFamilies = $("#ddlProductFamilies").dxSelectBox({
+            items: productFamilies,
+            value: productFamilyId,
+            displayExpr: "Name",
+            valueExpr: "Id",
+            searchEnabled: true,
+            width: "350px",
+            placeholder: "Select",
+            onValueChanged: function (e) {
+                if (e.event !== undefined) { // only enter this block if the value was changed by the user (not programatically)
+                    //updateUiFromFabricationFacility(e.value);
+                }
+            }
+        }).dxValidator({
+            validationRules: [{
+                type: "required",
+                message: "Product Family is required"
+            }],
+        }).dxSelectBox("instance");
+
+        ddlScodes = $("#ddlScodes").dxSelectBox({
+            items: scodes,
+            value: scodeId,
+            displayExpr: "Name",
+            valueExpr: "Id",
+            searchEnabled: true,
+            width: "100px",
+            placeholder: "Select",
+            onValueChanged: function (e) {
+                if (e.event !== undefined) { // only enter this block if the value was changed by the user (not programatically)
+                    //updateUiFromFabricationFacility(e.value);
+                }
+            }
+        }).dxValidator({
+            validationRules: [{
+                type: "required",
+                message: "Scode is required"
+            }],
+        }).dxSelectBox("instance");
+
+        ddlMediaIPNs = $("#ddlMediaIPNs").dxSelectBox({
+            items: mediaIPNs,
+            value: mediaIPNId,
+            displayExpr: "Name",
+            valueExpr: "Id",
+            searchEnabled: true,
+            width: "100px",
+            placeholder: "Select",
+            onValueChanged: function (e) {
+                if (e.event !== undefined) { // only enter this block if the value was changed by the user (not programatically)
+                    updateUiFromSelections();
+                }
+            }
+        }).dxValidator({
+            validationRules: [{
+                type: "required",
+                message: "Media IPN is required"
+            }],
+        }).dxSelectBox("instance");
+
+        ddlStartFrom = $("#ddlStartFrom").dxSelectBox({
+            items: startFromItems,
+            value: 1, // Default option: Existing Version
+            displayExpr: "Name",
+            valueExpr: "Id",
+            searchEnabled: true,
+            width: "150px",
+            placeholder: "Select",
+            onValueChanged: function (e) {
+                if (e.event !== undefined) { // only enter this block if the value was changed by the user (not programatically)
+                    updateUiFromStartFrom(e.value);
+                }
+            }
+        }).dxSelectBox("instance");
+
+        ddlVersions = $("#ddlVersions").dxSelectBox({
+            items: versions,
+            value: versionIdInitial,
+            displayExpr: "Name",
+            valueExpr: "Id",
+            searchEnabled: true,
+            width: "250px",
+            placeholder: "Select",
+            onValueChanged: function (e) {
+                if (e.event !== undefined) { // only enter this block if the value was changed by the user (not programatically)
+                    versionSelected(e.value);
+                }
+            }
+        }).dxSelectBox("instance");
+
+        var dictFilterOperations = {}; // { AttributeDataType.Name: ComparisonOperations }
+        for (var i = 0; i < attributeDataTypes.length; i++) {
+            var operations = [];
+            for (var j = 0; j < attributeDataTypes[i].ComparisonOperations.length; j++) {
+                operations.push(attributeDataTypes[i].ComparisonOperations[j].Key);
+            }
+            dictFilterOperations[attributeDataTypes[i].Name] = operations;
+        }
+
+        // create filter builder fields from the attribute types
+        var fbFields = [];
+        for (var i = 0; i < attributeTypes.length; i++) {
+            fbFields.push({
+                caption: attributeTypes[i].NameDisplay,
+                dataField: attributeTypes[i].Name,
+                dataType: attributeTypes[i].DataType.Name,
+                filterOperations: dictFilterOperations[attributeTypes[i].DataType.Name],
+            });
+        };
+
+        fbBuildCriteria = $("#fbBuildCriteria").dxFilterBuilder({
+            fields: fbFields,
+            maxGroupLevel: 0,
+            groupOperations: ["and"],
+            customOperations: [{
+                name: "in",
+                caption: "Is in",
+                icon: "check",
+                editorTemplate: function (conditionInfo) {
+                    return $("<div>").dxTagBox({
+                        value: conditionInfo.value,
+                        onValueChanged: function (e) {
+                            conditionInfo.setValue(e.value && e.value.length ? e.value : null);
+                        },
+                        acceptCustomValue: true,
+                        onCustomItemCreating: function (args) {
+                            var newValue = args.text,
+                                component = args.component,
+                                currentItems = component.option("items");
+                            currentItems.unshift(newValue);
+                            component.option("items", currentItems);
+                            args.customItem = newValue;
+                        },
+                        width: "auto"
+                    });
+                },
+                calculateFilterExpression: function (filterValue, field) {
+                    return filterValue && filterValue.length
+                        && Array.prototype.concat.apply([], filterValue.map(function (value) {
+                            return [[field.dataField, "=", value], "or"];
+                        })).slice(0, -1);
+                }
+            },
+            {
+                name: "notin",
+                caption: "Is not in",
+                icon: "close",
+                editorTemplate: function (conditionInfo) {
+                    return $("<div>").dxTagBox({
+                        value: conditionInfo.value,
+                        onValueChanged: function (e) {
+                            conditionInfo.setValue(e.value && e.value.length ? e.value : null);
+                        },
+                        acceptCustomValue: true,
+                        onCustomItemCreating: function (args) {
+                            var newValue = args.text,
+                                component = args.component,
+                                currentItems = component.option("items");
+                            currentItems.unshift(newValue);
+                            component.option("items", currentItems);
+                            args.customItem = newValue;
+                        },
+                        width: "auto"
+                    });
+                },
+                calculateFilterExpression: function (filterValue, field) {
+                    return filterValue && filterValue.length
+                        && Array.prototype.concat.apply([], filterValue.map(function (value) {
+                            return [[field.dataField, "<>", value], "and"];
+                        })).slice(0, -1);
+                }
+            }],
+        }).dxFilterBuilder("instance");
+
+        txtComments = $("#txtComments");
+
+        //updateUiFromDesign(designId);
+        //updateFilterFrom(buildCriteria);
+
+        $("#btnCancel").dxButton({
+            text: "Cancel",
+            onClick: function (e) {
+                cancel();
+            },
+        });
+
+        $("#btnCreate").dxButton({
+            text: "Save",
+            onClick: function (e) {
+                var result = e.validationGroup.validate();
+                if (result.isValid) {
+                    create();
+                }
+            },
+        });
+
+        initialized = true;
+
+        if (buildCriteria) {
+            ddlCapacities.option("value", buildCriteria.Capacity.Id);
+            ddlDesigns.option("value", buildCriteria.Design.Id);
+            ddlDevices.option("value", buildCriteria.Device.Id);
+            ddlFabricationFacilities.option("value", buildCriteria.FabricationFacility.Id);
+            ddlMediaIPNs.option("value", buildCriteria.MediaIPN.Id);
+            ddlProductFamilies.option("value", buildCriteria.ProductFamily.Id);
+            ddlScodes.option("value", buildCriteria.Scode.Id);
+            updateUiFromSelections();
+        }
+
+    });
+
+</script>
+
+
+<div>
+    <div class="formwrapper fixed centered" style="width:960px;">
+        <div class="bluebox padeightpixel marginfourpixel">
+            <div>
+                <div class="rightalign">
+                    <div class="padeightpixel">
+                        <span><a title="Click here to view all PRQ build criteria" id="lnkAllPOR" href="/Mat/ListBuildCriteriaPOR/"><span class="imagelinkbutton bordered"><span class="fa fa-list-alt "></span><span class="margintwopixel">All PRQ</span> </span></a></span>
+                        <span><a title="Click here to view all non-PRQ build criteria" id="lnkAllNonPOR" href="/Mat/ListBuildCriteriaNonPOR/"><span class="imagelinkbutton bordered"><span class="fa fa-list-alt "></span><span class="margintwopixel">All Non-PRQ</span> </span></a></span>
+                    </div>
+                </div>
+                <div class="bluebox bglightblue padeightpixel">
+                    <div class="" style="width:940px;display:inline;">
+                        <div class="infotext">
+                            <span class="infotext italic">Items marked as <span class="mandatory">*</span> are required inputs</span>
+                        </div>
+                        <div>
+                            <div id="divValidationSummary" style="margin-left: 150px;"></div>
+                        </div>
+                        <div class="display formrow">
+                            <!-- designs -->
+                            <div class="showinline" style="margin-top:8px;width:300px;">
+                                <div class="dx-field-label required" style="width:100px;">Design</div>
+                                <div class="colon floatleft" style="margin-top: 8px;"></div>
+                                <div class="">
+                                    <div id="ddlDesigns" style="display:inline-block;"></div>
+                                </div>
+                            </div>
+                            <!-- product families -->
+                            <div class="showinline" style="margin-top:8px;width:60%;">
+                                <div class="dx-field-label required" style="width:125px;">Product Family</div>
+                                <div class="colon floatleft" style="margin-top: 8px;"></div>
+                                <div class="">
+                                    <div id="ddlProductFamilies" style="display:inline-block;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="display formrow">
+                            <!-- capacities -->
+                            <div class="showinline" style="margin-top:8px;width:300px;">
+                                <div class="dx-field-label required" style="width:100px;">Capacity</div>
+                                <div class="colon floatleft" style="margin-top: 8px;"></div>
+                                <div class="">
+                                    <div id="ddlCapacities" style="display:inline-block;"></div>
+                                </div>
+                            </div>
+                            <!-- fabrication facilities -->
+                            <div class="showinline" style="margin-top:8px;width:35%;">
+                                <div class="dx-field-label required" style="width:125px;">Fabrication Facility</div>
+                                <div class="colon floatleft" style="margin-top: 8px;"></div>
+                                <div class="">
+                                    <div id="ddlFabricationFacilities" style="display:inline-block;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- dependent fields based on the selected design -->
+                        <div class="display formrow">
+                            <!-- test flows; display only if the design is of type NAND -->
+                            <div id="divDevices" class="showinline" style="margin-top:8px;width:300px;">
+                                <!-- display: none; -->
+                                <div class="dx-field-label required" style="width:100px;">Device</div>
+                                <div class="colon floatleft" style="margin-top: 8px;"></div>
+                                <div class="">
+                                    <div id="ddlDevices" style="display:inline-block;"></div>
+                                </div>
+                            </div>
+                            <!-- scode; display only if the design is of type Optane -->
+                            <div id="divScodes" class="showinline" style="margin-top:8px;width:35%;">
+                                <!-- display: none; -->
+                                <div class="dx-field-label required" style="width:125px;">Scode</div>
+                                <div class="colon floatleft" style="margin-top: 8px;"></div>
+                                <div style="display:inline-block;" class="forminput">
+                                    <div id="ddlScodes"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- media ipn -->
+                        <div class="display formrow">
+                            <div class="showinline" style="margin-top:8px;width:100%;">
+                                <div class="dx-field-label required" style="width:100px;">Media IPN</div>
+                                <div class="colon floatleft" style="margin-top: 8px;"></div>
+                                <div style="display:inline-block;" class="forminput">
+                                    <div id="ddlMediaIPNs"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- start from -->
+                        <div class="display formrow">
+                            <div class="showinline" style="margin-top:8px;width:100%;">
+                                <div class="dx-field-label" style="width:100px;">Start From</div>
+                                <div class="colon floatleft" style="margin-top: 8px;"></div>
+                                <div style="display:inline-block;" class="forminput">
+                                    <div id="ddlStartFrom"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- versions; display only if start from = Existing Version -->
+                        <div id="divVersions" class="display formrow">
+                            <div class="showinline" style="margin-top:8px;width:100%;">
+                                <div class="dx-field-label" style="width:100px;">Existing Versions</div>
+                                <div class="colon floatleft" style="margin-top: 8px;"></div>
+                                <div style="display:inline-block;" class="forminput">
+                                    <div id="ddlVersions"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- conditions -->
+                        <div class="display formrow">
+                            <div class="showinline" style="margin-top:8px;width:100%;">
+                                <div class="dx-field-label required" style="width:100px;">Criteria</div>
+                                <div class="colon floatleft" style="margin-top: 8px;"></div>
+                                <div style="display:inline-block;" class="forminput">
+                                    <div id="fbBuildCriteria"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- comments -->
+                        <div class="display formrow">
+                            <div class="showinline" style="margin-top:8px;width:100%;">
+                                <div class="dx-field-label" style="width:100px;">Comments</div>
+                                <div class="colon floatleft" style="margin-top: 8px;"></div>
+                                <div style="display:inline-block;" class="forminput">
+                                    <textarea id="txtComments" name="txtComments" rows="5" cols="100"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div>
+            <!-- A section for all the actions -->
+            <div class="bluebox padeightpixel bglightblue marginfourpixel" style="margin-top:8px;">
+                <div class=" padeightpixel">
+                    <div class="rightalign">
+                        <div id="btnCancel"></div>
+                        <div id="btnCreate" class="submitbutton"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

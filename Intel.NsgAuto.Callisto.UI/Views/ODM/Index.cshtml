@@ -1,0 +1,33 @@
+﻿@model Intel.NsgAuto.Callisto.UI.Models.ODMModel
+
+@{
+    ViewBag.Title = "ODM Home";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<style scoped>
+    .widgetrow { margin-top: 25px; display: block; padding: 4px; }
+    .widgetbox { /*display:inline-block;height:250px; */ float: left; width: 250px; margin: 4px; }
+    .widgetboxheader { margin: 0px; padding: 10px; border-bottom: 1px solid #dcdcdc; }
+    .widgetbox li { margin: 4px; }
+</style>
+<div class="fixed">
+    <div class="widgetrow">
+        <div class="widgetbox graybox">
+            <div>
+                <div class="widgetboxheader bglightblue heading">ODM Qual Filters</div>
+            </div>
+            <div class="padeightpixel">
+                <ul>
+                    <li><a href="/ODM/PRF" target="_self">Manage PRF</a> </li>
+                    <li><a href="/ODM/MAT" target="_self">Manage MAT (Media Attributes Table)</a> </li>
+                    <li><a href="/ODM/QFScenarios" target="_self">Qual Filters Scenarios &amp; Results</a> </li>
+                    <li><a href="/ODM/LotDispositions" target="_self">Comparison (Lot disposition) Report</a> </li>
+                    <li><a href="/ODM/Daily" target="_self">ODM Qual Filter History</a> </li>
+                    <li><a href="/ODM/QualFilterExplanations" target="_self">Qual Filter Explanations</a> </li>
+                </ul>
+            </div>
+        </div>
+    </div>   
+</div>

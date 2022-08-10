@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Intel.NsgAuto.Callisto.UI.Controllers.MATVersionsApiController">
+    <Position X="0.5" Y="0.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAgAAAIAQAAAAABAIAAAAAAAAAAAAAAgAgAAAQAAAIA=</HashCode>
+      <FileName>Controllers\MATVersionsApiController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Services.MATVersionsService">
+    <Position X="3" Y="0.5" Width="2" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.DataContexts.MATVersionsDataContext">
+    <Position X="5.5" Y="2" Width="2" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MATs.MATVersion">
+    <Position X="8" Y="3.5" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.MATs.MATVersionImportResponse">
+    <Position X="0.5" Y="3.75" Width="2.25" />
+    <TypeIdentifier />
+  </Class>
+  <Interface Name="Intel.NsgAuto.Callisto.Business.DataContexts.IMATVersionsDataContext">
+    <Position X="5.5" Y="0.5" Width="2" />
+    <TypeIdentifier />
+  </Interface>
+  <Interface Name="Intel.NsgAuto.Callisto.Business.Entities.MATs.IMATVersion">
+    <Position X="8" Y="0.5" Width="1.5" />
+    <TypeIdentifier />
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

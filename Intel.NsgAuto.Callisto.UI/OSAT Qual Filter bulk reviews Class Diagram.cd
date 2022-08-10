@@ -1,0 +1,78 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Intel.NsgAuto.Callisto.UI.Controllers.OSATApiController" Collapsed="true">
+    <Position X="1.5" Y="2" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>IQEAgBIAAAYCIAAEAKgAAAAIUgAAAgAQAAAAgQCBAoA=</HashCode>
+      <FileName>Controllers\OSATApiController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.UI.Controllers.OSATController" Collapsed="true">
+    <Position X="1.5" Y="1" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAABAEAAAABQIAAAACABAABAAAABAAAAABEAAAAAAyA=</HashCode>
+      <FileName>Controllers\OSATController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.Osat.QualFilterRecordsQuery" Collapsed="true">
+    <Position X="7" Y="1" Width="2" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.Osat.QualFilterRecord" Collapsed="true">
+    <Position X="7" Y="2" Width="2" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.Osat.QualFilterRecords">
+    <Position X="7" Y="3" Width="1.75" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.Osat.QualFilterFile" Collapsed="true">
+    <Position X="7" Y="4.5" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Services.OsatService" Collapsed="true">
+    <Position X="4.75" Y="1" Width="2" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.DataContexts.OsatDataContext" Collapsed="true">
+    <Position X="11.75" Y="2.5" Width="2.75" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.Osat.Workflows.ReviewDecisionDto" Collapsed="true">
+    <Position X="9.25" Y="5" Width="1.75" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.Workflows.Review" Collapsed="true">
+    <Position X="9.25" Y="1" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.Workflows.ReviewDecision" Collapsed="true">
+    <Position X="9.25" Y="4" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.Workflows.Reviewer" Collapsed="true">
+    <Position X="9.25" Y="2" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.Workflows.ReviewStage" Collapsed="true">
+    <Position X="9.25" Y="6.25" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.Workflows.ReviewStep" Collapsed="true">
+    <Position X="9.25" Y="8" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Intel.NsgAuto.Callisto.Business.Entities.Workflows.ReviewResponse" Collapsed="true">
+    <Position X="9.25" Y="3" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Enum Name="Intel.NsgAuto.Callisto.Business.Entities.Workflows.ReviewStatus" Collapsed="true">
+    <Position X="9.25" Y="7" Width="1.5" />
+    <TypeIdentifier />
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

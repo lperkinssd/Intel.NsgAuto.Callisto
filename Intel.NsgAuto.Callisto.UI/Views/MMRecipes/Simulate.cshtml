@@ -1,0 +1,31 @@
+﻿@model Intel.NsgAuto.Callisto.UI.Models.MMRecipeDetailsModel
+
+@{
+    ViewBag.Title = "MM Recipe Prototype";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section scripts {
+
+    @Html.Partial("_DetailsScript", Model)
+
+}
+
+<div id="popupContainer">
+    <div id="popupContent"></div>
+</div>
+
+<div class="padeightpixel">
+    <div class="rightalign">
+        <div class="padeightpixel">
+            <span><a title="Click here to view all MM Recipes" id="lnkViewAll" href="/MMRecipes/List/"><span class="imagelinkbutton bordered"><span class="fa fa-list-alt"></span><span class="margintwopixel">All MM Recipes</span> </span></a></span>
+        </div>
+    </div>
+    <div id="divDetails">
+        <div class="accordion-label open">Details</div>
+        <div class="accordion-panel" style="padding: 8px;">
+            @Html.Partial("_DetailsHtml", Model)
+        </div>
+    </div>
+</div>
+

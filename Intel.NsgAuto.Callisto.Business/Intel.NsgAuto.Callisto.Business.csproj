@@ -1,0 +1,828 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\Microsoft.SourceLink.GitHub.1.1.1\build\Microsoft.SourceLink.GitHub.props" Condition="Exists('..\packages\Microsoft.SourceLink.GitHub.1.1.1\build\Microsoft.SourceLink.GitHub.props')" />
+  <Import Project="..\packages\Microsoft.SourceLink.Common.1.1.1\build\Microsoft.SourceLink.Common.props" Condition="Exists('..\packages\Microsoft.SourceLink.Common.1.1.1\build\Microsoft.SourceLink.Common.props')" />
+  <Import Project="..\packages\Microsoft.Build.Tasks.Git.1.1.1\build\Microsoft.Build.Tasks.Git.props" Condition="Exists('..\packages\Microsoft.Build.Tasks.Git.1.1.1\build\Microsoft.Build.Tasks.Git.props')" />
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{AC902E5E-52D6-4126-BB64-70170D9F9B19}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Intel.NsgAuto.Callisto.Business</RootNamespace>
+    <AssemblyName>Intel.NsgAuto.Callisto.Business</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Integration|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Integration\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="CsvHelper, Version=15.0.0.0, Culture=neutral, PublicKeyToken=8c4959082be5c823, processorArchitecture=MSIL">
+      <HintPath>..\packages\CsvHelper.15.0.8\lib\net45\CsvHelper.dll</HintPath>
+    </Reference>
+    <Reference Include="Dejavu.Calendar">
+      <HintPath>..\packages\Dejavu.Calendar.2019.9.27.1020\lib\net45\Dejavu.Calendar.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.Charts.v20.2.Core, Version=20.2.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <HintPath>..\packages\DevExpress.Charts.Core.20.2.7\lib\net452\DevExpress.Charts.v20.2.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.CodeParser.v20.2, Version=20.2.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <HintPath>..\packages\DevExpress.CodeParser.20.2.7\lib\net452\DevExpress.CodeParser.v20.2.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.Data.v20.2, Version=20.2.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <HintPath>..\packages\DevExpress.Data.20.2.7\lib\net452\DevExpress.Data.v20.2.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.DataAccess.v20.2, Version=20.2.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <HintPath>..\packages\DevExpress.DataAccess.20.2.7\lib\net452\DevExpress.DataAccess.v20.2.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.DataVisualization.v20.2.Core, Version=20.2.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <HintPath>..\packages\DevExpress.DataVisualization.Core.20.2.7\lib\net452\DevExpress.DataVisualization.v20.2.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.Docs.v20.2, Version=20.2.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <HintPath>..\packages\DevExpress.Document.Processor.20.2.7\lib\net452\DevExpress.Docs.v20.2.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.Office.v20.2.Core, Version=20.2.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <HintPath>..\packages\DevExpress.Office.Core.20.2.7\lib\net452\DevExpress.Office.v20.2.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.Pdf.v20.2.Core, Version=20.2.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <HintPath>..\packages\DevExpress.Pdf.Core.20.2.7\lib\net452\DevExpress.Pdf.v20.2.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.Pdf.v20.2.Drawing, Version=20.2.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <HintPath>..\packages\DevExpress.Pdf.Drawing.20.2.7\lib\net452\DevExpress.Pdf.v20.2.Drawing.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.Printing.v20.2.Core, Version=20.2.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <HintPath>..\packages\DevExpress.Printing.Core.20.2.7\lib\net452\DevExpress.Printing.v20.2.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.RichEdit.v20.2.Core, Version=20.2.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <HintPath>..\packages\DevExpress.RichEdit.Core.20.2.7\lib\net452\DevExpress.RichEdit.v20.2.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.Snap.v20.2.Core, Version=20.2.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <HintPath>..\packages\DevExpress.Snap.Core.20.2.7\lib\net452\DevExpress.Snap.v20.2.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.Sparkline.v20.2.Core, Version=20.2.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <HintPath>..\packages\DevExpress.Sparkline.Core.20.2.7\lib\net452\DevExpress.Sparkline.v20.2.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.Spreadsheet.v20.2.Core, Version=20.2.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <HintPath>..\packages\DevExpress.Spreadsheet.Core.20.2.7\lib\net452\DevExpress.Spreadsheet.v20.2.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.Xpo.v20.2, Version=20.2.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <HintPath>..\packages\DevExpress.Xpo.20.2.7\lib\net452\DevExpress.Xpo.v20.2.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.XtraCharts.v20.2, Version=20.2.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <HintPath>..\packages\DevExpress.Charts.20.2.7\lib\net452\DevExpress.XtraCharts.v20.2.dll</HintPath>
+    </Reference>
+    <Reference Include="ExcelDataReader, Version=3.5.0.0, Culture=neutral, PublicKeyToken=93517dbe6a4012fa, processorArchitecture=MSIL">
+      <HintPath>..\packages\ExcelDataReader.3.5.0\lib\net45\ExcelDataReader.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="ExcelDataReader.DataSet, Version=3.5.0.0, Culture=neutral, PublicKeyToken=93517dbe6a4012fa, processorArchitecture=MSIL">
+      <HintPath>..\packages\ExcelDataReader.DataSet.3.5.0\lib\net35\ExcelDataReader.DataSet.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Intel.NsgAuto.DataAccess, Version=1.0.2.2, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Intel.NsgAuto.DataAccess.1.0.2.2\lib\net452\Intel.NsgAuto.DataAccess.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Intel.NsgAuto.Shared, Version=1.0.15.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Intel.NsgAuto.Shared.1.0.15\lib\net452\Intel.NsgAuto.Shared.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net">
+      <HintPath>..\packages\log4net.2.0.12\lib\net45\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Oracle.ManagedDataAccess, Version=4.121.2.0, Culture=neutral, PublicKeyToken=89b483f429c47342, processorArchitecture=MSIL">
+      <HintPath>..\packages\Oracle.ManagedDataAccess.12.1.24160719\lib\net40\Oracle.ManagedDataAccess.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.ValueTuple, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.4.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Teradata.Client.Provider, Version=15.11.0.0, Culture=neutral, PublicKeyToken=76b417ee2e04956c, processorArchitecture=MSIL">
+      <HintPath>..\packages\Teradata.Net.Data.Provider.15.11.0.1\lib\Teradata.Client.Provider.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Teradata.Net.Security.Tdgss, Version=15.11.0.1, Culture=neutral, PublicKeyToken=76b417ee2e04956c, processorArchitecture=MSIL">
+      <HintPath>..\packages\Teradata.Net.Data.Provider.15.11.0.1\lib\Teradata.Net.Security.Tdgss.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Applications\OsatQualFilterExportApplication.cs" />
+    <Compile Include="Applications\OsatQualFilterImportApplication.cs" />
+    <Compile Include="Applications\TaskApplication.cs" />
+    <Compile Include="Core\Constants.cs" />
+    <Compile Include="Core\EmailTableDefintions.cs" />
+    <Compile Include="Core\EmailTemplateSender.cs" />
+    <Compile Include="Core\Extensions\BooleanExtensions.cs" />
+    <Compile Include="Core\Extensions\DataTableExtensions.cs" />
+    <Compile Include="Core\Enumerations.cs" />
+    <Compile Include="Core\Extensions\DateTimeExtensions.cs" />
+    <Compile Include="Core\Extensions\GenericExtensions.cs" />
+    <Compile Include="Core\Extensions\IEnumerableExtensions.cs" />
+    <Compile Include="Core\Extensions\NullableTypeExtensions.cs" />
+    <Compile Include="Core\Extensions\ObjectExtensions.cs" />
+    <Compile Include="Core\Extensions\DataReaderReviewExtensions.cs" />
+    <Compile Include="Core\Extensions\StringExtensions.cs" />
+    <Compile Include="Core\Functions.cs" />
+    <Compile Include="Core\ImportSpecifications.cs" />
+    <Compile Include="Core\NpsgStoredProcedures.cs" />
+    <Compile Include="Core\NpsgUserDefinedTypes.cs" />
+    <Compile Include="Core\Settings.cs" />
+    <Compile Include="Core\StoredProcedures.cs" />
+    <Compile Include="Core\UserDefinedTypes.cs" />
+    <Compile Include="DataContexts\AccountOwnershipDataContext.cs" />
+    <Compile Include="DataContexts\AdministrationDataContext.cs" />
+    <Compile Include="DataContexts\AutoCheckerDataContext.cs" />
+    <Compile Include="DataContexts\FormFactorsDataContext.cs" />
+    <Compile Include="DataContexts\IAccountOwnershipDataContext.cs" />
+    <Compile Include="DataContexts\IOdmIogDataContext.cs" />
+    <Compile Include="DataContexts\IIogNpsgDataContext.cs" />
+    <Compile Include="DataContexts\IOdmNpsgDataContext.cs" />
+    <Compile Include="DataContexts\IOdmDataContext.cs" />
+    <Compile Include="DataContexts\IPCNApproverDataContext.cs" />
+    <Compile Include="DataContexts\IPCNManagerFinderDataContect.cs" />
+    <Compile Include="DataContexts\IProductOwnershipDataContext.cs" />
+    <Compile Include="DataContexts\MatDataContext.cs" />
+    <Compile Include="DataContexts\OdmDataContext.cs" />
+    <Compile Include="DataContexts\OdmDataContextFactory.cs" />
+    <Compile Include="DataContexts\OdmIogDataContext.cs" />
+    <Compile Include="DataContexts\OdmNpsgDataContext.cs" />
+    <Compile Include="DataContexts\OsatDataContext.cs" />
+    <Compile Include="DataContexts\PCNApproverDataContext.cs" />
+    <Compile Include="DataContexts\PCNManagerFinderDataContext.cs" />
+    <Compile Include="DataContexts\ProductFamiliesDataContext.cs" />
+    <Compile Include="DataContexts\CustomersDataContext.cs" />
+    <Compile Include="DataContexts\EmailTemplatesDataContext.cs" />
+    <Compile Include="DataContexts\IMATVersionsDataContext.cs" />
+    <Compile Include="DataContexts\IMMRecipesDataContext.cs" />
+    <Compile Include="DataContexts\IProductLabelSetVersionsDataContext.cs" />
+    <Compile Include="DataContexts\IPartsDataContext.cs" />
+    <Compile Include="DataContexts\IProductsDataContext.cs" />
+    <Compile Include="DataContexts\IUserDataContext.cs" />
+    <Compile Include="DataContexts\MATVersionsDataContext.cs" />
+    <Compile Include="DataContexts\MMRecipesDataContext.cs" />
+    <Compile Include="DataContexts\ProductOwnershipDataContext.cs" />
+    <Compile Include="DataContexts\SpeedItemsDataContext.cs" />
+    <Compile Include="DataContexts\TasksDataContext.cs" />
+    <Compile Include="DataContexts\ProductLabelSetVersionsDataContext.cs" />
+    <Compile Include="DataContexts\ProductsDataContext.cs" />
+    <Compile Include="DataContexts\SpeedApiDataContext.cs" />
+    <Compile Include="DataContexts\UserDataContext.cs" />
+    <Compile Include="Entities\AdministrationResult.cs" />
+    <Compile Include="Entities\App\IProcess.cs" />
+    <Compile Include="Entities\App\IProcessRole.cs" />
+    <Compile Include="Entities\App\IUser.cs" />
+    <Compile Include="Entities\App\Process.cs" />
+    <Compile Include="Entities\App\ProcessRole.cs" />
+    <Compile Include="Entities\App\ProcessRoles.cs" />
+    <Compile Include="Entities\App\User.cs" />
+    <Compile Include="Entities\AutoChecker\AttributeDataTypeOperations.cs" />
+    <Compile Include="Entities\AutoChecker\AttributeDataTypeOperation.cs" />
+    <Compile Include="Entities\AutoChecker\AttributeDataTypes.cs" />
+    <Compile Include="Entities\AutoChecker\AttributeDataType.cs" />
+    <Compile Include="Entities\AutoChecker\AttributeTypeValue.cs" />
+    <Compile Include="Entities\AutoChecker\AttributeTypeValues.cs" />
+    <Compile Include="Entities\AutoChecker\BuildCriteriaComment.cs" />
+    <Compile Include="Entities\AutoChecker\BuildCriteriaComments.cs" />
+    <Compile Include="Entities\AutoChecker\BuildCriteriaComparisonResult.cs" />
+    <Compile Include="Entities\AutoChecker\BuildCriteriaComparisonResults.cs" />
+    <Compile Include="Entities\AutoChecker\AttributeTypeUpdateDto.cs" />
+    <Compile Include="Entities\AutoChecker\AttributeTypeCreateDto.cs" />
+    <Compile Include="Entities\AutoChecker\AttributeType.cs" />
+    <Compile Include="Entities\AutoChecker\AttributeTypes.cs" />
+    <Compile Include="Entities\AutoChecker\BuildCombinations.cs" />
+    <Compile Include="Entities\AutoChecker\BuildCombination.cs" />
+    <Compile Include="Entities\AutoChecker\BuildCriteriaCommentCreateDto.cs" />
+    <Compile Include="Entities\AutoChecker\BuildCriteriaExportConditions.cs" />
+    <Compile Include="Entities\AutoChecker\BuildCriteriaExportCondition.cs" />
+    <Compile Include="Entities\AutoChecker\BuildCriteriaDetails.cs" />
+    <Compile Include="Entities\AutoChecker\BuildCriteriaTemplateConditions.cs" />
+    <Compile Include="Entities\AutoChecker\BuildCriteriaTemplates.cs" />
+    <Compile Include="Entities\AutoChecker\BuildCriteriaTemplateCondition.cs" />
+    <Compile Include="Entities\AutoChecker\BuildCriteriaTemplate.cs" />
+    <Compile Include="Entities\AutoChecker\BuildCriteria.cs" />
+    <Compile Include="Entities\AutoChecker\BuildCriteriaAndVersions.cs" />
+    <Compile Include="Entities\AutoChecker\BuildCriteriaConditionCreateDto.cs" />
+    <Compile Include="Entities\AutoChecker\BuildCriteriaCondition.cs" />
+    <Compile Include="Entities\AutoChecker\BuildCriteriaConditionsCreateDto.cs" />
+    <Compile Include="Entities\AutoChecker\BuildCriteriaCreateDto.cs" />
+    <Compile Include="Entities\AutoChecker\BuildCriterias.cs" />
+    <Compile Include="Entities\AutoChecker\ComparisonOperation.cs" />
+    <Compile Include="Entities\AutoChecker\ComparisonOperations.cs" />
+    <Compile Include="Entities\AutoChecker\AttributeTypesMetadata.cs" />
+    <Compile Include="Entities\AutoChecker\BuildCriteriaCreate.cs" />
+    <Compile Include="Entities\AutoChecker\BuildCriteriaConditions.cs" />
+    <Compile Include="Entities\AutoChecker\LogicalOperation.cs" />
+    <Compile Include="Entities\AutoChecker\OperandType.cs" />
+    <Compile Include="Entities\AutoChecker\Workflows\DraftDecisionDto.cs" />
+    <Compile Include="Entities\AutoChecker\Workflows\ReviewDecisionDto.cs" />
+    <Compile Include="Entities\DesignFamilies.cs" />
+    <Compile Include="Entities\EmailTemplateBodyXsl.cs" />
+    <Compile Include="Entities\EmailTemplates.cs" />
+    <Compile Include="Entities\FileResponse.cs" />
+    <Compile Include="Entities\Imports\ISpecification.cs" />
+    <Compile Include="Entities\Imports\ReadOnlyField.cs" />
+    <Compile Include="Entities\Imports\IReadOnlyField.cs" />
+    <Compile Include="Entities\Imports\IReadOnlySpecification.cs" />
+    <Compile Include="Entities\Imports\ReadOnlySpecification.cs" />
+    <Compile Include="Entities\Imports\Specification.cs" />
+    <Compile Include="Entities\ODM\QualFilterRemovableSLot.cs" />
+    <Compile Include="Entities\ODM\QualFilterRemovableSLots.cs" />
+    <Compile Include="Entities\ODM\QualFilterRemovableSLotUpload.cs" />
+    <Compile Include="Entities\ODM\QualFilterRemovableSLotUploadResponse.cs" />
+    <Compile Include="Entities\ODM\QualFilterRemovableSLotUploads.cs" />
+    <Compile Include="Entities\Osat\IOsatMetaData.cs" />
+    <Compile Include="Entities\IReadOnlyTask.cs" />
+    <Compile Include="Entities\IReadOnlyTaskType.cs" />
+    <Compile Include="Entities\IRequestRequestor.cs" />
+    <Compile Include="Entities\ITaskType.cs" />
+    <Compile Include="Entities\Osat\IVersionName.cs" />
+    <Compile Include="Entities\Mat\AttributeDataType.cs" />
+    <Compile Include="Entities\Mat\AttributeDataTypeOperation.cs" />
+    <Compile Include="Entities\Mat\AttributeDataTypeOperations.cs" />
+    <Compile Include="Entities\Mat\AttributeDataTypes.cs" />
+    <Compile Include="Entities\Mat\AttributeType.cs" />
+    <Compile Include="Entities\Mat\AttributeTypes.cs" />
+    <Compile Include="Entities\Mat\AttributeTypesMetadata.cs" />
+    <Compile Include="Entities\Mat\BuildCombination.cs" />
+    <Compile Include="Entities\Mat\BuildCombinations.cs" />
+    <Compile Include="Entities\Mat\BuildCriteria.cs" />
+    <Compile Include="Entities\Mat\BuildCriteriaCondition.cs" />
+    <Compile Include="Entities\Mat\BuildCriteriaConditions.cs" />
+    <Compile Include="Entities\Mat\BuildCriteriaCreate.cs" />
+    <Compile Include="Entities\Mat\BuildCriteriaDetails.cs" />
+    <Compile Include="Entities\Mat\BuildCriteriaExportCondition.cs" />
+    <Compile Include="Entities\Mat\BuildCriteriaExportConditions.cs" />
+    <Compile Include="Entities\Mat\BuildCriterias.cs" />
+    <Compile Include="Entities\Mat\BuildCriteriaTemplate.cs" />
+    <Compile Include="Entities\Mat\BuildCriteriaTemplateCondition.cs" />
+    <Compile Include="Entities\Mat\BuildCriteriaTemplateConditions.cs" />
+    <Compile Include="Entities\Mat\BuildCriteriaTemplates.cs" />
+    <Compile Include="Entities\Mat\ComparisonOperation.cs" />
+    <Compile Include="Entities\Mat\ComparisonOperations.cs" />
+    <Compile Include="Entities\Mat\Design.cs" />
+    <Compile Include="Entities\Mat\Designs.cs" />
+    <Compile Include="Entities\Mat\IDesign.cs" />
+    <Compile Include="Entities\Mat\LogicalOperation.cs" />
+    <Compile Include="Entities\Mat\ManageAttributeTypes.cs" />
+    <Compile Include="Entities\Mat\ManageBuildCriteria.cs" />
+    <Compile Include="Entities\Mat\MatRecord.cs" />
+    <Compile Include="Entities\Mat\MatRecords.cs" />
+    <Compile Include="Entities\Mat\OperandType.cs" />
+    <Compile Include="Entities\Mat\PrfRecord.cs" />
+    <Compile Include="Entities\Mat\PrfRecords.cs" />
+    <Compile Include="Entities\Mat\PrototypeCondition.cs" />
+    <Compile Include="Entities\Mat\PrototypeConditions.cs" />
+    <Compile Include="Entities\MixType.cs" />
+    <Compile Include="Entities\MMRecipes\AccountOwnerships\AccountClient.cs" />
+    <Compile Include="Entities\MMRecipes\AccountOwnerships\AccountClients.cs" />
+    <Compile Include="Entities\MMRecipes\AccountOwnerships\AccountContact.cs" />
+    <Compile Include="Entities\MMRecipes\AccountOwnerships\AccountContactRole.cs" />
+    <Compile Include="Entities\MMRecipes\AccountOwnerships\AccountContactRoles.cs" />
+    <Compile Include="Entities\MMRecipes\AccountOwnerships\AccountContacts.cs" />
+    <Compile Include="Entities\MMRecipes\AccountOwnerships\AccountCustomer.cs" />
+    <Compile Include="Entities\MMRecipes\AccountOwnerships\AccountCustomers.cs" />
+    <Compile Include="Entities\MMRecipes\AccountOwnerships\AccountEmailTemplate.cs" />
+    <Compile Include="Entities\MMRecipes\AccountOwnerships\AccountOwnership.cs" />
+    <Compile Include="Entities\MMRecipes\AccountOwnerships\AccountOwnershipContact.cs" />
+    <Compile Include="Entities\MMRecipes\AccountOwnerships\AccountOwnershipContacts.cs" />
+    <Compile Include="Entities\MMRecipes\AccountOwnerships\AccountOwnershipLookup.cs" />
+    <Compile Include="Entities\MMRecipes\AccountOwnerships\AccountOwnershipLookups.cs" />
+    <Compile Include="Entities\MMRecipes\AccountOwnerships\AccountOwnershipMetaData.cs" />
+    <Compile Include="Entities\MMRecipes\AccountOwnerships\AccountOwnerships.cs" />
+    <Compile Include="Entities\MMRecipes\AccountOwnerships\AccountProcess.cs" />
+    <Compile Include="Entities\MMRecipes\AccountOwnerships\AccountProcesses.cs" />
+    <Compile Include="Entities\MMRecipes\AccountOwnerships\AccountProduct.cs" />
+    <Compile Include="Entities\MMRecipes\AccountOwnerships\AccountProducts.cs" />
+    <Compile Include="Entities\MMRecipes\AccountOwnerships\AccountRole.cs" />
+    <Compile Include="Entities\MMRecipes\AccountOwnerships\AccountRoles.cs" />
+    <Compile Include="Entities\MMRecipes\AccountOwnerships\AccountSubsidiaries.cs" />
+    <Compile Include="Entities\MMRecipes\AccountOwnerships\AccountSubsidiary.cs" />
+    <Compile Include="Entities\MMRecipes\AccountOwnerships\EmailRecord.cs" />
+    <Compile Include="Entities\MMRecipes\AccountOwnerships\EmailRecords.cs" />
+    <Compile Include="Entities\MMRecipes\AccountOwnerships\IAccountClient.cs" />
+    <Compile Include="Entities\MMRecipes\AccountOwnerships\IAccountContact.cs" />
+    <Compile Include="Entities\MMRecipes\AccountOwnerships\IAccountContactRole.cs" />
+    <Compile Include="Entities\MMRecipes\AccountOwnerships\IAccountCustomer.cs" />
+    <Compile Include="Entities\MMRecipes\AccountOwnerships\IAccountEmailTemplate.cs" />
+    <Compile Include="Entities\MMRecipes\AccountOwnerships\IAccountOwnership.cs" />
+    <Compile Include="Entities\MMRecipes\AccountOwnerships\IAccountOwnershipContact.cs" />
+    <Compile Include="Entities\MMRecipes\AccountOwnerships\IAccountOwnershipLookup.cs" />
+    <Compile Include="Entities\MMRecipes\AccountOwnerships\IAccountOwnershipMetaData.cs" />
+    <Compile Include="Entities\MMRecipes\AccountOwnerships\IAccountProcess.cs" />
+    <Compile Include="Entities\MMRecipes\AccountOwnerships\IAccountProduct.cs" />
+    <Compile Include="Entities\MMRecipes\AccountOwnerships\IAccountRole.cs" />
+    <Compile Include="Entities\MMRecipes\AccountOwnerships\IAccountSubsidiary.cs" />
+    <Compile Include="Entities\MMRecipes\AccountOwnerships\IEmailRecord.cs" />
+    <Compile Include="Entities\MMRecipes\PCNApprovers\AccountCustomer.cs" />
+    <Compile Include="Entities\MMRecipes\PCNApprovers\AccountCustomers.cs" />
+    <Compile Include="Entities\MMRecipes\PCNApprovers\Approver.cs" />
+    <Compile Include="Entities\MMRecipes\PCNApprovers\Approvers.cs" />
+    <Compile Include="Entities\MMRecipes\PCNApprovers\IAccountCustomer.cs" />
+    <Compile Include="Entities\MMRecipes\PCNApprovers\IApprover.cs" />
+    <Compile Include="Entities\MMRecipes\PCNApprovers\IPCNApproverFilter.cs" />
+    <Compile Include="Entities\MMRecipes\PCNApprovers\IPCNApproverMetaData.cs" />
+    <Compile Include="Entities\MMRecipes\PCNApprovers\IPCNRole.cs" />
+    <Compile Include="Entities\MMRecipes\PCNApprovers\PCNApproverFilter.cs" />
+    <Compile Include="Entities\MMRecipes\PCNApprovers\PCNApproverMetadata.cs" />
+    <Compile Include="Entities\MMRecipes\PCNApprovers\PCNRole.cs" />
+    <Compile Include="Entities\MMRecipes\PCNApprovers\PCNRoles.cs" />
+    <Compile Include="Entities\MMRecipes\PCNApprovers\ProductCodeName.cs" />
+    <Compile Include="Entities\MMRecipes\PCNApprovers\ProductCodeNames.cs" />
+    <Compile Include="Entities\MMRecipes\PCNApprovers\IProductCodeName.cs" />
+    <Compile Include="Entities\MMRecipes\PCNManagerFinder\AccountCustomer.cs" />
+    <Compile Include="Entities\MMRecipes\PCNManagerFinder\AccountCustomers.cs" />
+    <Compile Include="Entities\MMRecipes\PCNManagerFinder\Approver.cs" />
+    <Compile Include="Entities\MMRecipes\PCNManagerFinder\Approvers.cs" />
+    <Compile Include="Entities\MMRecipes\PCNManagerFinder\IAccountCustomer.cs" />
+    <Compile Include="Entities\MMRecipes\PCNManagerFinder\IApprover.cs" />
+    <Compile Include="Entities\MMRecipes\PCNManagerFinder\IPCNManagerFilter.cs" />
+    <Compile Include="Entities\MMRecipes\PCNManagerFinder\IPCNManagerMetaData.cs" />
+    <Compile Include="Entities\MMRecipes\PCNManagerFinder\IPCNManagerRole.cs" />
+    <Compile Include="Entities\MMRecipes\PCNManagerFinder\IPCNRole.cs" />
+    <Compile Include="Entities\MMRecipes\PCNManagerFinder\IProductCodeName.cs" />
+    <Compile Include="Entities\MMRecipes\PCNManagerFinder\PCNManagerFilter.cs" />
+    <Compile Include="Entities\MMRecipes\PCNManagerFinder\PCNManagerMetadata.cs" />
+    <Compile Include="Entities\MMRecipes\PCNManagerFinder\PCNManagerRole.cs" />
+    <Compile Include="Entities\MMRecipes\PCNManagerFinder\PCNManagerRoles.cs" />
+    <Compile Include="Entities\MMRecipes\PCNManagerFinder\PCNRole.cs" />
+    <Compile Include="Entities\MMRecipes\PCNManagerFinder\PCNRoles.cs" />
+    <Compile Include="Entities\MMRecipes\PCNManagerFinder\ProductCodeName.cs" />
+    <Compile Include="Entities\MMRecipes\PCNManagerFinder\ProductCodeNames.cs" />
+    <Compile Include="Entities\MMRecipes\ProductOwnerships\EmailRecord.cs" />
+    <Compile Include="Entities\MMRecipes\ProductOwnerships\EmailRecords.cs" />
+    <Compile Include="Entities\MMRecipes\ProductOwnerships\IEmailRecord.cs" />
+    <Compile Include="Entities\MMRecipes\ProductOwnerships\IProductOwnershipLookups.cs" />
+    <Compile Include="Entities\MMRecipes\ProductOwnerships\IProductBrandName.cs" />
+    <Compile Include="Entities\MMRecipes\ProductOwnerships\IProductCodeName.cs" />
+    <Compile Include="Entities\MMRecipes\ProductOwnerships\IProductContact.cs" />
+    <Compile Include="Entities\MMRecipes\ProductOwnerships\IProductContactRole.cs" />
+    <Compile Include="Entities\MMRecipes\ProductOwnerships\IProductLifeCycleStatus.cs" />
+    <Compile Include="Entities\MMRecipes\ProductOwnerships\IProductOwnership.cs" />
+    <Compile Include="Entities\MMRecipes\ProductOwnerships\IProductPlatform .cs" />
+    <Compile Include="Entities\MMRecipes\ProductOwnerships\IProductRole.cs" />
+    <Compile Include="Entities\MMRecipes\ProductOwnerships\IProductType.cs" />
+    <Compile Include="Entities\MMRecipes\ProductOwnerships\IProductOwnershipMetaData.cs" />
+    <Compile Include="Entities\MMRecipes\ProductOwnerships\ProductBrandName.cs" />
+    <Compile Include="Entities\MMRecipes\ProductOwnerships\ProductBrandNames.cs" />
+    <Compile Include="Entities\MMRecipes\ProductOwnerships\ProductCodeName.cs" />
+    <Compile Include="Entities\MMRecipes\ProductOwnerships\ProductCodeNames.cs" />
+    <Compile Include="Entities\MMRecipes\ProductOwnerships\ProductContact.cs" />
+    <Compile Include="Entities\MMRecipes\ProductOwnerships\ProductContacts.cs" />
+    <Compile Include="Entities\MMRecipes\ProductOwnerships\ProductLifeCycleStatus.cs" />
+    <Compile Include="Entities\MMRecipes\ProductOwnerships\ProductLifeCycleStatuses.cs" />
+    <Compile Include="Entities\MMRecipes\ProductOwnerships\ProductOwnership.cs" />
+    <Compile Include="Entities\MMRecipes\ProductOwnerships\ProductOwnershipCreate.cs" />
+    <Compile Include="Entities\MMRecipes\ProductOwnerships\ProductOwnershipLookup.cs" />
+    <Compile Include="Entities\MMRecipes\ProductOwnerships\ProductOwnershipLookups.cs" />
+    <Compile Include="Entities\MMRecipes\ProductOwnerships\ProductPlatform.cs" />
+    <Compile Include="Entities\MMRecipes\ProductOwnerships\ProductPlatforms.cs" />
+    <Compile Include="Entities\MMRecipes\ProductOwnerships\ProductRole.cs" />
+    <Compile Include="Entities\MMRecipes\ProductOwnerships\ProductRoles.cs" />
+    <Compile Include="Entities\MMRecipes\ProductOwnerships\ProductType.cs" />
+    <Compile Include="Entities\MMRecipes\ProductOwnerships\ProductTypes.cs" />
+    <Compile Include="Entities\MMRecipes\ProductOwnerships\ProductOwnershipMetaData.cs" />
+    <Compile Include="Entities\MMRecipes\ProductOwnerships\ProductOwnerships.cs" />
+    <Compile Include="Entities\MMRecipes\ProductOwnerships\ProductContactRole.cs" />
+    <Compile Include="Entities\MMRecipes\ProductOwnerships\ProductContactRoles.cs" />
+    <Compile Include="Entities\ODM\CheckProhibitedScenarioRunTimeResponse.cs" />
+    <Compile Include="Entities\ODM\QualFilterScenarioInfo.cs" />
+    <Compile Include="Entities\Osat\BuildCriteriaSetConditionsUpdateDto.cs" />
+    <Compile Include="Entities\Osat\OsatBuildCriteriaSetBulkImportInfo.cs" />
+    <Compile Include="Entities\Osat\OsatBuildCriteriaSetBulkImportPending.cs" />
+    <Compile Include="Entities\Osat\OsatBuildCriteriaSetBulkUpdateChangeDTO.cs" />
+    <Compile Include="Entities\Osat\OsatBuildCriteriaSetBulkUpdateImport.cs" />
+    <Compile Include="Entities\Osat\OsatBuildCriteriaSetBulkUpdateImportRecord.cs" />
+    <Compile Include="Entities\Osat\OsatImportedBuildCriteria.cs" />
+    <Compile Include="Entities\Osat\OsatMetaData.cs" />
+    <Compile Include="Entities\Osat\QualFilterBulkUpdateAttributeChange.cs" />
+    <Compile Include="Entities\Osat\Workflows\DraftDecisionDtoText.cs" />
+    <Compile Include="Entities\RequestRequestor.cs" />
+    <Compile Include="Entities\ODM\BadSlot.cs" />
+    <Compile Include="Entities\ODM\BadSlots.cs" />
+    <Compile Include="Entities\ODM\ComparisonLotDisposition.cs" />
+    <Compile Include="Entities\ODM\ComparisonLotDispositions.cs" />
+    <Compile Include="Entities\ODM\Disposition.cs" />
+    <Compile Include="Entities\ODM\Dispositions.cs" />
+    <Compile Include="Entities\ODM\DispositionVersion.cs" />
+    <Compile Include="Entities\ODM\DispositionVersions.cs" />
+    <Compile Include="Entities\ODM\ExemptPart.cs" />
+    <Compile Include="Entities\ODM\ExemptParts.cs" />
+    <Compile Include="Entities\ODM\ExplainabilityReport.cs" />
+    <Compile Include="Entities\ODM\Explanation.cs" />
+    <Compile Include="Entities\ODM\Explanations.cs" />
+    <Compile Include="Entities\ODM\GenerateFilesRequest.cs" />
+    <Compile Include="Entities\ODM\GenerateFilesResponse.cs" />
+    <Compile Include="Entities\ODM\Handlers\EmailHelper.cs" />
+    <Compile Include="Entities\ODM\IDisposition.cs" />
+    <Compile Include="Entities\ODM\IDispositionVersion.cs" />
+    <Compile Include="Entities\ODM\IExemptPart.cs" />
+    <Compile Include="Entities\ODM\IExplanation.cs" />
+    <Compile Include="Entities\ODM\IImportDispositionsResponse.cs" />
+    <Compile Include="Entities\ODM\IImportVersion.cs" />
+    <Compile Include="Entities\ODM\ImportDispositionsResponse.cs" />
+    <Compile Include="Entities\ODM\ILotDisposition.cs" />
+    <Compile Include="Entities\ODM\ImportVersion.cs" />
+    <Compile Include="Entities\ODM\ImportVersions.cs" />
+    <Compile Include="Entities\ODM\INonQualifiedPart.cs" />
+    <Compile Include="Entities\ODM\IRemovableSLot.cs" />
+    <Compile Include="Entities\ODM\ISlot.cs" />
+    <Compile Include="Entities\ODM\LotDisposition.cs" />
+    <Compile Include="Entities\ODM\LotDispositionAction.cs" />
+    <Compile Include="Entities\ODM\LotDispositionActions.cs" />
+    <Compile Include="Entities\ODM\LotDispositionDto.cs" />
+    <Compile Include="Entities\ODM\LotDispositionReason.cs" />
+    <Compile Include="Entities\ODM\LotDispositionReasons.cs" />
+    <Compile Include="Entities\ODM\LotDispositions.cs" />
+    <Compile Include="Entities\ODM\LotShip.cs" />
+    <Compile Include="Entities\ODM\LotShips.cs" />
+    <Compile Include="Entities\ODM\MatRecord.cs" />
+    <Compile Include="Entities\ODM\MatRecords.cs" />
+    <Compile Include="Entities\ODM\MatVersion.cs" />
+    <Compile Include="Entities\ODM\MatVersions.cs" />
+    <Compile Include="Entities\ODM\NonQualifiedMedia.cs" />
+    <Compile Include="Entities\ODM\NonQualifiedMediaException.cs" />
+    <Compile Include="Entities\ODM\NonQualifiedMediaExceptions.cs" />
+    <Compile Include="Entities\ODM\NonQualifiedMediaRaw.cs" />
+    <Compile Include="Entities\ODM\NonQualifiedMedias.cs" />
+    <Compile Include="Entities\ODM\NonQualifiedMediasRaw.cs" />
+    <Compile Include="Entities\ODM\NonQualifiedPart.cs" />
+    <Compile Include="Entities\ODM\NonQualifiedParts.cs" />
+    <Compile Include="Entities\ODM\OdmQualFilter.cs" />
+    <Compile Include="Entities\ODM\OdmQualFilters.cs" />
+    <Compile Include="Entities\ODM\OdmWip.cs" />
+    <Compile Include="Entities\ODM\OdmWips.cs" />
+    <Compile Include="Entities\ODM\PrfRecord.cs" />
+    <Compile Include="Entities\ODM\PrfRecords.cs" />
+    <Compile Include="Entities\ODM\PrfVersion.cs" />
+    <Compile Include="Entities\ODM\PrfVersions.cs" />
+    <Compile Include="Entities\ODM\QualFilterScenario.cs" />
+    <Compile Include="Entities\ODM\QualFilterScenarioVersion.cs" />
+    <Compile Include="Entities\ODM\QualFilterScenarioVersions.cs" />
+    <Compile Include="Entities\ODM\RemovableSLot.cs" />
+    <Compile Include="Entities\ODM\RemovableSLots.cs" />
+    <Compile Include="Entities\ODM\RunScenarioResponse.cs" />
+    <Compile Include="Entities\ODM\SaveLotDispositionResponse.cs" />
+    <Compile Include="Entities\ODM\Slot.cs" />
+    <Compile Include="Entities\ODM\Slots.cs" />
+    <Compile Include="Entities\ODM\UploadFile.cs" />
+    <Compile Include="Entities\Osat\AttributeDataType.cs" />
+    <Compile Include="Entities\Osat\AttributeDataTypeOperation.cs" />
+    <Compile Include="Entities\Osat\AttributeDataTypeOperations.cs" />
+    <Compile Include="Entities\Osat\AttributeDataTypes.cs" />
+    <Compile Include="Entities\Osat\AttributeType.cs" />
+    <Compile Include="Entities\Osat\AttributeTypeCreateDto.cs" />
+    <Compile Include="Entities\Osat\AttributeTypes.cs" />
+    <Compile Include="Entities\Osat\AttributeTypesManage.cs" />
+    <Compile Include="Entities\Osat\AttributeTypeUpdateDto.cs" />
+    <Compile Include="Entities\Osat\AttributeTypeValue.cs" />
+    <Compile Include="Entities\Osat\AttributeTypeValues.cs" />
+    <Compile Include="Entities\Osat\BuildCombination.cs" />
+    <Compile Include="Entities\Osat\BuildCombinations.cs" />
+    <Compile Include="Entities\Osat\BuildCombinationUpdatePublishDto.cs" />
+    <Compile Include="Entities\Osat\BuildCriteria.cs" />
+    <Compile Include="Entities\Osat\BuildCriteriaCreateDto.cs" />
+    <Compile Include="Entities\Osat\BuildCriterias.cs" />
+    <Compile Include="Entities\Osat\BuildCriteriasCreateDto.cs" />
+    <Compile Include="Entities\Osat\BuildCriteriaSet.cs" />
+    <Compile Include="Entities\Osat\BuildCriteriaSetAndVersions.cs" />
+    <Compile Include="Entities\Osat\BuildCriteriaSetComment.cs" />
+    <Compile Include="Entities\Osat\BuildCriteriaSetCommentCreateDto.cs" />
+    <Compile Include="Entities\Osat\BuildCriteriaSetComments.cs" />
+    <Compile Include="Entities\Osat\BuildCriteriaSetComparisonResult.cs" />
+    <Compile Include="Entities\Osat\BuildCriteriaSetComparisonResults.cs" />
+    <Compile Include="Entities\Osat\BuildCriteriaCondition.cs" />
+    <Compile Include="Entities\Osat\BuildCriteriaConditionCreateDto.cs" />
+    <Compile Include="Entities\Osat\BuildCriteriaConditions.cs" />
+    <Compile Include="Entities\Osat\BuildCriteriaConditionsCreateDto.cs" />
+    <Compile Include="Entities\Osat\BuildCriteriaSetCreate.cs" />
+    <Compile Include="Entities\Osat\BuildCriteriaSetCreateDto.cs" />
+    <Compile Include="Entities\Osat\BuildCriteriaSetDetails.cs" />
+    <Compile Include="Entities\Osat\BuildCriteriaSets.cs" />
+    <Compile Include="Entities\Osat\BuildCriteriaSetTemplate.cs" />
+    <Compile Include="Entities\Osat\BuildCriteriaTemplate.cs" />
+    <Compile Include="Entities\Osat\BuildCriteriaTemplateCondition.cs" />
+    <Compile Include="Entities\Osat\BuildCriteriaTemplateConditions.cs" />
+    <Compile Include="Entities\Osat\BuildCriteriaSetTemplates.cs" />
+    <Compile Include="Entities\Osat\BuildCombinationAndBuildCriteriaSets.cs" />
+    <Compile Include="Entities\Osat\BuildCriteriaTemplates.cs" />
+    <Compile Include="Entities\Osat\ComparisonOperation.cs" />
+    <Compile Include="Entities\Osat\ComparisonOperations.cs" />
+    <Compile Include="Entities\Osat\DesignSummary.cs" />
+    <Compile Include="Entities\Osat\LogicalOperation.cs" />
+    <Compile Include="Entities\Osat\OperandType.cs" />
+    <Compile Include="Entities\Osat\Osat.cs" />
+    <Compile Include="Entities\Osat\Osats.cs" />
+    <Compile Include="Entities\Osat\PackageDieType.cs" />
+    <Compile Include="Entities\Osat\PasCombination.cs" />
+    <Compile Include="Entities\Osat\PasVersionImport.cs" />
+    <Compile Include="Entities\Osat\PasVersionImportMessages.cs" />
+    <Compile Include="Entities\Osat\PasVersionImportSpecification.cs" />
+    <Compile Include="Entities\Osat\PasVersionDetails.cs" />
+    <Compile Include="Entities\Osat\PasVersionImportMessage.cs" />
+    <Compile Include="Entities\Osat\PasVersionImportResult.cs" />
+    <Compile Include="Entities\Osat\PasVersion.cs" />
+    <Compile Include="Entities\Osat\PasVersionRecord.cs" />
+    <Compile Include="Entities\Osat\PasVersionRecords.cs" />
+    <Compile Include="Entities\Osat\PasVersions.cs" />
+    <Compile Include="Entities\Osat\PasVersionsListAndImport.cs" />
+    <Compile Include="Entities\Osat\QualFilter.cs" />
+    <Compile Include="Entities\Osat\QualFilterAttributeValues.cs" />
+    <Compile Include="Entities\Osat\QualFilterData.cs" />
+    <Compile Include="Entities\Osat\QualFilterExportDetails.cs" />
+    <Compile Include="Entities\Osat\QualFilterImport.cs" />
+    <Compile Include="Entities\Osat\QualFilterImportBuildCriteria.cs" />
+    <Compile Include="Entities\Osat\QualFilterImportBuildCriterias.cs" />
+    <Compile Include="Entities\Osat\QualFilterImportDetails.cs" />
+    <Compile Include="Entities\Osat\QualFilterImportMessage.cs" />
+    <Compile Include="Entities\Osat\QualFilterImportMessages.cs" />
+    <Compile Include="Entities\Osat\QualFilterImports.cs" />
+    <Compile Include="Entities\Osat\QualFilterImportsList.cs" />
+    <Compile Include="Entities\Osat\QualFilterRecordsQueryBase.cs" />
+    <Compile Include="Entities\Osat\QualFilterRecordsQueryCustom.cs" />
+    <Compile Include="Entities\Osat\QualFilterRecordsQuery.cs" />
+    <Compile Include="Entities\Osat\QualFilterExport.cs" />
+    <Compile Include="Entities\Osat\QualFilterExports.cs" />
+    <Compile Include="Entities\Osat\QualFilterFile.cs" />
+    <Compile Include="Entities\Osat\QualFilterFiles.cs" />
+    <Compile Include="Entities\Osat\QualFilterExportsListAndPublish.cs" />
+    <Compile Include="Entities\Osat\QualFilterSheet.cs" />
+    <Compile Include="Entities\Osat\QualFilterSheets.cs" />
+    <Compile Include="Entities\Osat\QualFilterRecord.cs" />
+    <Compile Include="Entities\Osat\QualFilterRecords.cs" />
+    <Compile Include="Entities\Osat\Workflows\DraftDecisionDto.cs" />
+    <Compile Include="Entities\Osat\Workflows\ReviewDecisionDto.cs" />
+    <Compile Include="Entities\PartUseType.cs" />
+    <Compile Include="Entities\PartUseTypes.cs" />
+    <Compile Include="Entities\PostedFile.cs" />
+    <Compile Include="Entities\ProbeConversions.cs" />
+    <Compile Include="Entities\ProbeConversion.cs" />
+    <Compile Include="Entities\TestFlows.cs" />
+    <Compile Include="Entities\FabricationFacilities.cs" />
+    <Compile Include="Entities\TestFlow.cs" />
+    <Compile Include="Entities\FabricationFacility.cs" />
+    <Compile Include="Entities\FormFactors.cs" />
+    <Compile Include="Entities\FormFactor.cs" />
+    <Compile Include="Entities\Customers.cs" />
+    <Compile Include="Entities\CustomerQualStatuses.cs" />
+    <Compile Include="Entities\LongIdAndName.cs" />
+    <Compile Include="Entities\IFormFactor.cs" />
+    <Compile Include="Entities\LongIdAndNames.cs" />
+    <Compile Include="Entities\MATs\IMATAttributeType.cs" />
+    <Compile Include="Entities\MATs\MATAttributeType.cs" />
+    <Compile Include="Entities\MATs\Workflows\MATReview.cs" />
+    <Compile Include="Entities\MATs\Workflows\MATReviewDecision.cs" />
+    <Compile Include="Entities\MATs\Workflows\MATReviewGroup.cs" />
+    <Compile Include="Entities\MATs\Workflows\MATReviewGroupReviewer.cs" />
+    <Compile Include="Entities\MATs\Workflows\MATReviewMessage.cs" />
+    <Compile Include="Entities\MATs\Workflows\MATReviewMessages.cs" />
+    <Compile Include="Entities\MATs\Workflows\MATReviewResponse.cs" />
+    <Compile Include="Entities\MATs\Workflows\MATReviewReviewer.cs" />
+    <Compile Include="Entities\MATs\Workflows\MATReviewStage.cs" />
+    <Compile Include="Entities\MATs\Workflows\MATReviewStep.cs" />
+    <Compile Include="Entities\MMRecipes\IMMRecipe.cs" />
+    <Compile Include="Entities\MMRecipes\MMRecipe.cs" />
+    <Compile Include="Entities\MMRecipes\MMRecipeDetails.cs" />
+    <Compile Include="Entities\MMRecipes\MMRecipeNandMediaItem.cs" />
+    <Compile Include="Entities\MMRecipes\MMRecipeAssociatedItem.cs" />
+    <Compile Include="Entities\MMRecipes\MMRecipeAssociatedItems.cs" />
+    <Compile Include="Entities\MMRecipes\MMRecipeNandMediaItems.cs" />
+    <Compile Include="Entities\MMRecipes\MMRecipes.cs" />
+    <Compile Include="Entities\MMRecipes\MMRecipeUpdate.cs" />
+    <Compile Include="Entities\PLCStages.cs" />
+    <Compile Include="Entities\PLCStage.cs" />
+    <Compile Include="Entities\CustomerQualStatus.cs" />
+    <Compile Include="Entities\EmailTemplate.cs" />
+    <Compile Include="Entities\IdAndName.cs" />
+    <Compile Include="Entities\IdAndNames.cs" />
+    <Compile Include="Entities\IReadOnlyEmailTemplate.cs" />
+    <Compile Include="Entities\ImportResult.cs" />
+    <Compile Include="Entities\ImportMessage.cs" />
+    <Compile Include="Entities\ImportMessages.cs" />
+    <Compile Include="Entities\IOpalType.cs" />
+    <Compile Include="Entities\ICustomer.cs" />
+    <Compile Include="Entities\IProductFamily.cs" />
+    <Compile Include="Entities\IStatus.cs" />
+    <Compile Include="Entities\ITask.cs" />
+    <Compile Include="Entities\ITaskMessage.cs" />
+    <Compile Include="Entities\MATs\IMAT.cs" />
+    <Compile Include="Entities\MATs\IMATAttribute.cs" />
+    <Compile Include="Entities\MATs\IMATImport.cs" />
+    <Compile Include="Entities\MATs\IMATVersion.cs" />
+    <Compile Include="Entities\MATs\MAT.cs" />
+    <Compile Include="Entities\MATs\MATAttribute.cs" />
+    <Compile Include="Entities\MATs\MATAttributes.cs" />
+    <Compile Include="Entities\MATs\MATImport.cs" />
+    <Compile Include="Entities\MATs\MATs.cs" />
+    <Compile Include="Entities\MATs\MATsImport.cs" />
+    <Compile Include="Entities\MATs\MATVersion.cs" />
+    <Compile Include="Entities\MATs\MATVersionImportResponse.cs" />
+    <Compile Include="Entities\MATs\MATVersions.cs" />
+    <Compile Include="Entities\Customer.cs" />
+    <Compile Include="Entities\ProductFamilies.cs" />
+    <Compile Include="Entities\ProductFamily.cs" />
+    <Compile Include="Entities\ProductLabels\IProductLabelAttribute.cs" />
+    <Compile Include="Entities\ProductLabels\IProductFamilyNameSeries.cs" />
+    <Compile Include="Entities\ProductLabels\IProductLabelAttributeType.cs" />
+    <Compile Include="Entities\ProductLabels\IProductLabelImport.cs" />
+    <Compile Include="Entities\ProductLabels\IProductLabelSetVersion.cs" />
+    <Compile Include="Entities\OpalType.cs" />
+    <Compile Include="Entities\ProductLabels\ProductLabelAttribute.cs" />
+    <Compile Include="Entities\ProductLabels\ProductLabelAttributes.cs" />
+    <Compile Include="Entities\ProductLabels\ProductLabelAttributeType.cs" />
+    <Compile Include="Entities\ProductLabels\ProductLabelSetVersionImportResult.cs" />
+    <Compile Include="Entities\ProductLabels\ProductFamilyNameSeries.cs" />
+    <Compile Include="Entities\ProductLabels\ProductLabel.cs" />
+    <Compile Include="Entities\ProductLabels\ProductLabels.cs" />
+    <Compile Include="Entities\ProductLabels\ProductLabelSetVersions.cs" />
+    <Compile Include="Entities\ProductLabels\ProductLabelsImport.cs" />
+    <Compile Include="Entities\IPart.cs" />
+    <Compile Include="Entities\IProduct.cs" />
+    <Compile Include="Entities\IDesignFamily.cs" />
+    <Compile Include="Entities\ProductLabels\ProductLabelImport.cs" />
+    <Compile Include="Entities\ProductLabels\ProductLabelSetVersion.cs" />
+    <Compile Include="Entities\Part.cs" />
+    <Compile Include="Entities\Parts.cs" />
+    <Compile Include="Entities\Product.cs" />
+    <Compile Include="Entities\DesignFamily.cs" />
+    <Compile Include="Entities\EntitySingleMessageResult.cs" />
+    <Compile Include="Entities\Result.cs" />
+    <Compile Include="Entities\SingleMessageResult.cs" />
+    <Compile Include="Entities\ResultBase.cs" />
+    <Compile Include="Entities\SpeedBomAssociationType.cs" />
+    <Compile Include="Entities\SpeedItemCategory.cs" />
+    <Compile Include="Entities\Speed\SpeedAssociatedItem.cs" />
+    <Compile Include="Entities\Speed\SpeedAssociatedItems.cs" />
+    <Compile Include="Entities\Speed\SpeedItem.cs" />
+    <Compile Include="Entities\Status.cs" />
+    <Compile Include="Entities\Products.cs" />
+    <Compile Include="Entities\Speed\ISpeedAccessToken.cs" />
+    <Compile Include="Entities\Speed\SpeedAccessToken.cs" />
+    <Compile Include="Entities\Speed\SpeedAccessTokenResponse.cs" />
+    <Compile Include="Entities\Speed\SpeedBaseAPIResponse.cs" />
+    <Compile Include="Entities\Speed\SpeedBOMDetailsV2.cs" />
+    <Compile Include="Entities\Speed\SpeedBOMDetailsV2Element.cs" />
+    <Compile Include="Entities\Speed\SpeedBOMDetailsV2Elements.cs" />
+    <Compile Include="Entities\Speed\SpeedItemCharacteristicDetailsV2.cs" />
+    <Compile Include="Entities\Speed\SpeedBOMExplosionDetailsV2.cs" />
+    <Compile Include="Entities\Speed\SpeedBOMExplosionDetailsV2Element.cs" />
+    <Compile Include="Entities\Speed\SpeedBOMExplosionDetailsV2Elements.cs" />
+    <Compile Include="Entities\Speed\SpeedItemCharacteristicDetailsV2Element.cs" />
+    <Compile Include="Entities\Speed\SpeedItemCharacteristicDetailsV2Elements.cs" />
+    <Compile Include="Entities\Speed\SpeedItemDetailsV2.cs" />
+    <Compile Include="Entities\Speed\SpeedItemDetailsV2Element.cs" />
+    <Compile Include="Entities\Speed\SpeedItemDetailsV2Elements.cs" />
+    <Compile Include="Entities\Statuses.cs" />
+    <Compile Include="Entities\Task.cs" />
+    <Compile Include="Entities\TaskMessage.cs" />
+    <Compile Include="Entities\TaskMessages.cs" />
+    <Compile Include="Entities\Tasks.cs" />
+    <Compile Include="Entities\TaskType.cs" />
+    <Compile Include="Entities\Osat\VersionName.cs" />
+    <Compile Include="Entities\Osat\VersionNames.cs" />
+    <Compile Include="Entities\Workflows\IReviewDecision.cs" />
+    <Compile Include="Entities\Workflows\IReviewGroup.cs" />
+    <Compile Include="Entities\Workflows\IReviewGroupReviewer.cs" />
+    <Compile Include="Entities\Workflows\IReviewMessage.cs" />
+    <Compile Include="Entities\Workflows\IReviewer.cs" />
+    <Compile Include="Entities\Workflows\IReviewStage.cs" />
+    <Compile Include="Entities\Workflows\IReviewStep.cs" />
+    <Compile Include="Entities\Workflows\Review.cs" />
+    <Compile Include="Entities\Workflows\ReviewDecision.cs" />
+    <Compile Include="Entities\Workflows\ReviewDecisionDto.cs" />
+    <Compile Include="Entities\Workflows\ReviewEmail.cs" />
+    <Compile Include="Entities\Workflows\ReviewEmails.cs" />
+    <Compile Include="Entities\Workflows\ReviewGroup.cs" />
+    <Compile Include="Entities\Workflows\ReviewGroupReviewer.cs" />
+    <Compile Include="Entities\Workflows\ReviewGroupReviewers.cs" />
+    <Compile Include="Entities\Workflows\ReviewMessage.cs" />
+    <Compile Include="Entities\Workflows\ReviewMessages.cs" />
+    <Compile Include="Entities\Workflows\ReviewResponse.cs" />
+    <Compile Include="Entities\Workflows\Reviewer.cs" />
+    <Compile Include="Entities\Workflows\Reviewers.cs" />
+    <Compile Include="Entities\Workflows\ReviewStage.cs" />
+    <Compile Include="Entities\Workflows\ReviewStatus.cs" />
+    <Compile Include="Entities\Workflows\ReviewStep.cs" />
+    <Compile Include="Entities\Workflows\ReviewSteps.cs" />
+    <Compile Include="Helpers\ExcelStreamToDataTable.cs" />
+    <Compile Include="Logging\LogHandler.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\AccountOwnershipService.cs" />
+    <Compile Include="Services\AdministrationService.cs" />
+    <Compile Include="Services\AutoCheckerService.cs" />
+    <Compile Include="Services\FormFactorsService.cs" />
+    <Compile Include="Services\EmailTemplatesService.cs" />
+    <Compile Include="Services\FrameworkService.cs" />
+    <Compile Include="Services\IAccountOwnershipService.cs" />
+    <Compile Include="Services\IFrameworkService.cs" />
+    <Compile Include="Services\IMMRecipeService.cs" />
+    <Compile Include="Services\IPartsService.cs" />
+    <Compile Include="Services\IPCNApproverService.cs" />
+    <Compile Include="Services\IPCNManagerFinderService.cs" />
+    <Compile Include="Services\IProductOwnershipService.cs" />
+    <Compile Include="Services\IProductsService.cs" />
+    <Compile Include="Services\MatService.cs" />
+    <Compile Include="Services\MATVersionsService.cs" />
+    <Compile Include="Services\MMRecipesService.cs" />
+    <Compile Include="Services\OdmService.cs" />
+    <Compile Include="Services\OsatService.cs" />
+    <Compile Include="Services\CustomersService.cs" />
+    <Compile Include="Services\PCNApproverService.cs" />
+    <Compile Include="Services\PCNManagerFinderService.cs" />
+    <Compile Include="Services\ProductFamiliesService.cs" />
+    <Compile Include="Services\ProductLabelSetVersionsService.cs" />
+    <Compile Include="Services\ProductOwnershipService.cs" />
+    <Compile Include="Services\ProductsService.cs" />
+    <Compile Include="Services\SpeedItemsService.cs" />
+    <Compile Include="Services\TasksService.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="Core\ClassDiagram.cd" />
+    <None Include="Core\Extensions\ClassDiagram.cd" />
+    <None Include="DataContexts\ClassDiagram.cd" />
+    <None Include="Entities\App\ClassDiagram.cd" />
+    <None Include="Entities\AutoChecker\ClassDiagram.cd" />
+    <None Include="Entities\MATs\ClassDiagram.cd" />
+    <None Include="Entities\MATs\Workflows\ClassDiagram.cd" />
+    <None Include="Entities\MMRecipes\AccountOwnerships\AccountOwnership.cd" />
+    <None Include="Entities\MMRecipes\ClassDiagram.cd" />
+    <None Include="Entities\MMRecipes\PCNApprovers\PCN Approvers.cd" />
+    <None Include="Entities\MMRecipes\PCNManagerFinder\PCNManagerFinder.cd" />
+    <None Include="Entities\MMRecipes\ProductOwnerships\ProductOwnership.cd" />
+    <None Include="Entities\ProductLabels\ClassDiagram.cd" />
+    <None Include="Entities\Speed\ClassDiagram.cd" />
+    <None Include="Entities\Workflows\ClassDiagram.cd" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Services\ClassDiagram.cd" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Microsoft.Build.Tasks.Git.1.1.1\build\Microsoft.Build.Tasks.Git.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Build.Tasks.Git.1.1.1\build\Microsoft.Build.Tasks.Git.props'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.Build.Tasks.Git.1.1.1\build\Microsoft.Build.Tasks.Git.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Build.Tasks.Git.1.1.1\build\Microsoft.Build.Tasks.Git.targets'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.SourceLink.Common.1.1.1\build\Microsoft.SourceLink.Common.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.SourceLink.Common.1.1.1\build\Microsoft.SourceLink.Common.props'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.SourceLink.Common.1.1.1\build\Microsoft.SourceLink.Common.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.SourceLink.Common.1.1.1\build\Microsoft.SourceLink.Common.targets'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.SourceLink.GitHub.1.1.1\build\Microsoft.SourceLink.GitHub.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.SourceLink.GitHub.1.1.1\build\Microsoft.SourceLink.GitHub.props'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.SourceLink.GitHub.1.1.1\build\Microsoft.SourceLink.GitHub.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.SourceLink.GitHub.1.1.1\build\Microsoft.SourceLink.GitHub.targets'))" />
+  </Target>
+  <Import Project="..\packages\Microsoft.Build.Tasks.Git.1.1.1\build\Microsoft.Build.Tasks.Git.targets" Condition="Exists('..\packages\Microsoft.Build.Tasks.Git.1.1.1\build\Microsoft.Build.Tasks.Git.targets')" />
+  <Import Project="..\packages\Microsoft.SourceLink.Common.1.1.1\build\Microsoft.SourceLink.Common.targets" Condition="Exists('..\packages\Microsoft.SourceLink.Common.1.1.1\build\Microsoft.SourceLink.Common.targets')" />
+  <Import Project="..\packages\Microsoft.SourceLink.GitHub.1.1.1\build\Microsoft.SourceLink.GitHub.targets" Condition="Exists('..\packages\Microsoft.SourceLink.GitHub.1.1.1\build\Microsoft.SourceLink.GitHub.targets')" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

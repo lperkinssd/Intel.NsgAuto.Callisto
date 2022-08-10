@@ -1,0 +1,52 @@
+﻿@model Intel.NsgAuto.Web.Mvc.Models.HeaderModel    
+@if (Model != null && Model.Visible == true){
+<!-- Header { -->
+<div class="uheader header">
+    <div class="component">
+        <div id="header">
+            <div class="content">
+                <div class="">
+                    <ul>
+                        <li class="home">
+                            <div class="logo">
+                                <div class="component">
+                                    <a href="https://www.domain.com" target="_blank" title="Click here to view domain.com">
+                                        <img src="/Images/intellogo.png" alt="visit intel web site" border="0" style="margin-top: 18px;" />
+                                    </a>
+                                </div>
+                            </div>
+                        </li>
+                        @if (Model.Menu != null)
+                        {
+                            @Html.Partial("_Menu", Model.Menu)
+                        }
+                        <li>
+                            <span class="applogo">Callisto</span>
+                            <span class="classification">Intel Confidential</span>
+                        </li>
+                        <li>
+                            <span class="poweredby ">Powered by : </span>
+                        </li>
+                        <li>
+                            <img src="/Images/autoblocks.png" alt="" border="0" class="autoblocks" />
+                        </li>
+                        <li>
+                            <span class="autologo">MSO Automation</span>
+                        </li>
+                    </ul>
+                    <div class="headerright">
+                        <div class="component" style="margin-top: 40px;">
+                            <div class="topmenusection">
+                                <span class="welcomenote">
+                                    Welcome! @Html.Raw(Intel.NsgAuto.Web.Mvc.Core.Functions.GetCurrentUserName())
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--  } Header -->
+}

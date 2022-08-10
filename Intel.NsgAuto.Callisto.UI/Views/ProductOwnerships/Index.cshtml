@@ -1,0 +1,1773 @@
+﻿@model Intel.NsgAuto.Callisto.UI.Models.MM.ProductOwnershipsModel
+
+@{
+    ViewBag.Title = "Product Ownership Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style type="text/css">
+    .dx-datagrid-content .dx-datagrid-table .dx-row .dx-command-edit {
+        min-width: 40px;
+    }
+
+    .breakword {
+        white-space: normal;
+        word-wrap: break-word;
+    }
+
+    .dx-scrollable {
+        height: 600px;
+    }
+
+</style>
+
+<script type="text/javascript">
+
+    var entity = @(JsonHelper.Serialize(Model.ProductOwnerships));
+
+    var ProductType = entity.ProductOwnershipLookup.ProductTypes;
+    var Platform = entity.ProductOwnershipLookup.ProductPlatforms;
+    var CodeName = entity.ProductOwnershipLookup.ProductCodeNames;
+    var BrandName = entity.ProductOwnershipLookup.ProductBrandNames;
+    var Status = entity.ProductOwnershipLookup.ProductLifeCycleStatuses;
+    var contacts = entity.ProductOwnershipLookup.ProductContacts;
+    var Role = entity.ProductOwnershipLookup.ProductRoles;
+   // var ContactRoles = entity.ProductContactRoles;
+    var ContactRolesData = entity.ProductOwnershipLookup.ProductContactRoles;
+    var optane = ("@(Html.Raw(Intel.NsgAuto.Web.Mvc.Core.Functions.IsOptaneUser()))").toLowerCase() == "true";
+    var records = entity.ProductOwnerships;
+    var editrecordId = 0;
+    var recordChanged = false;
+  //  debugger;
+    var WWID = "";
+    var idSid = "";
+    var Email = "";
+   // debugger;
+  
+
+    var contactsGrid = [];
+    var contactsGridEdit = [];
+
+    // Show Update Panel for Create Grid
+
+
+  
+
+    var showUpdatePanel = function () {
+
+        var popup;
+        contactsGrid = [];
+        gridData(contactsGrid);
+        $('#ddlProductList').dxSelectBox("instance").option("value", undefined);
+        var validator = $("#ddlProductList").dxValidator("instance");
+        validator.reset();
+
+        $('#ddlAlternateEmail').dxTextBox("instance").option("value", undefined);
+        //var e = document.getElementById('ddlAlternateEmail');
+        //e.style.display = 'none';
+        var e = document.getElementById('showEmail');
+        e.style.display = 'none';
+        var validator = $("#ddlAlternateEmail").dxValidator("instance");
+        validator.reset();
+
+        $('#ddlContacts').dxTextBox("instance").option("value", null);
+        var validator = $("#ddlContacts").dxValidator("instance");
+        validator.reset();
+
+        $('#ddlRole').dxSelectBox("instance").option("value", null);
+        var validator = $("#ddlRole").dxValidator("instance");
+        validator.reset();
+
+        $('#ddlPlatform').dxSelectBox("instance").option("value", undefined);
+        var validator = $("#ddlPlatform").dxValidator("instance");
+        validator.reset();
+
+        $('#ddlStatus').dxSelectBox("instance").option("value", undefined);
+        //var validator = $("#ddlStatus").dxValidator("instance");
+        //validator.reset();
+
+        $('#ddlDate').dxDateBox("instance").option("value", undefined);
+        //var validator = $("#ddlPlatform").dxValidator("instance");
+        //validator.reset();
+
+        $('#ddlCodeName').dxTextBox("instance").option("value", undefined);
+        //var validator = $("#ddlCodeName").dxValidator("instance");
+        //validator.reset();
+
+        $('#ddlBrandName').dxTextBox("instance").option("value", undefined);
+
+
+        var popupOptions = {
+            width: "1200px",
+            height: "900px",
+            showTitle: true,
+            title: "Create Product Ownership",
+            visible: false,
+            dragEnabled: false,
+            closeOnOutsideClick: false
+        }
+
+        if (popup) {
+            popup.option("contentTemplate", popupOptions.contentTemplate.bind(this));
+        } else {
+            popup = $("#divCreateProductOwnership").dxPopup(popupOptions).dxPopup("instance");
+        }
+        // debugger;
+
+        popup.show();
+    };
+
+    //Load data into APprovers Grid for Load Data
+
+    var loaddata = function () {
+        //Suresh
+     //   debugger;
+        var valPCN = false;
+        if ($("#ddlPCN").dxCheckBox("instance").option("value")) { valPCN = true; }
+
+        var vOthers = DevExpress.data.query(contactsGrid).filter([["Role", $('#ddlRole').dxSelectBox("instance").option("value")]]).toArray();
+      //  debugger;
+        // if (result.isValid) {
+       /* if (vOthers.length == 0) {*/
+            var data = {
+
+
+                Name: $('#ddlContacts').dxTextBox("instance").option("value"), Role: $('#ddlRole').dxSelectBox("instance").option("value"), IsPCN: valPCN, Email: Email, idSid: idSid, WWID: WWID, AlternateEmail: optane ? null : $('#ddlAlternateEmail').dxTextBox("instance").option("value")
+            }
+            contactsGrid.push(data);
+            gridData(contactsGrid);
+
+            $('#ddlContacts').dxTextBox("instance").option("value", null);
+            var validator = $("#ddlContacts").dxValidator("instance");
+            validator.reset();
+
+            $('#ddlRole').dxSelectBox("instance").option("value", null);
+            var validator = $("#ddlRole").dxValidator("instance");
+            validator.reset();
+
+            $("#ddlPCN").dxCheckBox("instance").option("value", false);
+        //    $("#addRole").attr('disabled', 'disabled');
+        //}
+        //else {
+        //    var message = $('#ddlRole').dxSelectBox("instance").option("value") + " Role already exists.";
+
+
+        //    Nsga.Callisto.Messages.showError(message);
+        //}
+
+        WWID = "";
+        idSid = "";
+        Email = "";
+
+        $('#ddlAlternateEmail').dxTextBox("instance").option("value", null)
+        var validator = $("#ddlAlternateEmail").dxValidator("instance");
+        validator.reset();
+
+
+
+    };
+
+
+
+
+    $(document).ready(function () {
+
+        if (!optane) {
+            var e = document.getElementById('ddlAlternateEmail');
+            e.style.display = 'block';
+            var e = document.getElementById('ddlAlternateEmailEdit');
+            e.style.display = 'block';
+        }
+
+        $("#btnCancelEdit").dxButton({
+            text: "Cancel",
+            onClick: function (e) {
+                //  var result = e.validationGroup.validate();
+                onCancelEditPopUp();
+            }
+        });
+
+
+        $("#btnConfirmEdit").dxButton({
+            text: "Confirm",
+            onClick: function (e) {
+                //var result = e.validationGroup.validate();
+
+                var valid = true;
+                var validate = true;
+
+                // $('#ddlProductListEdit').dxSelectBox("instance").option("value", undefined);
+                var validator = $("#ddlProductListEdit").dxValidator("instance");
+                var result = validator.validate();
+
+                if (!result.isValid)
+                    valid = false;
+
+                //  $('#ddlPlatformEdit').dxSelectBox("instance").option("value", undefined);
+                var validator = $("#ddlPlatformEdit").dxValidator("instance");
+                result = validator.validate();
+                if (!result.isValid)
+                    valid = false;
+
+                if (valid && validate) {
+
+
+
+                    var valProduct = $('#ddlProductListEdit').dxSelectBox("instance").option("value");
+                    var vProduct = DevExpress.data.query(ProductType)
+                        .filter([["Id", valProduct]]).toArray();
+
+
+                    var valPlatform = $('#ddlPlatformEdit').dxSelectBox("instance").option("value");
+                    var vPlatform = DevExpress.data.query(Platform)
+                        .filter([["Id", valPlatform]]).toArray();
+
+
+                    //NewCode
+                    var valCode = $('#ddlCodeNameEdit').dxTextBox("instance").option("value");
+                    var valCodeId = null;
+                    if (valCode != null) {
+                        var vCodeName = DevExpress.data.query(CodeName)
+                            .filter([["Name", valCode]]).toArray();
+                        if (vCodeName.length > 0) {
+                            valCode = vCodeName[0].Name
+                            valCodeId = vCodeName[0].Id
+                        }
+
+                    }
+                    else {
+                        valCode = null;
+                    }
+
+
+
+
+
+
+                    var valBrand = $('#ddlBrandNameEdit').dxTextBox("instance").option("value");
+                    var valBrandId = null;
+
+                    if (valBrand != null) {
+                        var vBrandName = DevExpress.data.query(BrandName)
+                            .filter([["Name", valBrand]]).toArray();
+                        if (vBrandName.length != 0) {
+                            valBrand = vBrandName[0].Name;
+                            valBrandId = vBrandName[0].Id;
+                        }
+
+                    }
+                    else {
+                        valBrand = null;
+                    }
+
+                    Date.prototype.getUTCTime = function () {
+                        return this.getTime() - (this.getTimezoneOffset() * 60000);
+                    };
+
+
+                    var valStatus = $('#ddlStatusEdit').dxSelectBox("instance").option("value");
+                    var valStatusId = null;
+                //    debugger;
+                    if (valStatus != null) {
+                        var vStatus = DevExpress.data.query(Status)
+                            .filter([["Id", valStatus]]).toArray();
+                        if (vStatus.length > 0) {
+                            valStatus = vStatus[0].Name;
+                            valStatusId = vStatus[0].Id;
+
+                        }
+                    }
+                    else {
+                        valStatus = null;
+                    }
+
+
+                    var dateBox = $("#ddlDateEdit").dxDateBox("instance");
+                    var dateBoxValue = dateBox._changedValue;
+                    //if (dateBoxValue != null)
+                    //    dateBoxValue = Nsga.Framework.Init.getUserTimeZoneDateFromUtcString(Date().toLocaleString())
+
+
+                   // debugger;
+
+                    var productOwnershipContacts = [];
+
+                    $.each(contactsGridEdit, function (index, value) {
+                    //    debugger;
+                        if (value.isNew == 1)
+                            recordChanged = true;
+                        productOwnershipContacts.push({ ContactName: value.Name, ContactId: 0, ContactRoleId: 0, Email: value.Email, idSid: value.idSid, RoleName: value.Role, WWID: value.WWID, ProductOwnershipId: value.ProductOwnershipId, ContactId: value.ContactId, AlternateEmail: value.AlternateEmail });
+                    });
+
+                    var updateEntity = {
+                        Id: editrecordId,
+                        ProductType: { Id: vProduct[0].Id, Name: vProduct[0].Name },
+                        ProductPlatform: { Id: vPlatform[0].Id, Name: vPlatform[0].Name },
+                        ProductCodeName: { Id: valCodeId, Name: valCode },
+                        ProductBrandName: { Id: valBrandId, Name: valBrand },
+                        ProductLifeCycleStatus: { Id: valStatusId, Name: valStatus },
+                        ProductLaunchDate: dateBoxValue,
+                        ProductContactRoles: productOwnershipContacts,
+                        RecordChanged: recordChanged,
+                        //PME: { ContactId: PMEId, ContactName: PMEContactName, RoleName: PMERoleName, Email:PMEEmail, WWID:PMEWWID, idSid:PMEidSid },
+                        //TME: { ContactId: TMEId, ContactName: TMEContactName, RoleName: TMERoleName, Email:TMEEmail, WWID:TMEWWID, idSid:TMEidSid },
+                        //PMT: { ContactId: PMTId, ContactName: PMTContactName, RoleName: PMTRoleName, Email:PMTEmail, WWID:PMTWWID, idSid:PMTidSid },
+                        //PDT: { ContactId: PDTId, ContactName: PDTContactName, RoleName: PDTRoleName, Email:PDTEmail, WWID:PDTWWID, idSid:PDTidSid },
+                        //PQE: { ContactId: PQEId, ContactName: PQEContactName, RoleName: PQERoleName, Email:PQEEmail, WWID:PQEWWID, idSid:PQEidSid },
+                        //Others: { ContactId: OtherId, ContactName: OtherContactName, RoleName: OtherRoleName, Email:OthersEmail, WWID:OthersWWID, idSid:OthersidSid },
+                        IsActive: true,
+                        CreatedBy: 'SYSTEM',
+                        CreatedOn: new Date().getUTCTime(),
+                        UpdatedBy: 'SYSTEM',
+                        UpdatedOn: new Date().getUTCTime()
+                    };
+
+                    // records.push(data);
+
+                    Nsga.Callisto.ProductOwnership.updateProductOwnership(updateEntity, onEditSuccess, onError);
+                    //debugger;
+
+
+                }
+
+
+            }
+        });
+
+        $("#searchContactEdit").dxButton({
+            text: "Confirm",
+            onClick: function (e) {
+              //  debugger;
+                WWID = "";
+                idSid = "";
+                Email = "";
+                //var e = document.getElementById('ddlAlternateEmailEdit');
+                //e.style.display = 'none';
+                var e = document.getElementById('showEmailEdit');
+                e.style.display = 'none';
+
+                var validator = $("#ddlContactsEdit").dxValidator("instance");
+                var result = validator.validate();
+                if (result.isValid) {
+                    Nsga.Framework.getDataToUrl(null,
+                        "/api/EmployeeApi/GetContact?idsid=" + $('#ddlContactsEdit').dxTextBox("instance").option("value"),
+                        function () {
+                            //    $("#divContent").addClass('loader');
+                        },
+                        function () {
+                            //     $("#divContent").removeClass('loader');
+                        },
+
+                        function (result) {
+
+                            $('#ddlContactsEdit').dxTextBox("instance").option("value", result.Requestor.Name)
+                            WWID = result.Requestor.WWID;
+                            idSid = result.Requestor.Idsid;
+                            Email = result.Requestor.Email;
+                            if (!optane) {
+                                //var e = document.getElementById('ddlAlternateEmailEdit');
+                                //e.style.display = 'block';
+                                var e = document.getElementById('showEmailEdit');
+                                e.style.display = 'block';
+                            }
+                        },
+                        function (xhr, status) {
+                     //       debugger;
+                            Nsga.Callisto.Messages.showError("There was an error finding that user. Please retry.");
+                            //     request.RequestedBy.idsid = "";
+                            //    request.RequestedBy.Requestor.Name = "";
+                            //  $('#txtRequestorName').text("");
+                        });;
+                }
+                else {
+                }
+            }
+        });
+
+
+        $("#ddlAlternateEmail").dxTextBox({
+            //   dataSource: contacts,
+            placeholder: "Alternate Email",
+            showClearButton: true,
+
+        }).dxValidator({
+            validationRules: [{
+                type: 'email',
+                message: 'Email is invalid'
+            }]
+        });
+
+        $("#ddlAlternateEmailEdit").dxTextBox({
+            //   dataSource: contacts,
+            placeholder: "Alternate Email",
+            showClearButton: true,
+
+        }).dxValidator({
+            validationRules: [{
+                type: 'email',
+                message: 'Email is invalid'
+            }]
+        });
+
+
+        $("#addRoleEdit").dxButton({
+            text: "Confirm",
+            onClick: function (e) {
+             //   debugger;
+                var valid = true;
+                //   $('#ddlContactsEdit').dxAutocomplete("instance").option("value", null);
+                var validator = $("#ddlContactsEdit").dxValidator("instance");
+                var result = validator.validate();
+
+
+                if (WWID == "") {
+                    Nsga.Callisto.Messages.showError("Please enter a valid IdSID/WWID and click Search");
+                    valid = false;
+                    WWID = "";
+                    idSid = "";
+                    Email = "";
+                }
+
+                if (!result.isValid)
+                    valid = false;
+                //   $('#ddlRoleEdit').dxSelectBox("instance").option("value", null);
+                var validator = $("#ddlRoleEdit").dxValidator("instance");
+                result = validator.validate();
+
+                if (!result.isValid)
+                    valid = false;
+
+                $.each(contactsGridEdit, function (index, value) {
+                    //   debugger;
+                    if ($('#ddlContactsEdit').dxTextBox("instance").option("value") == value.Name && $('#ddlRoleEdit').dxSelectBox("instance").option("value") == value.Role) {
+
+                        valid = false;
+                        Nsga.Callisto.Messages.showError("Contact " + value.Name + " with Role " + value.Role + " already exist");
+                    }
+
+                });
+
+                var tempmail = $('#ddlAlternateEmailEdit').dxTextBox("instance").option("value")
+              //  debugger;
+
+                if (tempmail != "") {
+                    var validator = $("#ddlAlternateEmailEdit").dxValidator("instance");
+                    result = validator.validate();
+                    if (!result.isValid)
+                        if (result.isValid)
+                            Nsga.Callisto.Messages.showError("Please enter a valid email id");
+                }
+
+                if (!result.isValid)
+                    valid = false;
+
+                if (valid)
+                    loadEditdata();
+                //else {
+                //    WWID = "";
+                //    idSid = "";
+                //    Email = "";
+                //}
+
+            }
+        });
+
+
+        // Click Search Button to get active directory users
+
+        $("#searchContact").dxButton({
+            text: "Confirm",
+            onClick: function (e) {
+                WWID = "";
+                idSid = "";
+                Email = "";
+                var validator = $("#ddlContacts").dxValidator("instance");
+                var result = validator.validate();
+                //var e = document.getElementById('ddlAlternateEmail');
+                //e.style.display = 'none';
+                var e = document.getElementById('showEmail');
+                e.style.display = 'none';
+
+                if (result.isValid) {
+                    Nsga.Framework.getDataToUrl(null,
+                        "/api/EmployeeApi/GetContact?idsid=" + $('#ddlContacts').dxTextBox("instance").option("value"),
+                        function () {
+                        //    $("#divContent").addClass('loader');
+                        },
+                        function () {
+                       //     $("#divContent").removeClass('loader');
+                        },
+
+                        function (result) {
+                          //  debugger;
+                            $('#ddlContacts').dxTextBox("instance").option("value", result.Requestor.Name);
+                            WWID = result.Requestor.WWID;
+                            idSid = result.Requestor.Idsid;
+                            Email = result.Requestor.Email;
+                            if (!optane) {
+                                //var e = document.getElementById('ddlAlternateEmail');
+                                //e.style.display = 'block';
+                                var e = document.getElementById('showEmail');
+                                e.style.display = 'block';
+                            }
+                        },
+                        function (xhr, status) {
+                      //      debugger;
+                            Nsga.Callisto.Messages.showError("There was an error finding that user. Please retry.");
+                       //     request.RequestedBy.idsid = "";
+                        //    request.RequestedBy.Requestor.Name = "";
+                          //  $('#txtRequestorName').text("");
+                        });;
+                }
+                else {
+                }
+            }
+        });
+
+        // Add Approvers for Create Grid
+
+        $("#addRole").dxButton({
+            text: "Confirm",
+            onClick: function (e) {
+                var valid = true;
+             //   $('#ddlContacts').dxAutocomplete("instance").option("value", null);
+                var validator = $("#ddlContacts").dxValidator("instance");
+                var result = validator.validate();
+
+
+                if (WWID == "") {
+                    Nsga.Callisto.Messages.showError("Please enter a valid IdSID/WWID and click Search");
+                    valid = false;
+                    WWID = "";
+                    idSid = "";
+                    Email = "";
+                }
+
+                if (!result.isValid)
+                    valid = false;
+             //   $('#ddlRole').dxSelectBox("instance").option("value", null);
+                var validator = $("#ddlRole").dxValidator("instance");
+                result = validator.validate();
+
+
+                if (!result.isValid)
+                    valid = false;
+
+                $.each(contactsGrid, function (index, value) {
+                    if ($('#ddlContacts').dxTextBox("instance").option("value") == value.Name && $('#ddlRole').dxSelectBox("instance").option("value") == value.Role) {
+                        //   debugger;
+                        valid = false;
+                        Nsga.Callisto.Messages.showError("Contact " + value.Name + " with Role " + value.Role + " already exist");
+                    }
+
+                });
+
+                var tempmail = $('#ddlAlternateEmail').dxTextBox("instance").option("value")
+              //  debugger;
+
+                if (tempmail != "") {
+                    var validator = $("#ddlAlternateEmail").dxValidator("instance");
+                    result = validator.validate();
+                    if (!result.isValid)
+                        Nsga.Callisto.Messages.showError("Please enter a valid email id");
+                }
+
+                if (valid)
+                    loaddata();
+                //else {
+                //    WWID = "";
+                //    idSid = "";
+                //    Email = "";
+                //}
+
+            }
+        });
+
+// Create Product Ownership record to Database
+
+        $("#btnConfirm").dxButton({
+            text: "Confirm",
+            onClick: function (e) {
+                var valid = true;
+                var validate = true;
+                var validator = $("#ddlProductList").dxValidator("instance");
+                var result = validator.validate();
+
+                if (!result.isValid)
+                    valid = false;
+
+
+                var validator = $("#ddlPlatform").dxValidator("instance");
+                result = validator.validate();
+                if (!result.isValid)
+                    valid = false;
+
+                if (valid && validate) {
+
+
+
+                    var valProduct = $('#ddlProductList').dxSelectBox("instance").option("value");
+                    var vProduct = DevExpress.data.query(ProductType)
+                        .filter([["Id", valProduct]]).toArray();
+
+
+                    var valPlatform = $('#ddlPlatform').dxSelectBox("instance").option("value");
+                    var vPlatform = DevExpress.data.query(Platform)
+                        .filter([["Id", valPlatform]]).toArray();
+
+
+                    //NewCode
+                    var valCode = $('#ddlCodeName').dxTextBox("instance").option("value");
+                    var valCodeId = null;
+                    if (valCode != null) {
+                        var vCodeName = DevExpress.data.query(CodeName)
+                            .filter([["Name", valCode]]).toArray();
+                        if (vCodeName.length > 0) {
+                            valCode = vCodeName[0].Name
+                            valCodeId = vCodeName[0].Id
+                        }
+
+                    }
+                    else {
+                        valCode = null;
+                    }
+
+                    var valBrand = $('#ddlBrandName').dxTextBox("instance").option("value");
+                    var valBrandId = null;
+
+                    if (valBrand != null) {
+                        var vBrandName = DevExpress.data.query(BrandName)
+                            .filter([["Name", valBrand]]).toArray();
+                        if (vBrandName.length != 0) {
+                            valBrand = vBrandName[0].Name;
+                            valBrandId = vBrandName[0].Id;
+                        }
+
+                    }
+                    else {
+                        valBrand = null;
+                    }
+
+                    Date.prototype.getUTCTime = function () {
+                        return this.getTime() - (this.getTimezoneOffset() * 60000);
+                    };
+
+
+                    var valStatus = $('#ddlStatus').dxSelectBox("instance").option("value");
+                    var valStatusId = null;
+         //           debugger;
+                    if (valStatus != null) {
+                        var vStatus = DevExpress.data.query(Status)
+                            .filter([["Id", valStatus]]).toArray();
+                        if (vStatus.length > 0) {
+                            valStatus = vStatus[0].Name;
+                            valStatusId = vStatus[0].Id;
+
+                        }
+                    }
+                    else {
+                        valStatus = null;
+                    }
+
+
+                    var dateBox = $("#ddlDate").dxDateBox("instance");
+                    var dateBoxValue = dateBox._changedValue;
+              //     debugger;
+                    var productOwnershipContacts = [];
+                    $.each(contactsGrid, function (index, value) {
+                        productOwnershipContacts.push({ ContactName: value.Name, ProductOwnershipId: 0, ContactId: 0, ContactRoleId: 0, Email: value.Email, idSid: value.idSid, RoleName: value.Role, WWID: value.WWID, AlternateEmail: value.AlternateEmail });
+                    });
+
+                 //   debugger;
+
+                    var createEntity = {
+
+                        ProductType: { Id: vProduct[0].Id, Name: vProduct[0].Name },
+                        ProductPlatform: { Id: vPlatform[0].Id, Name: vPlatform[0].Name  },
+                        ProductCodeName: { Id: valCodeId , Name: valCode },
+                        ProductBrandName: { Id: valBrandId , Name: valBrand },
+                        ProductLifeCycleStatus: { Id: valStatusId, Name: valStatus },
+                        ProductLaunchDate: dateBoxValue,
+                        ProductContactRoles: productOwnershipContacts,
+                        RecordChanged:false,
+
+                        IsActive: true,
+                        CreatedBy: 'SYSTEM',
+                        CreatedOn: new Date().getUTCTime(),
+                        UpdatedBy: 'SYSTEM',
+                        UpdatedOn: new Date().getUTCTime()
+                    };
+
+                   // records.push(data);
+
+                    Nsga.Callisto.ProductOwnership.createProductOwnership(createEntity, onCreateSuccess, onError);
+                    //debugger;
+
+
+                }
+
+
+            }
+        });
+
+        function onCreateSuccess(result) {
+         //   debugger;
+            records = result.Entity;
+            onConfirmPopUp();
+        }
+
+        function onError(xhr) {
+            var result = null;
+            var message = "An unexpected error occurred. If the problem persists, contact support.";
+            if (xhr && xhr.responseJSON) {
+                result = xhr.responseJSON;
+                if (result.ExceptionMessage) message = result.ExceptionMessage;
+                else if (result.Message) message = result.Message;
+            }
+            Nsga.Callisto.Messages.showError(message);
+            return result;
+        }
+
+        // Cancel Create Product Ownership record
+        $("#btnCancel").dxButton({
+            text: "Cancel",
+            onClick: function (e) {
+              //  var result = e.validationGroup.validate();
+                onCancelPopUp();
+            }
+        });
+
+
+        @*var records = @(JsonHelper.Serialize(Model.ProductOwnerships));*@
+        //Commented 11/4
+
+        displayProductOwnerships(records);
+
+        $(".gridcontainer .dx-toolbar-items-container").append($("<div class='infotext'><span class='padeightpixel fas fa-exclamation-circle' style='font-size:14px;'></span>Use scroll bar of the table below to scroll and view the content. If scroll bar is very thin and not evidently visible, hover over to bring it up.</div>"));
+
+
+    // Load Create Grid Datas
+
+        $("#ddlRole").dxSelectBox({
+            items: Role,
+            displayExpr: "Name",
+            valueExpr: "Name",
+            //  value: osatId,
+            width: "200px",
+            onValueChanged: function (e) {
+              //  debugger;
+                var vRole = DevExpress.data.query(Role)
+                    .filter([["Name", e.value]]).toArray();
+             //   debugger;
+
+                if (vRole.length > 0) {
+                    if (vRole[0].PCN) {
+                        $("#ddlPCN").dxCheckBox("instance").option("value", true);
+                        $("#ddlPCN").dxCheckBox("instance").option("disabled", true);
+                    }
+                    else {
+                        $("#ddlPCN").dxCheckBox("instance").option("value", false);
+                        $("#ddlPCN").dxCheckBox("instance").option("disabled", true);
+                    }
+                }
+
+
+
+
+
+                if (e.value != null)
+                    if ($('#ddlContacts').dxTextBox("instance").option("value") != null)
+                        $("#addRole").removeAttr('disabled');
+                // Event handling commands go here
+            }
+        }).dxValidator({
+            validationRules: [{
+                type: "required",
+                message: "Role is required",
+            }]
+        });
+
+        $("#ddlPCN").dxCheckBox({
+            value: false
+        });
+
+      //  debugger;
+
+        $("#ddlContacts").dxTextBox({
+         //   dataSource: contacts,
+            placeholder: "idsid or wwid",
+            //valueExpr: 'Name',
+            //searchExpr: 'Name',
+            showClearButton: true,
+           onValueChanged: function (data) {
+               WWID = "";
+               idSid = "";
+               Email = "";
+            }
+
+        }).dxValidator({
+            validationRules: [{
+                type: "required",
+                message: "Contact is required",
+            }]
+        });
+
+
+
+        $("#ddlProductList").dxSelectBox({
+            items: ProductType,
+            displayExpr: "Name",
+            valueExpr: "Id",
+          //  value: osatId,
+            width: "200px",
+        }).dxValidator({
+            validationRules: [{
+                type: "required",
+                message: "Product is required",
+            }]
+        });
+
+        $("#ddlPlatform").dxSelectBox({
+            items: Platform,
+            displayExpr: "Name",
+            valueExpr: "Id",
+            //  value: osatId,
+            width: "200px",
+        }).dxValidator({
+            validationRules: [{
+                type: "required",
+                message: "Platform is required",
+            }]
+        });
+        $("#ddlCodeName").dxTextBox({
+            placeholder: 'Product Code Name',
+
+            //    stylingMode: 'outlined'
+        })
+
+
+        $("#ddlBrandName").dxTextBox({
+            placeholder: 'Product Brand Name',
+            //    stylingMode: 'outlined'
+        })
+
+
+        $("#ddlStatus").dxSelectBox({
+            items: Status,
+            displayExpr: "Name",
+            valueExpr: "Id",
+            showClearButton: true,
+            //  value: osatId,
+            width: "200px",
+        })
+
+
+        $("#ddlDate").dxDateBox({
+            type: "date",
+
+        })
+
+
+        $('#lnkAddProductDetails').on("click", function (e) {
+            showUpdatePanel();
+            // TO DO: Show the form to add a product information in a pop up
+        });
+
+
+        //Load Edit Records Data
+
+        $("#ddlRoleEdit").dxSelectBox({
+            items: Role,
+            displayExpr: "Name",
+            valueExpr: "Name",
+            //  value: osatId,
+            width: "200px",
+            onValueChanged: function (e) {
+
+                var vRole = DevExpress.data.query(Role)
+                    .filter([["Name", e.value]]).toArray();
+
+            //    debugger;
+
+                if (vRole.length > 0) {
+
+                    if (vRole[0].PCN) {
+                        $("#ddlPCNEdit").dxCheckBox("instance").option("value", true);
+                        $("#ddlPCNEdit").dxCheckBox("instance").option("disabled", true);
+                    }
+                    else {
+                        $("#ddlPCNEdit").dxCheckBox("instance").option("value", false);
+                        $("#ddlPCNEdit").dxCheckBox("instance").option("disabled", true);
+                    }
+
+
+                }
+
+                //  debugger;
+
+
+                if (e.value != null)
+                    if ($('#ddlContactsEdit').dxTextBox("instance").option("value") != null)
+                        $("#addRoleEdit").removeAttr('disabled');
+                // Event handling commands go here
+            }
+        }).dxValidator({
+            validationRules: [{
+                type: "required",
+                message: "Role is required",
+            }]
+        });
+
+        $("#ddlPCNEdit").dxCheckBox({
+            value: false
+        });
+
+        //  debugger;
+
+        $("#ddlContactsEdit").dxTextBox({
+            //   dataSource: contacts,
+            placeholder: "idsid or wwid",
+            //valueExpr: 'Name',
+            //searchExpr: 'Name',
+            showClearButton: true,
+            onValueChanged: function (data) {
+                WWID = "";
+                idSid = "";
+                Email = "";
+            }
+
+        }).dxValidator({
+            validationRules: [{
+                type: "required",
+                message: "Contact is required",
+            }]
+        });
+
+
+
+        $("#ddlProductListEdit").dxSelectBox({
+            items: ProductType,
+            displayExpr: "Name",
+            valueExpr: "Id",
+            //  value: osatId,
+            width: "200px",
+            readOnly: true
+        }).dxValidator({
+            validationRules: [{
+                type: "required",
+                message: "Product is required",
+            }]
+        });
+
+        $("#ddlPlatformEdit").dxSelectBox({
+            items: Platform,
+            displayExpr: "Name",
+            valueExpr: "Id",
+            //  value: osatId,
+            width: "200px",
+            readOnly: true
+        }).dxValidator({
+            validationRules: [{
+                type: "required",
+                message: "Platform is required",
+            }]
+        });
+        $("#ddlCodeNameEdit").dxTextBox({
+            placeholder: 'Product Code Name',
+            readOnly: true
+
+            //    stylingMode: 'outlined'
+        })
+
+
+        $("#ddlBrandNameEdit").dxTextBox({
+            placeholder: 'Product Brand Name',
+            readOnly: true
+            //    stylingMode: 'outlined'
+        })
+
+
+        $("#ddlStatusEdit").dxSelectBox({
+            items: Status,
+            displayExpr: "Name",
+            valueExpr: "Id",
+            showClearButton: true,
+            //  value: osatId,
+            width: "200px",
+        })
+
+
+        $("#ddlDateEdit").dxDateBox({
+            type: "date",
+
+        })
+
+    });
+
+    // Edit Grid
+
+
+
+
+
+    var loadEditdata = function () {
+        //Suresh
+     //    debugger;
+        var valPCN = false;
+     //   debugger;
+        if ($("#ddlPCNEdit").dxCheckBox("instance").option("value")) { valPCN = true; }
+
+        var vOthers = DevExpress.data.query(contactsGridEdit).filter([["Role", $('#ddlRoleEdit').dxSelectBox("instance").option("value")]]).toArray();
+
+
+            var data = {
+
+
+                Name: $('#ddlContactsEdit').dxTextBox("instance").option("value"), Role: $('#ddlRoleEdit').dxSelectBox("instance").option("value"), IsPCN: valPCN, Email: Email, idSid: idSid, WWID: WWID, isNew: 1, ProductOwnershipId: 0, ContactId: 0, AlternateEmail: optane ? null : $('#ddlAlternateEmailEdit').dxTextBox("instance").option("value")
+            }
+            contactsGridEdit.push(data);
+
+            gridDataEdit(contactsGridEdit);
+
+            $('#ddlContactsEdit').dxTextBox("instance").option("value", null);
+            var validator = $("#ddlContactsEdit").dxValidator("instance");
+            validator.reset();
+
+            $('#ddlRoleEdit').dxSelectBox("instance").option("value", null);
+            var validator = $("#ddlRoleEdit").dxValidator("instance");
+            validator.reset();
+
+            $("#ddlPCNEdit").dxCheckBox("instance").option("value", false);
+        $("#addRole").attr('disabled', 'disabled');
+
+        $('#ddlAlternateEmailEdit').dxTextBox("instance").option("value", null)
+        var validator = $("#ddlAlternateEmailEdit").dxValidator("instance");
+        validator.reset();
+
+
+
+        WWID = "";
+        idSid = "";
+        Email = "";
+
+    };
+
+
+    var showUpdatePanelEdit = function (data) {
+
+        var popup;
+        contactsGridEdit = [];
+        editrecordId = null;
+        editrecordId = data.Id;
+        recordChanged = false;
+
+        $('#ddlAlternateEmailEdit').dxTextBox("instance").option("value", undefined);
+        var validator = $("#ddlAlternateEmailEdit").dxValidator("instance");
+        validator.reset();
+        //var e = document.getElementById('ddlAlternateEmailEdit');
+        //e.style.display = 'none';
+        var e = document.getElementById('showEmailEdit');
+        e.style.display = 'none';
+
+
+        if (data.ProductContactRoles.length > 0) {
+
+
+            $.each(data.ProductContactRoles, function (index, value) {
+                var valPCN = false;
+                var vRole = DevExpress.data.query(Role)
+                    .filter([["Name", value.RoleName]]).toArray();
+              //  debugger;
+
+                if (vRole.length > 0) {
+                    if (vRole[0].PCN) {
+                         valPCN = true;
+
+                    }
+                    else {
+                         valPCN = false;
+
+                    }
+                }
+
+          //      debugger;
+                contactsGridEdit.push({ Name: value.ContactName, Role: value.RoleName, IsPCN: valPCN, Email: value.Email, idSid: value.idSid, WWID: value.WWID, isNew: 0, ProductOwnershipId: value.ProductOwnershipId, ContactId: value.ContactId, AlternateEmail: value.AlternateEmail });
+            });
+        }
+        gridDataEdit(contactsGridEdit);
+      //  debugger;
+     //   debugger;
+        $('#ddlProductListEdit').dxSelectBox("instance").option("value", data.ProductType.Id);
+        //var validator = $("#ddlProductListEdit").dxValidator("instance");
+        //validator.reset();
+
+
+
+        $('#ddlContactsEdit').dxTextBox("instance").option("value", null);
+        var validator = $("#ddlContactsEdit").dxValidator("instance");
+        validator.reset();
+
+        $('#ddlRoleEdit').dxSelectBox("instance").option("value", null);
+        var validator = $("#ddlRoleEdit").dxValidator("instance");
+        validator.reset();
+
+        $('#ddlStatusEdit').dxSelectBox("instance").option("value", data.ProductLifeCycleStatus.Id);
+        //var validator = $("#ddlStatusEdit").dxValidator("instance");
+        //validator.reset();
+
+        //ddlStatusEdit
+
+        $('#ddlPlatformEdit').dxSelectBox("instance").option("value", data.ProductPlatform.Id);
+        //var validator = $("#ddlPlatformEdit").dxValidator("instance");
+        //validator.reset();
+
+        $('#ddlCodeNameEdit').dxTextBox("instance").option("value", data.ProductCodeName.Name);
+        //var validator = $("#ddlCodeName").dxValidator("instance");
+        //validator.reset();
+
+        $('#ddlBrandNameEdit').dxTextBox("instance").option("value", data.ProductBrandName.Name);
+
+        if (data.ProductLaunchDate == "0001-01-01T00:00:00Z")
+            $('#ddlDateEdit').dxDateBox("instance").option("value", undefined);
+        else
+            $('#ddlDateEdit').dxDateBox("instance").option("value", data.ProductLaunchDate);
+
+
+        var popupOptionsEdit = {
+            width: "1200px",
+            height: "900px",
+            showTitle: true,
+            title: "Update Product Ownership",
+            visible: false,
+            dragEnabled: false,
+            closeOnOutsideClick: false
+        }
+
+        if (popup) {
+            popup.option("contentTemplate", popupOptionsEdit.contentTemplate.bind(this));
+        } else {
+            popup = $("#divEditProductOwnership").dxPopup(popupOptionsEdit).dxPopup("instance");
+        }
+        // debugger;
+
+        popup.show();
+    };
+
+
+    function onEditSuccess(result) {
+     //   debugger;
+        records = result.Entity;
+        onConfirmEditPopUp();
+    }
+
+    var onConfirmEditPopUp = function () {
+
+
+        hideEditPopUp();
+    }
+
+
+    var onConfirmPopUp = function () {
+
+
+        hidePopUp();
+    }
+
+    var hidePopUp = function () {
+        var popupSwitchRole = $("#divCreateProductOwnership").dxPopup("instance");
+        popupSwitchRole.hide();
+        displayProductOwnerships(records);
+        $(".gridcontainer .dx-toolbar-items-container").append($("<div class='infotext'><span class='padeightpixel fas fa-exclamation-circle' style='font-size:14px;'></span>Use scroll bar of the table below to scroll and view the content. If scroll bar is very thin and not evidently visible, hover over to bring it up.</div>"));
+    }
+
+    var hideEditPopUp = function () {
+        var popupSwitchRole = $("#divEditProductOwnership").dxPopup("instance");
+        popupSwitchRole.hide();
+        displayProductOwnerships(records);
+        $(".gridcontainer .dx-toolbar-items-container").append($("<div class='infotext'><span class='padeightpixel fas fa-exclamation-circle' style='font-size:14px;'></span>Use scroll bar of the table below to scroll and view the content. If scroll bar is very thin and not evidently visible, hover over to bring it up.</div>"));
+    }
+
+    var onCancelPopUp = function () {
+        hidePopUp();
+    }
+
+    var onCancelEditPopUp = function () {
+        hideEditPopUp();
+    }
+
+
+    //Load the Create Contact Grid
+
+    var gridData = function (records) {
+    //    debugger;
+        $("#contactsData").dxDataGrid({
+            dataSource: records,
+            showBorders: true,
+            headerFilter: { visible: true },
+
+            paging: {
+                pageSize: 8
+            },
+            editing: {
+                mode: "row",
+                allowUpdating: false,
+                allowDeleting: true,
+                allowAdding: false,
+                useIcons: true
+            },
+            columns: [
+                {
+                    dataField: "Name",
+                    caption: "Contact",
+
+                },
+                {
+                    dataField: "Role",
+                    caption: "Role",
+
+                },
+                {
+                    dataField: "IsPCN",
+                    caption: "Is PCN?",
+                    falseText: 'N',
+                    trueText: 'Y',
+                    alignment: "center",
+                    showEditorAlways: false
+                }
+            ]
+        });
+        };
+
+
+    var gridDataEdit = function (records) {
+
+        $("#contactsDataEdit").dxDataGrid({
+            dataSource: records,
+            showBorders: true,
+            headerFilter: { visible: true },
+
+            paging: {
+                pageSize: 8
+            },
+            editing: {
+                mode: "row",
+                allowUpdating: false,
+                allowDeleting: true,
+                allowAdding: false,
+                useIcons: true
+            },
+            columns: [
+                {
+                    dataField: "Name",
+                    caption: "Contact",
+
+                },
+                {
+                    dataField: "Role",
+                    caption: "Role",
+
+                },
+                {
+                    dataField: "IsPCN",
+                    caption: "Is PCN?",
+                    falseText: 'N',
+                    trueText: 'Y',
+                    alignment: "center",
+                    showEditorAlways: false
+                }
+            ],
+            onRowRemoving: function (e) {
+                //debugger;
+                recordChanged = true;
+            }
+        });
+    };
+
+
+    var displayProductOwnerships = function (records) {
+      //  debugger;
+        // Product details grid
+        $("#grdProductOwnerships").dxDataGrid({
+            dataSource: records,
+            columnAutoWidth: true,
+            showColumnLines: true,
+            showRowLines: true,
+            rowAlternationEnabled: true,
+            wordWrapEnabled: true,
+            showBorders: true,
+            headerFilter: { visible: true },
+            loadPanel: {
+                enabled: true
+            },
+            filterRow: {
+                visible: true
+            },
+            paging: { enabled: false },
+            editing: {
+                mode: "row",
+                allowUpdating: false,
+                allowDeleting: true,
+                allowAdding: false,
+                useIcons: true
+            },
+            "export": {
+                enabled: true,
+                fileName: "ProductOwnerships",
+                allowExportSelectedData: false
+            },
+            columns: [
+                {
+                    dataField: "ProductType.Name",
+                    caption: "Product",
+                    fixed: true,
+                    width: "95px",
+                    fixedPosition: "left",
+                    cssClass: "fixedcolumn",
+                    lookup: {
+                        dataSource: ProductType,
+                        valueExpr: "Name",
+                        displayExpr: "Name"
+                    }
+                },
+                {
+                    dataField: "ProductPlatform.Name",
+                    caption: "Platform",
+                    fixed: true,
+                    width: "95px",
+                    fixedPosition: "left",
+                    cssClass: "fixedcolumn",
+                    lookup: {
+                        dataSource: Platform,
+                        valueExpr: "Name",
+                        displayExpr: "Name"
+                    }
+                },
+                {
+                    dataField: "ProductCodeName.Name",
+                    caption: "Code Name",
+                    fixed: true,
+                    width: "250px",
+                    fixedPosition: "left",
+                    cssClass: "fixedcolumn",
+                    //lookup: {
+                    //    dataSource: CodeName,
+                    //    valueExpr: "Name",
+                    //    displayExpr: "Name"
+                    //}
+                },
+                {
+                    dataField: "ProductClassification",
+                    caption: "Product Classification",
+                    fixed: true,
+                    width: "110px",
+                    fixedPosition: "left",
+                    cssClass: "fixedcolumn",
+                    //lookup: {
+                    //    dataSource: CodeName,
+                    //    valueExpr: "Name",
+                    //    displayExpr: "Name"
+                    //}
+                },
+                {
+                    dataField: "ProductBrandName.Name",
+                    caption: "Brand Name",
+                    //lookup: {
+                    //    dataSource: BrandName,
+                    //    valueExpr: "Name",
+                    //    displayExpr: "Name"
+                    //}
+                },
+                {
+                    dataField: "ProductLifeCycleStatus.Name",
+                    caption: "Status",
+                    width: "95px",
+                    lookup: {
+                        dataSource: Status,
+                        valueExpr: "Name",
+                        displayExpr: "Name"
+                    }
+                },
+                {
+                    dataField: "ProductLaunchDate",
+                    caption: "Product Launch Date",
+                    width: "90px",
+                   // dataType: "date",
+                    //customizeText: function (cellInfo) {
+
+                    //    if (cellInfo.valueText == "12/31/1900") {
+                    //        return null;
+                    //    } else {
+                    //        return cellInfo.valueText;
+                    //    }
+                    ////    //  format: "MM/dd/yyyy hh:mm:ss a",
+                    //}
+                },
+                {
+                    dataField: "IsActive",
+                    caption: "Is Active?",
+                    falseText: 'N',
+                    trueText: 'Y',
+                    alignment: "center",
+                    width: "95px",
+                    showEditorAlways: false
+                },
+
+                {
+                    caption: "PCN Approver",
+                    columns: [{
+                        caption: "PME",
+                        dataField: "PME",
+                        cssClass: 'breakword',
+
+                    },
+                    {
+                        caption: "PMT",
+                        dataField: "PMT",
+                        cssClass: 'breakword',
+
+                    }]
+
+                },
+                {
+                    dataField: "PDT",
+                    caption: "PDT",
+                    cssClass: 'breakword',
+
+                },
+                 {
+                    caption: "TME",
+                    dataField: "TME",
+                    cssClass: 'breakword',
+
+                },
+                {
+                    dataField: "PQE",
+                    caption: "PQE",
+                    cssClass: 'breakword',
+
+                },
+                {
+                    dataField: "Others",
+                    caption: "Others",
+                    cssClass: 'breakword',
+
+                },
+                {
+                    dataField: "PMEManager",
+                    caption: "PMEManager",
+                    cssClass: 'breakword',
+
+                },
+                {
+                    dataField: "PMEManagerBackup",
+                    caption: "PMEManager Backup",
+                    cssClass: 'breakword',
+
+                },
+                {
+                    dataField: "PMTManager",
+                    caption: "PMTManager",
+                    cssClass: 'breakword',
+
+                },
+                {
+                    dataField: "PMTManagerBackup",
+                    caption: "PMTManager Backup",
+                    cssClass: 'breakword',
+
+                },
+                {
+                    dataField: "CreatedBy",
+                    caption: "Created By",
+                    cssClass: 'breakword',
+
+                },
+                {
+                    dataField: "UpdatedBy",
+                    caption: "Updated By",
+                    cssClass: 'breakword',
+
+                },
+
+                {
+                    dataField: 'Edit',
+                 //   caption: 'Edit',
+                    fixed: true,
+                    fixedPosition: 'right',
+                    width: 100,
+                    alignment: 'center',
+                  //  type: "Edit",
+                    cellTemplate: function (container, options) {
+                        //var divContent = $("<div></div>");
+                        //var icon = $("<i></i>");
+                        //icon.addClass("dx-icon-edit");
+                        //divContent.append(icon).append("&nbsp;&nbsp;").append("Edit");
+                        var divContent = $("<div></div>");
+                        var icon = $("<i ></i>");
+                        icon.addClass("dx-icon-edit");
+
+                        icon.bind("click", function (e) {  showUpdatePanelEdit(@MvcHtmlString.Create("options.data")); });
+                        var Add = $("<i ></i>");
+                        //Add.addClass("dx-icon-add");
+                        //Add.bind("click", function (e) { showUpdatePanel(); });
+                        divContent.append(icon).append("&nbsp;&nbsp;")
+
+                        container.append(divContent);
+
+
+                    },
+
+                },
+                     {
+                        dataField: 'Mail',
+                        caption: 'Mail',
+                        fixed: true,
+                        fixedPosition: 'right',
+                        width: 50,
+                        alignment: 'center',
+                        //  type: "Edit",
+                        cellTemplate: function (container, options) {
+
+
+                            var divContent = $("<div></div>");
+
+                            var icon = $("<a href='mailto:" + @MvcHtmlString.Create("options.data.Email") + "'></a>");
+                            icon.addClass("fa fa-envelope");
+
+                           // icon.bind("click", function (e) {  });
+                          //  var Add = $("<i ></i>");
+
+                            if (options.data.Email != "") {
+                          //      debugger;
+                                divContent.append(icon).append("&nbsp;&nbsp;")
+                            }
+
+
+                            container.append(divContent);
+
+
+                        },
+                    },
+
+
+
+            ],
+            onRowRemoving: function (e) {
+                //e.data.id
+
+                Nsga.Callisto.ProductOwnership.deleteProductOwnership(@MvcHtmlString.Create("e.data.Id"), onDeleteStatus, onError);
+             //   debugger;
+            }
+        });
+
+        function onDeleteStatus(result) {
+         //   debugger;
+            records = result.Entity;
+            displayProductOwnerships(records);
+            $(".gridcontainer .dx-toolbar-items-container").append($("<div class='infotext'><span class='padeightpixel fas fa-exclamation-circle' style='font-size:14px;'></span>Use scroll bar of the table below to scroll and view the content. If scroll bar is very thin and not evidently visible, hover over to bring it up.</div>"));
+        }
+
+        function onError(xhr) {
+            var result = null;
+            var message = "An unexpected error occurred. If the problem persists, contact support.";
+            if (xhr && xhr.responseJSON) {
+                result = xhr.responseJSON;
+                if (result.ExceptionMessage) message = result.ExceptionMessage;
+                else if (result.Message) message = result.Message;
+            }
+            Nsga.Callisto.Messages.showError(message);
+            return result;
+        }
+
+
+    };
+</script>
+
+<div id="divContent" class=" fluid">
+    <div class="fixed centered">
+        <div>
+            <div class=" padsixpixel">
+                <div class="showinline">
+                    <table class="table-legend">
+                        <tr>
+                            <td><br /></td>
+                            <td><br /></td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="showinline floatright">
+                    <span><a title="Click here to add product information" id="lnkAddProductDetails" href="JavaScript:void(0);"><span class="imagelinkbutton bordered"><span class="fa fa-plus "></span><span class="margintwopixel">Add Product Details</span></span></a></span>
+                    <span><a title="Click here to manage attribute types" id="lnkAccountOwnerships" href="/AccountOwnerships/Index/"><span class="imagelinkbutton bordered"><span class="fa fa-list-alt "></span><span class="margintwopixel">Account Ownerships</span> </span></a></span>
+                    <span><a title="Click here to view all PRQ build criteria" id="lnkAllPOR" href="/PCNApprovers/Index/"><span class="imagelinkbutton bordered"><span class="fa fa-list-alt "></span><span class="margintwopixel">PCN Approvers</span> </span></a></span>
+                    <span><a title="Click here to view all non-PRQ build criteria" id="lnkAllNonPOR" href="/PCNManagerFinder/Index/"><span class="imagelinkbutton bordered"><span class="fa fa-list-alt "></span><span class="margintwopixel">PCN Manager Finder</span> </span></a></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div id="importindicator"></div>
+    <div id="divResults" class="centeralign">
+
+        <div class="grid-wrapper" style="margin-top: 4px; ">
+            <div>
+                <div class="marginfourpixel">
+                    <div class="gridcontainer">
+                        <div id="grdProductOwnerships" style="margin-right: 20px; margin-left: 10px; "></div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    @*<div id="divResults" class="fluid">        
+        <div class="" style="margin-top:4px;">
+            <div>
+                <div class="marginfourpixel gridcontainer">
+                    <div id="grdProductOwnerships" style="margin-right:10px;margin-left:10px;margin-bottom:10px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>*@
+</div>
+
+<div id="divCreateProductOwnership" class="dx-fieldset" style="display:none">
+    <div class="bordered padfourpixel marginfourpixel bluebox bglightblue" vertical-align: top;">
+
+        <div class="padtwopixel margintwopixel" style="display:block;">
+            <div class="padtwopixel">
+                <div class="dx-fieldset" style="display:inline-block;">
+                    <div class="dx-field">
+                        <div class="dx-field-label required" style="width: 300px; font-size: 16px;">Product</div>
+                        <div class="dx-field-value" id="ddlProductList"></div>
+                    </div>
+                    <div class="dx-field">
+                        <div class="dx-field-label required" style="width: 300px; font-size: 16px;">Platform</div>
+                        <div class="dx-field-value" id="ddlPlatform"></div>
+                    </div>
+                    <div class="dx-field">
+                        <div class="dx-field-label required" style="width: 300px; font-size: 16px;">CodeName</div>
+                        <div class="dx-field-value" id="ddlCodeName"></div>
+                    </div>
+                    <div class="dx-field">
+                        <div class="dx-field-label required" style="width: 300px; font-size: 16px;">Brand Name</div>
+                        <div class="dx-field-value" id="ddlBrandName"></div>
+                    </div>
+                    <div class="dx-field">
+                        <div class="dx-field-label required" style="width: 300px; font-size: 16px;">Status</div>
+                        <div class="dx-field-value" id="ddlStatus"></div>
+                    </div>
+                    <div class="dx-field">
+                        <div class="dx-field-label required" style="width: 300px; font-size: 16px;">Product Launch Date</div>
+                        <div class="dx-field-value" id="ddlDate" style="display: block; width: 450px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="centeralign">
+            <table class="bordered padfourpixel marginfourpixel bluebox bglightblue">
+                <tr>
+                    <td colspan="4"><div class="centeralign .dx-header-row" style="color: #0123b4; font-size: 18px; background-color: #0071c5 !important; border: #0071c5 1px solid; "><b>Roles and Contacts</b><br /></div></td>
+                </tr>
+                <tr>
+                    <td style="padding-right:20px;"><div class="centeralign; dx-field-label required " style="width: 295px; font-size: 16px;">Contacts</div> </td>
+                    <td style="padding-right: 40px;"><div class="dx-field-label required centeralign" style="width: 210px; font-size: 16px;">Role</div></td>
+                    <td style="padding-right: 40px;"><div class="dx-field-label required centeralign" style="width: 90px; font-size: 16px;">Is PCN</div></td>
+                    <td style="padding-right: 40px;"><div class="dx-field-label required centeralign" style="width: 400px; font-size: 16px;display:none;" id="showEmail">Alternate Email</div></td>
+                </tr>
+                <tr>
+                    <td style="padding-right:20px;"><div class="centeralign dx-field-label required" style="width: 295px; font-size: 16px;"><div class="dx-field-value" id="ddlContacts"></div><input id="searchContact" type="button" value="Search" style="padding-bottom:5px;padding-top:5px;margin-left:10px;" /></div></td>
+                    <td style="padding-right: 40px;"><div class="dx-field-label required centeralign" style="width: 210px; font-size: 16px;"><div class="dx-field-value" id="ddlRole" style="display: block; "></div></div></td>
+                    <td style="padding-right: 40px;"><div class="dx-field-label required centeralign" style="width: 90px; font-size: 16px;"><div class="dx-field-value" id="ddlPCN" style="display: block; "></div></td>
+                    <td style="padding-right: 40px;"><div class="dx-field-label centeralign" style="width: 400px; font-size: 16px;"><div class="dx-field-value" id="ddlAlternateEmail" style="display: none; "></div><input id="addRole" type="button" value="Save Contact" style="padding-bottom: 5px; padding-top: 5px; margin-left: 10px; padding-left: 2px;" /></div></td>
+                </tr>
+              
+                @*<tr>
+                    <td colspan="3">&nbsp;</td>
+                </tr>*@
+            </table>
+        </div>
+        <div id="contactsData"></div>
+        <br />
+        <div class="centeralign" style="display: inline-block; margin-left: 8px; width: 40%;">
+            <span class=".dx-button floatright"><input id="btnConfirm" type="button" value="Save" style="padding-bottom:5px;padding-top:5px;margin-left:10px;" /></span>
+            <span class=".dx-button floatright"><input id="btnCancel" type="button" value="Cancel" style="padding-bottom:5px;padding-top:5px;" /></span>
+
+
+
+        </div>
+    </div>
+</div>
+
+<div id="divEditProductOwnership" class="dx-fieldset" style="display:none">
+    <div class="bordered padfourpixel marginfourpixel bluebox bglightblue" vertical-align: top;">
+
+        <div class="padtwopixel margintwopixel" style="display:block;">
+            <div class="padtwopixel">
+                <div class="dx-fieldset" style="display:inline-block;">
+                    <div class="dx-field">
+                        <div class="dx-field-label required" style="width: 300px; font-size: 16px;">Product</div>
+                        <div class="dx-field-value" id="ddlProductListEdit"></div>
+                    </div>
+                    <div class="dx-field">
+                        <div class="dx-field-label required" style="width: 300px; font-size: 16px;">Platform</div>
+                        <div class="dx-field-value" id="ddlPlatformEdit"></div>
+                    </div>
+                    <div class="dx-field">
+                        <div class="dx-field-label required" style="width: 300px; font-size: 16px;">CodeName</div>
+                        <div class="dx-field-value" id="ddlCodeNameEdit"></div>
+                    </div>
+                    <div class="dx-field">
+                        <div class="dx-field-label required" style="width: 300px; font-size: 16px;">Brand Name</div>
+                        <div class="dx-field-value" id="ddlBrandNameEdit"></div>
+                    </div>
+                    <div class="dx-field">
+                        <div class="dx-field-label required" style="width: 300px; font-size: 16px;">Status</div>
+                        <div class="dx-field-value" id="ddlStatusEdit"></div>
+                    </div>
+                    <div class="dx-field">
+                        <div class="dx-field-label required" style="width: 300px; font-size: 16px;">Product Launch Date</div>
+                        <div class="dx-field-value" id="ddlDateEdit" style="display: block; width: 450px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="centeralign">
+            <table class="bordered padfourpixel marginfourpixel bluebox bglightblue">
+                <tr>
+                    <td colspan="4"><div class="centeralign .dx-header-row" style="color: #0123b4; font-size: 18px; background-color: #0071c5 !important; border: #0071c5 1px solid; "><b>Roles and Contacts</b><br /></div></td>
+                </tr>
+                <tr>
+                    <td style="padding-right:20px;"><div class="centeralign; dx-field-label required " style="width: 295px; font-size: 16px;">Contacts</div> </td>
+                    <td style="padding-right: 40px;"><div class="dx-field-label required centeralign" style="width: 210px; font-size: 16px;">Role</div></td>
+                    <td style="padding-right: 40px;"><div class="dx-field-label required centeralign" style="width: 90px; font-size: 16px;">Is PCN</div></td>
+                    <td style="padding-right: 40px;"><div class="dx-field-label required centeralign" style="width: 295px; font-size: 16px;display:none;" id="showEmailEdit">Alternate Email</div></td>
+                </tr>
+                <tr>
+                    <td style="padding-right:20px;"><div class="centeralign dx-field-label required" style="width: 295px; font-size: 16px;"><div class="dx-field-value" id="ddlContactsEdit"></div><input id="searchContactEdit" type="button" value="Search" style="padding-bottom:5px;padding-top:5px;margin-left:10px;" /></div></td>
+                    <td style="padding-right: 40px;"><div class="dx-field-label required centeralign" style="width: 210px; font-size: 16px;"><div class="dx-field-value" id="ddlRoleEdit" style="display: block; "></div></div></td>
+                    <td style="padding-right: 40px;"><div class="dx-field-label required centeralign" style="width: 90px; font-size: 16px;"><div class="dx-field-value" id="ddlPCNEdit" style="display: block; "></div></td>
+                    <td style="padding-right: 40px;"><div class="dx-field-label centeralign" style="width: 295px; font-size: 16px;"><div class="dx-field-value" id="ddlAlternateEmailEdit" style="display: none; "></div><input id="addRoleEdit" type="button" value="Save Contact" style="padding-bottom: 5px; padding-top: 5px; margin-left: 10px; padding-left: 2px;" /></div></td>
+                </tr>
+
+                @*<tr>
+                        <td colspan="3">&nbsp;</td>
+                    </tr>*@
+            </table>
+        </div>
+        <div id="contactsDataEdit"></div>
+        <br />
+        <div class="cen" style="display:inline-block;margin-left:8px;width:40%;">
+            <span class=".dx-button floatright"><input id="btnConfirmEdit" type="button" value="Save" style="padding-bottom:5px;padding-top:5px;margin-left:10px;" /></span>
+            <span class=".dx-button floatright"><input id="btnCancelEdit" type="button" value="Cancel" style="padding-bottom:5px;padding-top:5px;" /></span>
+
+
+
+        </div>
+    </div>
+</div>

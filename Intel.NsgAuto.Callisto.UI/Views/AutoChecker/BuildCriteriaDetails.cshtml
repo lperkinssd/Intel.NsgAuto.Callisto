@@ -1,0 +1,831 @@
+﻿@model Intel.NsgAuto.Callisto.UI.Models.AutoChecker.BuildCriteriaModel
+
+@{
+    ViewBag.Title = "Auto Checker - Build Criteria Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var supportEmail = Intel.NsgAuto.Callisto.Business.Core.Settings.SupportEmailAddress;
+}
+
+@Html.Partial("_ReviewStyling")
+
+<style scoped>
+
+    del {
+        text-decoration: line-through;
+        background-color: #fbb;
+        color: #555;
+    }
+
+    ins {
+        text-decoration: none;
+        background-color: #d4fcbc;
+    }
+
+</style>
+
+<script type="text/javascript">
+
+    var entity = null;
+    var model = null;
+    var conditions = null;
+    var comparisonResults = null;
+    var comments = null;
+    var modelCompare = null;
+    var modelsCompare = null;
+    var review = null;
+    var userId = "@(Html.Raw(Intel.NsgAuto.Web.Mvc.Core.Functions.GetCurrentUserIdSid()))";
+    var comparisonEnabled = false;
+
+    updateFromEntity(@(JsonHelper.Serialize(Model.Entity)));
+
+    function updateFromEntity(entityNew) {
+        entity = entityNew;
+        model = entity.BuildCriteria;
+        conditions = model.Conditions;
+        comments = model.Comments;
+        comparisonResults = entity.ComparisonResults;
+        modelCompare = entity.BuildCriteriaCompare;
+        modelsCompare = entity.BuildCriteriasCompare;
+        review = entity.Review;
+        var idCompare = null;
+        if (modelCompare) {
+            comparisonEnabled = true;
+            idCompare = modelCompare.Id;
+        }
+        else {
+            comparisonEnabled = false;
+        }
+        var dxDrpCompareTo = $("#drpCompareTo").dxSelectBox("instance");
+        if (dxDrpCompareTo) {
+            dxDrpCompareTo.option("value", idCompare);
+        }
+    }
+
+    function refreshCommentsDataSource() {
+        $("#grdComments").dxDataGrid("instance").option("dataSource", comments);
+    }
+
+    function refreshComments() {
+        var accComments = $("#accComments");
+        if (comments && comments.length > 0) {
+            accComments.addClass("open");
+            updateAccordionPanelFromLabel(accComments[0]);
+        }
+        else {
+            accComments.removeClass("open");
+            updateAccordionPanelFromLabel(accComments[0]);
+        }
+        refreshCommentsDataSource();
+    }
+
+    function refreshFields() {
+        $("#lnkCreateNew").attr("href", "/AutoChecker/CreateBuildCriteria/" + model.Id);
+        $("#spnId").text(model.Id);
+        $("#spnVersion").text(model.Version);
+        $("#spnIsActive").text(model.IsActive);
+        $("#spnIsPOR").text(model.IsPOR);
+        $("#spnStatus").text(model.Status.Name);
+        $("#spnCreatedBy").text(model.CreatedByUserName ? model.CreatedByUserName : model.CreatedBy);
+        $("#spnCreatedOn").text(Nsga.Callisto.Dates.isoToLocaleString(model.CreatedOn));
+        $("#spnUpdatedBy").text(model.UpdatedByUserName ? model.UpdatedByUserName : model.UpdatedBy);
+        $("#spnUpdatedOn").text(Nsga.Callisto.Dates.isoToLocaleString(model.UpdatedOn));
+        $("#spnEffectiveOn").text(Nsga.Callisto.Dates.isoToLocaleString(model.EffectiveOn));
+        if (model.Design) $("#spnDesign").text(model.Design.Name);
+        if (model.FabricationFacility) $("#spnFabricationFacility").text(model.FabricationFacility.Name);
+        if (model.TestFlow) $("#spnTestFlow").text(model.TestFlow.Name);
+        if (model.ProbeConversion) $("#spnProbeConversion").text(model.ProbeConversion.Name);
+    }
+
+    function refreshReview() {
+        var statusName = model.Status.Name;
+        var divSubmitCancel = $("#divSubmitCancel");
+        var accReview = $("#accReview");
+        var acdReview = $("#acdReview");
+        if (statusName === "Draft") {
+            if (model && model.CreatedBy === userId) {
+                divSubmitCancel.show();
+                accReview.show();
+            }
+            else {
+                divSubmitCancel.hide();
+                accReview.hide();
+            }
+            acdReview.hide();
+        }
+        else {
+            divSubmitCancel.hide();
+            if (statusName === "Canceled") {
+                accReview.hide();
+                acdReview.hide();
+            }
+            else {
+                accReview.show();
+                acdReview.show();
+            }
+        }
+    }
+
+    function refreshCompare() {
+        var linkCompareTo = $("#lnkCompareTo");
+        if (comparisonEnabled && modelCompare) {
+            linkCompareTo.show();
+            linkCompareTo.attr("href", "/AutoChecker/BuildCriteriaDetails/" + modelCompare.Id);
+        }
+        else {
+            linkCompareTo.hide();
+        }
+    }
+
+    function refreshDrpCompareToDataSource() {
+        var drpCompareTo = $("#drpCompareTo");
+        var value = drpCompareTo.dxSelectBox("instance").option("value");
+        var dataSource = [];
+        if (modelsCompare) {
+            dataSource.push(null);
+            Array.prototype.push.apply(dataSource, modelsCompare)
+        }
+        drpCompareTo.dxSelectBox("instance").option("dataSource", dataSource);
+        drpCompareTo.dxSelectBox("instance").option("value", value);
+    }
+
+    function drpCompareToValue() {
+        var result = null;
+        var dxDrpCompareTo = $("#drpCompareTo").dxSelectBox("instance");
+        if (dxDrpCompareTo) {
+            result = dxDrpCompareTo.option("value");
+        }
+        return result;
+    }
+
+    function refreshAcdReviewDataSource() {
+        var dataSource = null;
+        if (review && review.ReviewSteps) {
+            dataSource = review.ReviewSteps;
+        }
+        $("#acdReview").dxAccordion("instance").option("dataSource", dataSource);
+    }
+
+    function refreshConditionsDataSource() {
+        var grdConditionsStandard = $("#grdConditionsStandard");
+        var grdConditionsRule = $("#grdConditionsRule");
+
+        var dataSource = null;
+        if (comparisonEnabled) {
+            dataSource = [];
+
+            var comparisonResult = null;
+            var condition = null;
+
+            // two new properties will be added to each condition: ComparisonStatus (string), and ValueCompare (string)
+
+            // append all conditions from current version and check to see if they have been inserted with respect to the compared version
+            for (var i = 0; i < conditions.length; i++) {
+                condition = conditions[i];
+                condition.ComparisonStatus = "Equal";
+                condition.ValueCompare = null;
+                for (var j = 0; j < comparisonResults.length; j++) {
+                    comparisonResult = comparisonResults[j];
+                    if (comparisonResult.EntityType === "AcBuildCriteriaCondition") {
+                        if (comparisonResult.Id1 === condition.Id) {
+                            if (comparisonResult.MissingFrom === 2) {
+                                condition.ComparisonStatus = "Inserted";
+                            }
+                            else if (comparisonResult.Different && comparisonResult.Field === "Value") {
+                                condition.ComparisonStatus = "Updated";
+                                condition.ValueCompare = comparisonResult.Value2;
+                            }
+                        }
+                    }
+                }
+                dataSource.push(condition);
+            }
+
+            // append only the conditions from compared version that have been deleted in the current version
+            for (var i = 0; i < modelCompare.Conditions.length; i++) {
+                condition = modelCompare.Conditions[i];
+                condition.ComparisonStatus = null;
+                condition.ValueCompare = null;
+                for (var j = 0; j < comparisonResults.length; j++) {
+                    comparisonResult = comparisonResults[j];
+                    if (comparisonResult.EntityType === "AcBuildCriteriaCondition") {
+                        if (comparisonResult.Id2 === condition.Id) {
+                            if (comparisonResult.MissingFrom === 1) {
+                                condition.ComparisonStatus = "Deleted";
+                                break;
+                            }
+                        }
+                    }
+                }
+                if (condition.ComparisonStatus === "Deleted") {
+                    dataSource.push(condition);
+                }
+            }
+
+            grdConditionsStandard.dxDataGrid("columnOption", "ComparisonStatus", "visible", true);
+            grdConditionsRule.dxDataGrid("columnOption", "ComparisonStatus", "visible", true);
+        }
+        else {
+            for (var i = 0; i < conditions.length; i++) {
+                conditions[i].ComparisonStatus = null;
+            }
+            dataSource = conditions;
+
+            grdConditionsStandard.dxDataGrid("columnOption", "ComparisonStatus", "visible", false);
+            grdConditionsRule.dxDataGrid("columnOption", "ComparisonStatus", "visible", false);
+        }
+        grdConditionsStandard.dxDataGrid("instance").option("dataSource", dataSource);
+        grdConditionsRule.dxDataGrid("instance").option("dataSource", dataSource);
+    }
+
+    function refreshUi() {
+        refreshFields();
+        refreshComments();
+        refreshCompare();
+        refreshReview();
+        refreshDrpCompareToDataSource();
+        refreshConditionsDataSource();
+        refreshAcdReviewDataSource();
+    }
+
+    function refreshFromEntity(entityNew) {
+        updateFromEntity(entityNew);
+        refreshUi();
+    }
+
+    function onSuccess(entityNew) {
+        refreshFromEntity(entityNew);
+    }
+
+    function onSuccessComment(result) {
+        comments = result.Entity;
+        refreshComments();
+    }
+
+    function onSuccessEntity(result) {
+        refreshFromEntity(result.Entity);
+    }
+
+    function onError(xhr, status) {
+        var message = "An unexpected error occurred. If the problem persists, contact support.";
+        var result = null;
+        if (xhr && xhr.responseJSON) {
+            result = xhr.responseJSON;
+            if (xhr.responseJSON.ExceptionMessage) message = xhr.responseJSON.ExceptionMessage;
+            else if (xhr.responseJSON.Message) message = xhr.responseJSON.Message;
+        }
+        Nsga.Callisto.Messages.showError(message);
+        if (result) {
+            refreshFromEntity(result);
+        }
+    };
+
+    function onErrorComment(xhr, status) {
+        var message = "An unexpected error occurred. If the problem persists, contact support.";
+        var result = null;
+        if (xhr && xhr.responseJSON) {
+            result = xhr.responseJSON;
+            if (xhr.responseJSON.ExceptionMessage) message = xhr.responseJSON.ExceptionMessage;
+            else if (xhr.responseJSON.Message) message = xhr.responseJSON.Message;
+        }
+        Nsga.Callisto.Messages.showError(message);
+        if (result && result.Entity) {
+            comments = result.Entity;
+            refreshComments();
+        }
+    };
+
+    function onErrorEntity(xhr, status) {
+        var message = "An unexpected error occurred. If the problem persists, contact support.";
+        var result = null;
+        if (xhr && xhr.responseJSON) {
+            result = xhr.responseJSON;
+            if (xhr.responseJSON.ExceptionMessage) message = xhr.responseJSON.ExceptionMessage;
+            else if (xhr.responseJSON.Message) message = xhr.responseJSON.Message;
+        }
+        Nsga.Callisto.Messages.showError(message);
+        if (result && result.Entity) {
+            refreshFromEntity(result.Entity);
+        }
+    };
+
+    function conditionsViewToggle() {
+        var grdConditionsStandard = $("#grdConditionsStandard");
+        var grdConditionsRule = $("#grdConditionsRule");
+        var btnConditionsViewToggle = $("#btnConditionsViewToggle");
+        if (grdConditionsStandard.is(":visible")) {
+            grdConditionsStandard.hide();
+            grdConditionsRule.show();
+            btnConditionsViewToggle.html("Switch To Standard View");
+        }
+        else {
+            grdConditionsStandard.show();
+            grdConditionsRule.hide();
+            btnConditionsViewToggle.html("Switch To Build Rule View");
+        }
+    }
+
+    function createDraftDecision(decisionType) {
+        return {
+            DecisionType: decisionType,
+            VersionId: model.Id,
+            VersionIdCompare: drpCompareToValue(),
+        };
+    }
+
+    function cancel() {
+        Nsga.Callisto.AutoChecker.cancelBuildCriteria(createDraftDecision("Cancel"), onSuccessEntity, onErrorEntity);
+    }
+
+    function submit1() {
+        Nsga.Callisto.AutoChecker.submitBuildCriteria(createDraftDecision("Submit"), onSuccessEntity, onErrorEntity);
+    }
+
+    function createComment(entity) {
+        Nsga.Callisto.AutoChecker.createBuildCriteriaComment(entity, onSuccessComment, onErrorComment);
+    }
+
+    function createReviewDecision(snapshotReviewerId, isApproved, comment) {
+        return {
+            VersionId: model.Id,
+            SnapshotReviewerId: snapshotReviewerId,
+            IsApproved: isApproved,
+            Comment: comment,
+            VersionIdCompare: drpCompareToValue(),
+        };
+    }
+
+    function validateComment(txtComment) {
+        var result = true;
+        if (txtComment.val().trim().length === 0) {
+            Nsga.Callisto.Messages.showError("Please provide a comment");
+            txtComment.focus();
+            result = false;
+        }
+        return result;
+    }
+
+    function submitReviewDecision(e, element) {
+        var button = $(element);
+
+        if (button) {
+            var divButton = button.closest(".groupwrapper");
+            if (divButton) {
+                var txtComment = divButton.find(".reviewTxt");
+
+                if (txtComment) {
+                    if (validateComment(txtComment)) {
+                        var reviewButton = button.find(".decision");
+                        var snapshotReviewerId = reviewButton.attr('data-snapshot-reviewer-id');
+                        var comment = txtComment.val().trim();
+                        if (reviewButton.val() === 'Approve') {
+                            Nsga.Callisto.AutoChecker.approveBuildCriteria(createReviewDecision(snapshotReviewerId, true, comment), onSuccessEntity, onErrorEntity);
+                        } else if (reviewButton.val() === 'Reject') {
+                            Nsga.Callisto.AutoChecker.rejectBuildCriteria(createReviewDecision(snapshotReviewerId, false, comment), onSuccessEntity, onErrorEntity);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    function reviewStageTemplate (data, index, element) {
+        var reviewStageStatus = data["StatusText"];
+        var reviewGroupReviewers = data["ReviewGroupReviewers"];
+
+        // render the group(s) and reviewers with review decision
+        var groupWrapper;
+        var reviewGroupReviewer, reviewers, reviewer, group;
+        var divReviewers;
+        var reviewerNames = [];
+        for (var g = 0; g < reviewGroupReviewers.length; g++) {
+            reviewerNames = [];
+            groupWrapper = $("<div class='groupwrapper' />");
+            reviewGroupReviewer = reviewGroupReviewers[g]; // 1-1 with group (reviewer.ReviewGroup) represents one review group
+            group = reviewGroupReviewer.ReviewGroup;
+            var groupStatus;
+            if (group) {
+                groupStatus = group.ReviewStatusText;
+                groupWrapper.append($("<div class='grouptitle' />").text(@MvcHtmlString.Create("group.DisplayName")));
+                divReviewers = $("<div  class='undecided ' ></div>");
+                groupWrapper.append(divReviewers);
+            }
+            // Get the reviewers with in the current group
+            reviewers = reviewGroupReviewer.Reviewers;
+            for (var a = 0; a < reviewers.length; a++) {
+                reviewer = reviewers[a];
+                if (reviewer) {
+                    if (reviewer.ReviewStatusText === "open") {
+                        // if this group has not made a decision, then list the approver, otherwise don't as it has been approved
+                        if (reviewGroupReviewer.ReviewGroup.ReviewStatusText === "open"){
+                            reviewerNames.push(reviewer.Employee.Name);
+                        }
+                    } else {
+                        var decision = (reviewer.ReviewStatusText === "approved") ? "Approved" : "Rejected";
+                        var decisionText = decision + " by " + reviewer.Employee.Name;
+                        if (reviewer.ReviewDate) {
+                            decisionText += " on " + Nsga.Callisto.Dates.isoToLocaleString(reviewer.ReviewDate);
+                        }
+                        decisionText += " with following comments:";
+                        groupWrapper.append($("<div class='" + decision + "' />").text(@MvcHtmlString.Create("decisionText")));
+                        groupWrapper.append($("<div class='comments display' />").text('"' + @MvcHtmlString.Create("reviewer.Comment") + '"'));
+                    }
+                }
+                if (reviewStageStatus === "open") { // if review has not been completed, then render the review controls & UX
+                    if (groupStatus === "open") {
+                        // only display the voting buttons if (1) this stage has not been reviewed yet and (2) the reviewer is the currently logged in user and (3) this stage is current stage
+                        if ((reviewer.Idsid === userId) && (data["IsCurrentStage"] === true)) {
+                            var divSecond = $("<div class='reviewControls showinline' />");
+                            divSecond.append($("<div class='txtacomments showinline' />").append(
+                                $("<div class='caption' style='margin-left:1px;font-size: 12px;' >You are a reviewer for " + group.DisplayName
+                                + ". Input comments below, and provide your decision:<span class='mandatory' >*</span></div><textarea class='reviewTxt' data-idsid-txt='" + reviewer.Idsid
+                                + "' style='margin-right:8px;' rows='3' cols='50'></textarea>")));
+                            divSecond.appendTo(groupWrapper);
+                            var divReviewSection = $("<div class='reviewactions showinline'/>");
+
+                            // reject
+                            divReviewSection.append($("<span class='reject-wrapper'><span class='thumbsdown fa fa-thumbs-down' style='color:red;'></span><input class='rejectBtn showinline decision' data-snapshot-reviewer-id='" + @MvcHtmlString.Create("reviewer.Id") + "' type='button' value='Reject'/></span>")
+                                .bind("click", function(e) {
+                                    submitReviewDecision(e, this);
+                                }));
+                            // approve
+                            divReviewSection.append($("<span class='approve-wrapper'><span class='thumbsup fa fa-thumbs-up' style='color:green;'></span><input class='approveBtn showinline decision' data-snapshot-reviewer-id='" + @MvcHtmlString.Create("reviewer.Id") + "' style='margin-right:8px;' type='button' value='Approve'/></span>")
+                                .bind("click", function (e) {
+                                    submitReviewDecision(e, this);
+                                }));
+                            divReviewSection.appendTo(groupWrapper);
+                        }
+                    }
+                }
+                // append all reviewer names
+                if (reviewerNames.length > 0) {
+                    divReviewers.text("Assigned Reviewers : " + reviewerNames.join(";  "));
+                }
+            }
+            element.append(groupWrapper);
+        }
+    }
+
+    function cellTemplateConditions(container, options) {
+        var divContent = $("<div></div>");
+        if (comparisonEnabled) {
+            if (options.column.dataField === "ComparisonStatus") {
+                var icon = $("<i></i>");
+                if (options.data.ComparisonStatus === "Deleted") {
+                    icon.addClass("dx-icon-remove");
+                }
+                else if (options.data.ComparisonStatus === "Inserted") {
+                    icon.addClass("dx-icon-add");
+                }
+                else if (options.data.ComparisonStatus === "Updated") {
+                    icon.addClass("dx-icon-edit");
+                }
+                else {
+                    icon.addClass("dx-icon-equal");
+                }
+                divContent.append(icon).append("&nbsp;&nbsp;").append(@MvcHtmlString.Create("options.text"));
+            }
+            else if (options.data.ComparisonStatus === "Inserted") {
+                var insElement = $("<ins>" + @MvcHtmlString.Create("options.text") + "</ins>");
+                divContent.append(insElement);
+            }
+            else if (options.data.ComparisonStatus === "Deleted") {
+                var delElement = $("<del>" + @MvcHtmlString.Create("options.text") + "</del>");
+                divContent.append(delElement);
+            }
+            else if (options.data.ComparisonStatus === "Updated" && options.column.dataField === "Value") {
+                var insElement = $("<ins>" + @MvcHtmlString.Create("options.text") + "</ins>");
+                divContent.append(insElement);
+                var delElement = $("<del>" + options.data.ValueCompare + "</del>");
+                divContent.append("&nbsp;").append(delElement);
+            }
+            else {
+                divContent.append(@MvcHtmlString.Create("options.text"));
+            }
+        }
+        else {
+            divContent.append(@MvcHtmlString.Create("options.text"));
+        }
+        container.append(divContent);
+    };
+
+    $("document").ready(function () {
+
+        // set initially to hidden (can be toggled in the UI)
+        $("#grdConditionsRule").hide();
+
+        // expand the comparison section only if comparison is currently enabled
+        if (comparisonEnabled) {
+            var accCompare = $("#accCompare");
+            accCompare.addClass("open");
+            updateAccordionPanelFromLabel(accCompare[0]);
+        }
+
+        var drpCompareDefaultValue = null;
+        if (modelCompare) drpCompareDefaultValue = modelCompare.Id;
+        $("#drpCompareTo").dxSelectBox({
+            valueExpr: "Id",
+            displayExpr: function (item) {
+                var result = null;
+                if (item) {
+                    result = "Version " + item.Version;
+                    if (item.IsPOR) result += "; PRQ";
+                    else result += "; " + item.Status.Name;
+                    result += "; " + item.CreatedBy;
+                }
+                return result;
+            },
+            onValueChanged: function (e) {
+                if (e.event !== undefined) { // do not enter this block if value was changed programatically
+                    var idCompare = e.value;
+                    if (idCompare) {
+                        Nsga.Callisto.AutoChecker.getBuildCriteriaDetails(model.Id, idCompare, onSuccess, onError);
+                    }
+                    else {
+                        comparisonEnabled = false;
+                        refreshUi();
+                    }
+                }
+            },
+            value: drpCompareDefaultValue,
+            width: "300px",
+        });
+
+        // grdComments
+        var config = Nsga.Callisto.Dx.dataGridDefaultConfig();
+        config.keyExpr = "Id";
+        config.columns = [
+            {
+                caption: "Comment Text",
+                dataField: "Text",
+                validationRules: [{ type: "required" }],
+                editorOptions: {
+                    width: "500px",
+                },
+            },
+            {
+                dataField: "CreatedByUserName",
+                caption: "By",
+                cellTemplate: function (container, options) {
+                    var cellValue = options.text ? options.text : (options.data.CreatedBy ? options.data.CreatedBy : "");
+                    container.append("<div>" + cellValue + "</div>");
+                }
+            },
+            {
+                dataField: "CreatedOn",
+                caption: "On",
+                dataType: "datetime",
+                format: "MM/dd/yyyy hh:mm:ss a",
+            },
+        ];
+        config.editing = {
+            mode: "popup",
+            allowUpdating: false,
+            allowAdding: true,
+            popup: {
+                title: "Comment Details",
+                showTitle: true,
+                width: 700,
+                height: 300,
+            },
+            form: {
+                items: ["Text"]
+            },
+            texts: {
+                addRow: "Add Comment"
+            }
+        };
+        config.onRowInserted = function (e) {
+            var text = null;
+            if (e.data && e.data.Text) {
+                text = e.data.Text.trim();
+            }
+            var entity = {
+                BuildCriteriaId: model.Id,
+                Text: text,
+            };
+            createComment(entity);
+        };
+        config.headerFilter = { visible: false };
+        config.filterRow = { visible: false };
+        $("#grdComments").dxDataGrid(config);
+
+        // grdConditionsStandard
+        var config = Nsga.Callisto.Dx.dataGridDefaultConfig();
+        config.keyExpr = "Id";
+        config.columns = [
+            {
+                caption: "Comparison Status",
+                dataField: "ComparisonStatus",
+                cellTemplate: cellTemplateConditions,
+            },
+            {
+                caption: "Attribute",
+                dataField: "AttributeType.NameDisplay",
+                cellTemplate: cellTemplateConditions,
+            },
+            {
+                caption: "Comparison Operation",
+                dataField: "ComparisonOperation.Name",
+                cellTemplate: cellTemplateConditions,
+            },
+            {
+                caption: "Value",
+                dataField: "Value",
+                cellTemplate: cellTemplateConditions,
+            },
+        ];
+        $("#grdConditionsStandard").dxDataGrid(config);
+
+        // grdConditionsRule
+        config = Nsga.Callisto.Dx.dataGridDefaultConfig();
+        config.keyExpr = "Id";
+        config.columns = [
+            {
+                caption: "Comparison Status",
+                dataField: "ComparisonStatus",
+                cellTemplate: cellTemplateConditions,
+            },
+            {
+                caption: "Design",
+                dataField: "Design.Name",
+                cellTemplate: cellTemplateConditions,
+            },
+            {
+                caption: "Fabrication Facility",
+                dataField: "FabricationFacility.Name",
+                cellTemplate: cellTemplateConditions,
+            },
+            {
+                caption: "Test Flow",
+                dataField: "TestFlow.Name",
+                cellTemplate: cellTemplateConditions,
+            },
+            {
+                caption: "Probe Conversion",
+                dataField: "ProbeConversion.Name",
+                cellTemplate: cellTemplateConditions,
+            },
+            {
+                caption: "Attribute",
+                dataField: "AttributeType.Name",
+                cellTemplate: cellTemplateConditions,
+            },
+            {
+                caption: "Logical Operation",
+                dataField: "LogicalOperation.Name",
+                cellTemplate: cellTemplateConditions,
+            },
+            {
+                caption: "Comparison Operation",
+                dataField: "ComparisonOperation.KeyTreadstone",
+                cellTemplate: cellTemplateConditions,
+            },
+            {
+                caption: "Value",
+                dataField: "Value",
+                minWidth: 500,
+                cellTemplate: cellTemplateConditions,
+            },
+        ];
+        $("#grdConditionsRule").dxDataGrid(config);
+
+        $("#acdReview").dxAccordion({
+            multiple: true,
+            collapsible: true,
+
+            itemTitleTemplate:
+                function (itemData, itemIndex, itemElement) {
+                    var status = (itemData.StatusText) ? itemData.StatusText : 'open';
+                    itemElement.addClass('bg-' + status);
+                    itemElement.append($("<div class='accordiontitle " + status + " ' >" + itemData.ReviewStage.DisplayName + "</div>"));
+                },
+            itemTemplate:
+                function (itemData, itemIndex, itemElement) {
+                    var childSteps = itemData['ChildSteps'];
+                    // if we have child steps, no approval and no groups at the parent level
+                    if (childSteps && childSteps.length > 0) {
+                        $("<div class='childstepwrapper childstepaccordion bglightergray' />")
+                            .dxAccordion({
+                                dataSource: childSteps,
+                                multiple: true,
+                                collapsible: true,
+                                itemTitleTemplate:
+                                    function (childStepData, childItemIndex, childItemElement) {
+                                        var status = (childStepData.StatusText) ? childStepData.StatusText : 'open';
+                                        childItemElement.append($("<div class='childaccordiontitle " + status + " ' >" + childStepData.ReviewStage.DisplayName + "</div>"));
+                                    },
+                                itemTemplate:
+                                    function (childItemData, childItemIndex, childItemElement) {
+                                        reviewStageTemplate(childItemData, childItemIndex, childItemElement);
+                                    },
+                                onItemRendered: function (dataItem) {
+                                    var i = dataItem.itemIndex;
+                                    var el = this;
+                                    el.expandItem(i);
+                                }
+                            }).appendTo(itemElement);
+                    }
+                    else {
+                        reviewStageTemplate(itemData, itemIndex, itemElement);
+                    }
+                },
+            onItemRendered: function (dataItem) {
+                var i = dataItem.itemIndex;
+                var container = this;
+                container.collapseItem(i);
+                var isCurrent = dataItem.itemData["IsCurrentStage"];
+                if (isCurrent && isCurrent === true)
+                    container.expandItem(i);
+            },
+            noDataText: "<div class='noreviewsetup'>No review data is available. If you believe this represents an issue, please contact <a href='mailto:@(supportEmail)?Subject=No auto checker build criteria review data for id = " + model.Id + "' target='_top'>Callisto Support Team</a> for assistance.</div>",
+        });
+
+        refreshUi();
+
+    });
+
+</script>
+
+<div class="padeightpixel">
+    <div class="rightalign">
+        <div class="padeightpixel">
+            <a title="Click here to create a new build criteria using this version as a starting point" id="lnkCreateNew" href=""><span class="imagelinkbutton bordered"><span class="margintwopixel">Create New From This</span></span></a>
+            <span><a title="Click here to view all PRQ build criteria" id="lnkAllPOR" href="/AutoChecker/ListBuildCriteriaPOR/"><span class="imagelinkbutton bordered"><span class="fa fa-list-alt "></span><span class="margintwopixel">All PRQ</span></span></a></span>
+            <span><a title="Click here to view all non-PRQ build criteria" id="lnkAllNonPOR" href="/AutoChecker/ListBuildCriteriaNonPOR/"><span class="imagelinkbutton bordered"><span class="fa fa-list-alt "></span><span class="margintwopixel">All Non-PRQ</span></span></a></span>
+        </div>
+    </div>
+    <div id="accDetails" class="accordion-label open">Details</div>
+    <div id="divDetails" class="accordion-panel" style="padding: 8px;">
+        <table style="width:96%; padding:2px;margin:2px;">
+            <tr>
+                <td style="width:25%"><label for="spnId" class="formlabel">Id</label></td>
+                <td style="width:25%"><span type="text" id="spnId"></span></td>
+                <td style="width:25%"><label for="spnCreatedBy" class="formlabel">Created By</label></td>
+                <td style="width:25%"><span type="text" id="spnCreatedBy"></span></td>
+            </tr>
+            <tr>
+                <td><label for="spnVersion" class="formlabel">Version</label></td>
+                <td><span type="text" id="spnVersion"></span></td>
+                <td><label for="spnCreatedOn" class="formlabel">Created On</label></td>
+                <td><span type="text" id="spnCreatedOn"></span></td>
+            </tr>
+            <tr>
+                <td><label for="spnIsActive" class="formlabel">Is Active?</label></td>
+                <td><span type="text" id="spnIsActive"></span></td>
+                <td><label for="spnUpdatedBy" class="formlabel">Updated By</label></td>
+                <td><span type="text" id="spnUpdatedBy"></span></td>
+            </tr>
+            <tr>
+                <td><label for="spnIsPOR" class="formlabel">Is PRQ?</label></td>
+                <td><span type="text" id="spnIsPOR"></span></td>
+                <td><label for="spnUpdatedOn" class="formlabel">Last Updated On</label></td>
+                <td><span type="text" id="spnUpdatedOn"></span></td>
+            </tr>
+            <tr>
+                <td><label for="spnStatus" class="formlabel">Status</label></td>
+                <td><span type="text" id="spnStatus"></span></td>
+                <td><label for="spnEffectiveOn" class="formlabel">Effective On</label></td>
+                <td><span type="text" id="spnEffectiveOn"></span></td>
+            </tr>
+            <tr>
+                <td><label for="spnDesign" class="formlabel">Design</label></td>
+                <td><span type="text" id="spnDesign"></span></td>
+                <td><label for="spnFabricationFacility" class="formlabel">Fabrication Facility</label></td>
+                <td><span type="text" id="spnFabricationFacility"></span></td>
+            </tr>
+            <tr>
+                <td><label for="spnTestFlow" class="formlabel">Test Flow</label></td>
+                <td><span type="text" id="spnTestFlow"></span></td>
+                <td><label for="spnProbeConversion" class="formlabel">Probe Conversion</label></td>
+                <td><span type="text" id="spnProbeConversion"></span></td>
+            </tr>
+        </table>
+    </div>
+    <div id="accComments" class="accordion-label open">Comments</div>
+    <div id="divComments" class="accordion-panel">
+        <div id="grdComments"></div>
+    </div>
+    <div id="accCompare" class="accordion-label">Compare To</div>
+    <div id="divCompare" class="accordion-panel">
+        <table style="margin: auto;">
+            <tr>
+                <td><div id="drpCompareTo"></div></td>
+                <td><a title="Click here to view details for the version selected" id="lnkCompareTo" href="" target="_blank">View Details</a></td>
+            </tr>
+        </table>
+    </div>
+    <div id="accConditions" class="accordion-label open">Criteria</div>
+    <div id="divConditions" class="accordion-panel">
+        <div id="divConditionsViewToggle" style="text-align: right;"><button id="btnConditionsViewToggle" onclick="conditionsViewToggle()" style="width: 200px;">Switch To Build Rule View</button></div>
+        <div id="grdConditionsStandard"></div>
+        <div id="grdConditionsRule"></div>
+    </div>
+    <div id="accReview" class="accordion-label open">Review</div>
+    <div id="divReview" class="accordion-panel">
+        @if (Intel.NsgAuto.Web.Mvc.Core.Functions.IsAutoCheckerCriteriaAuthor())
+        {
+            <div id="divSubmitCancel" style="padding: 8px; width: 100%; text-align: center; display: none;"><button id="btnCancel" onclick="cancel()">Cancel</button>&nbsp;&nbsp;<button id="btnSubmit" onclick="submit1()">Submit For Review</button></div>
+        }
+            <div id="acdReview" style="padding: 8px; width: 100%;"></div>
+        </div>
+</div>

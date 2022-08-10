@@ -1,0 +1,349 @@
+﻿@model Intel.NsgAuto.Callisto.UI.Models.OSAT.QualFilterModel
+
+@{
+    ViewBag.Title = "OSAT - Qual Filter";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+
+<style scoped>
+
+    .table-items {
+        width: 100%;
+        border: 1px solid black;
+        border-collapse: collapse;
+    }
+
+        .table-items th, .table-items td {
+            border: 1px solid grey;
+            padding: 5px;
+        }
+
+        .table-items tr:nth-child(even) {
+            background-color: #e8e8e8;
+        }
+</style>
+
+<script type="text/javascript">
+
+    var entity = @(JsonHelper.Serialize(Model.Entity));
+    var design = entity.Design;
+    var designs = entity.Designs;
+    var file = entity.File;
+    var osat = entity.Osat;
+    var osats = entity.Osats;
+    var tabQualFilter;
+
+    var attributeTypes = [];
+
+    function onError(xhr, status) {
+        Nsga.Callisto.Messages.showError("An unexpected error occurred. If the problem persists, contact support.");
+    };
+
+    function updateAttributeTypes() {
+        attributeTypes = [];
+        if (file && file.Sheets && file.Sheets.length > 0 && file.Sheets[0].Records && file.Sheets[0].Records.length > 0) {
+            for (var property in file.Sheets[0].Records[0].AttributeValues) {
+                attributeTypes.push({ Name: property });
+            }
+        }
+    }
+
+    function updateTabDataSource() {
+        var dataSource = null;
+        if (file && file.Sheets) {
+            dataSource = file.Sheets;
+        }
+        tabQualFilter.option("dataSource", dataSource);
+    };
+
+    function updateData(result) {
+        file = result;
+        updateAttributeTypes();
+        updateTabDataSource();
+    }
+
+    function refreshData() {
+        var includeStatusSubmittedInReview = $("#chkIncludeStatusSubmittedInReview").dxCheckBox("instance").option("value");
+        var requestEntity = {
+            DesignId: $("#ddlDesigns").dxSelectBox("instance").option("value"),
+            OsatId: $("#ddlOsats").dxSelectBox("instance").option("value"),
+            IncludePublishDisabled: true,
+            IncludeStatusInReview: includeStatusSubmittedInReview,
+            IncludeStatusSubmitted: includeStatusSubmittedInReview,
+            IncludeStatusDraft: $("#chkIncludeStatusDraft").dxCheckBox("instance").option("value"),
+            IsPOR: true
+        };
+        if (requestEntity.DesignId) {
+            Nsga.Callisto.Osat.getQualFilterFile(requestEntity, function (result) { updateData(result); }, onError);
+        }
+    }
+
+    $("document").ready(function () {
+
+        var osatId;
+        if (osat) {
+            osatId = osat.Id;
+        }
+
+        var designId;
+        if (design) {
+            designId = design.Id;
+        }
+
+        $("#ddlOsats").dxSelectBox({
+            items: osats,
+            displayExpr: "Name",
+            valueExpr: "Id",
+            value: osatId,
+            width: "100px",
+        }).dxValidator({
+            validationRules: [{
+                type: "required",
+                message: "OSAT is required",
+            }]
+        });
+
+        $("#ddlDesigns").dxSelectBox({
+            items: designs,
+            displayExpr: "Name",
+            valueExpr: "Id",
+            value: designId,
+            width: "100px"
+        }).dxValidator({
+            validationRules: [{
+                type: "required",
+                message: "Design is required",
+            }]
+        });
+
+        $("#chkIncludeStatusSubmittedInReview").dxCheckBox({});
+
+        $("#chkIncludeStatusDraft").dxCheckBox({});
+
+        $("#btnSubmit").dxButton({
+            text: "Submit",
+            onClick: function (e) {
+                var result = e.validationGroup.validate();
+                if (result.isValid) {
+                    refreshData();
+                }
+            }
+        });
+
+        $("#btnGenerate").dxButton({
+            text: "Generate Spreadsheet",
+            onClick: function (e) {
+                var selectedDesignId = $("#ddlDesigns").dxSelectBox("instance").option("value");
+                var selectedOsatId = $("#ddlOsats").dxSelectBox("instance").option("value");
+                var includeStatusSubmittedInReview = $("#chkIncludeStatusSubmittedInReview").dxCheckBox("instance").option("value");
+                var includeStatusDraft = $("#chkIncludeStatusDraft").dxCheckBox("instance").option("value");
+                if (selectedDesignId && selectedOsatId) {
+
+                    var oReq = new XMLHttpRequest();
+                   // oReq.addEventListener("load", reqListener(selectedDesignId, selectedOsatId, includeStatusSubmittedInReview, includeStatusDraft));
+                    oReq.open("GET", "/api/Osat/GenerateQualFilterSpreadsheetData/" + selectedDesignId + "/" + selectedOsatId + "/" + includeStatusSubmittedInReview + "/" + includeStatusDraft);
+                    oReq.send();
+                    oReq.onreadystatechange = function () {
+                        if (this.status == 200) {
+                            window.location.href = "/api/Osat/GenerateQualFilterSpreadsheet/" + selectedDesignId + "/" + selectedOsatId + "/" + includeStatusSubmittedInReview + "/" + includeStatusDraft;
+                        }
+
+                    }
+
+               //     $("#exceldownload").attr('src', "/api/Osat/GenerateQualFilterSpreadsheet/" + selectedDesignId + "/" + selectedOsatId + "/" + includeStatusSubmittedInReview + "/" + includeStatusDraft);
+                }
+            }
+        });
+
+        //tabQualFilter
+        tabQualFilter = $("#tabQualFilter").dxTabPanel({
+            selectedIndex: 0,
+            swipeEnabled: false,
+            loop: false,
+            itemTitleTemplate: function (data) {
+                return $("<span>" + data.Name + "</span>");
+            },
+            itemTemplate: function (data) {
+                var records = data.Records;
+
+                var classValue;
+                var container = $("<div style='padding: 5px;' />");
+                var isPublishable;
+                var statusId;
+                var statusName;
+                var table = $("<table class='table-items' />");
+                container.append(table);
+                var row;
+                var i;
+
+                //Is Publishable
+                row = $("<tr>");
+                row.append($("<td>Is Publishable</td>"));
+                for (i = 0; i < records.length; i++) {
+                    statusId = null;
+                    statusName = "";
+                    classValue = "";
+                    if (records[i].BuildCombinationIsPublishable) {
+                        isPublishable = "Y";
+                        classValue = "bglightgreen";
+                    }
+                    else {
+                        isPublishable = "N";
+                        classValue = "bgred";
+                    }
+                    row.append($("<td class='" + classValue + "'>" + isPublishable + "</td>"));
+                };
+                table.append(row);
+
+                //Status
+                row = $("<tr>");
+                row.append($("<td>Status</td>"));
+                for (i = 0; i < records.length; i++) {
+                    statusId = null;
+                    statusName = "";
+                    classValue = "";
+                    if (records[i].BuildCriteriaSetStatus) {
+                        statusId = records[i].BuildCriteriaSetStatus.Id;
+                        statusName = records[i].BuildCriteriaSetStatus.Name;
+                        if (statusId === 6) classValue = "bglightgreen"; // Complete
+                        else if (statusId === 3 || statusId == 5) classValue = "bgyellow"; // Submitted or In Review
+                        else if (statusId === 1) classValue = "bgred"; // Draft
+                    }
+                    row.append($("<td class='" + classValue + "'>" + statusName + "</td>"));
+                };
+                table.append(row);
+
+                //Separator
+                row = $("<tr>");
+                row.append($("<td style='background-color:#666666;'></td>"));
+                for (i = 0; i < records.length; i++) { row.append($("<td style='background-color:#666666;'></td>")); };
+                table.append(row);
+
+                //FilterDescription
+                row = $("<tr>");
+                row.append($("<td>Description</td>"));
+                for (i = 0; i < records.length; i++) { row.append($("<td>" + records[i].FilterDescription + "</td>")); };
+                table.append(row);
+
+                //DeviceName
+                row = $("<tr>");
+                row.append($("<td>Device name</td>"));
+                for (i = 0; i < records.length; i++) { row.append($("<td>" + records[i].DeviceName + "</td>")); };
+                table.append(row);
+
+                //PartNumberDecode
+                row = $("<tr>");
+                row.append($("<td>Part number decode</td>"));
+                for (i = 0; i < records.length; i++) { row.append($("<td>" + records[i].PartNumberDecode + "</td>")); };
+                table.append(row);
+
+                if (!file.Osat || file.Osat.Id != 1) { // not included for Amkor
+                    //EngineeringSample
+                    row = $("<tr>");
+                    row.append($("<td>ES</td>"));
+                    for (i = 0; i < records.length; i++) { row.append($("<td>" + (records[i].IsEngineeringSample ? "Y" : "N") + "</td>")); };
+                    table.append(row);
+                }
+
+                //Separator
+                row = $("<tr>");
+                row.append($("<td colspan='" + (records.length + 1) + "'><u>Required attribute conditions for shipment of that production part number</u></td>"));
+                table.append(row);
+
+                for (var j = 0; j < attributeTypes.length; j++) {
+                    var attributeType = attributeTypes[j];
+                    row = $("<tr>");
+                    row.append($("<td>" + attributeType.Name + "</td>"));
+                    for (i = 0; i < records.length; i++) {
+                        var value = records[i].AttributeValues[attributeType.Name];
+                        if (!value) value = "";
+                        row.append($("<td>" + value + "</td>"));
+                    };
+                    table.append(row);
+                }
+
+                container.dxScrollView({
+                    direction: 'horizontal',
+                });
+
+                return container;
+            },
+        }).dxTabPanel("instance");
+
+        updateData(entity.File);
+
+    });
+
+</script>
+
+<div id="divContent" class="content  centered">
+    <div class="fixed centered">
+        <div>
+            <div class=" padsixpixel">
+                <div class="showinline">
+                    <table class="table-legend">
+                        <tr>
+                            <td><br /></td>
+                            <td><br /></td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="showinline floatright">                    
+                    <span><a title="Click here to Qual Filter Bulk Update" id="lnkAccountOwnerships" href="/OSAT/BulkUpdates"><span class="imagelinkbutton bordered"><span class="fa fa-list-alt "></span><span class="margintwopixel">Qual Filter Bulk Updates</span> </span></a></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div style="vertical-align: top;">
+        <div class="bordered padfourpixel marginfourpixel bluebox bglightblue" style="display:inline-block;vertical-align: top;width:940px;">
+            <div id="divExplorerDetails" class="">
+                <div id="divForm" class="formwrapper ">
+                    <div class="formcontent display ">
+                        <div>
+                            <div class="infotext">
+                                <span class="infotext italic" style="font-size: 14px;">Items marked as <span class="mandatory">*</span> are required inputs</span>
+                            </div>
+                            <div class="padtwopixel margintwopixel" style="display:block;">
+                                <div class="padtwopixel">
+                                    <div class="form">
+                                        <div class="dx-fieldset" style="width:60%;display:inline-block;">
+                                            <div class="dx-field">
+                                                <div class="dx-field-label required" style="width: 300px; font-size: 16px;">OSAT</div>
+                                                <div class="dx-field-value" id="ddlOsats"></div>
+                                            </div>
+                                            <div class="dx-field">
+                                                <div class="dx-field-label required" style="width: 300px; font-size: 16px;">Design</div>
+                                                <div class="dx-field-value" id="ddlDesigns"></div>
+                                            </div>
+                                            <div class="dx-field">
+                                                <div class="dx-field-label" style="width: 300px; font-size: 16px;">Include Status Submitted / In-Review</div>
+                                                <div class="dx-field-value" id="chkIncludeStatusSubmittedInReview"></div>
+                                            </div>
+                                            <div class="dx-field">
+                                                <div class="dx-field-label" style="width: 300px; font-size: 16px;">Include Status Draft</div>
+                                                <div class="dx-field-value" id="chkIncludeStatusDraft"></div>
+                                            </div>
+                                        </div>
+                                        <div class="" style="display:inline-block;margin-left:8px;width:30%;text-align:right;vertical-align:middle;">
+                                            <span class="marginfourpixel" style=""><input id="btnSubmit" type="button" value="Submit" style="padding-bottom:4px;padding-top:4px;" /></span>
+                                            <span class="marginfourpixel" style=""><input id="btnGenerate" type="button" value="Generate Spreadsheet" style="padding-bottom:4px;padding-top:4px;" /></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="padeightpixel">
+    <div id="tabQualFilter"></div>
+</div>
+
+<iframe id="exceldownload" style="display:none">
+</iframe>

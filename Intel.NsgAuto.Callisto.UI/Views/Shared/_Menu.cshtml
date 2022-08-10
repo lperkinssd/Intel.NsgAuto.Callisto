@@ -1,0 +1,29 @@
+﻿@model Intel.NsgAuto.Web.Mvc.Models.MenuModel
+@if (Model != null && Model.Visible)
+{
+<li class="newmenu menurootli" style="z-index: 111;">
+    <div class="newmenu dont-close-menu">
+        <div class="uheadernavigationtitle mainmenutitle">
+            <div class="component dont-close-menu rootmenu" style="text-align: center; cursor: default;">
+                <a href="JavaScript:void(0);" class="dont-close-menu rootmenulink" title="Menu">Menu</a>
+                <noscript>
+                    Menu
+                </noscript>
+            </div>
+        </div>
+    </div>
+</li>
+<div id="mainMenu" class="mainmenu "></div>
+<script type="text/javascript">
+    var getMenuData = function(){
+        var menuData = @((Model.Menu != null) ? MvcHtmlString.Create(Model.Menu.ToJson()) : MvcHtmlString.Create("[]"));
+        return menuData;
+    };
+    ; (function ($, window, document, undefined) {
+        var menuData = getMenuData();
+        if(menuData){
+            $.Nsga.MainMenu('#mainMenu', menuData);
+        }
+    })(jQuery, window, document);
+</script>
+}

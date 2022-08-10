@@ -1,0 +1,361 @@
+﻿
+@{
+    ViewBag.Title = "Prf Version Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script>
+    var userId = "jakemurx";
+    var model = { "Id": 1, "Version": 1, "IsActive": true, "IsPOR": false, "Status": { "Id": 1, "Name": "Draft" }, "CreatedBy": "jakemurx", "CreatedByUserName": "Jake D", "CreatedOn": "2021/02/02 15:15:32", "UpdatedBy": "Jake D", "UpdatedByUserName": "jakemurx", "UpdatedOn": "2021/02/02 15:15:32", "OriginalFileName" : "Prf20210202.xlsx" }
+
+    var prfRecords = [
+        { "Id": 7, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "ALDERSTREAM", "MMNumber": "999WTA", "ProductCode": "PF21Q400GB", "SSDName": "ALDERSTREAM DC 400GB 2.5 PCIE" },
+        { "Id": 8, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "ALDERSTREAM", "MMNumber": "999WTL", "ProductCode": "PF21Q800GB", "SSDName": "ALDERSTREAM 800GB 2.5 PCIE" },
+        { "Id": 9, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "ALDERSTREAM", "MMNumber": "999WTM", "ProductCode": "PF21Q016TB", "SSDName": "ALDERSTREAM 1600GB 2.5 PCIE" },
+        { "Id": 10, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "ARBORDALE PLUS R VE", "MMNumber": "999W24", "ProductCode": "PF2NV307TZ", "SSDName": "ARBORDALE PLUS REFRESH VE 30720 GB 2.5 PCIE DATA CENTER" },
+        { "Id": 11, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "ARBORDALE PLUS REFRESH SE", "MMNumber": "999VMD", "ProductCode": "PF2KX076TZ", "SSDName": "ARBORDALE PLUS REFRESH SE 7680 GB 2.5 PCIE GEN4 DATA CENTER" },
+        { "Id": 12, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "ARBORDALE PLUS REFRESH VE", "MMNumber": "999ZD3", "ProductCode": "PFWNV153TZ", "SSDName": "ARBORDALE PLUS REFRESH VE 15360GB E1.L 9.5 PCIE" },
+        { "Id": 13, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "ARBORDALE PLUS REFRESH VE", "MMNumber": "999ZDG", "ProductCode": "PF2NV153TZ", "SSDName": "ARBORDALE PLUS REFRESH VE 15360GB 2.5 PCIE" },
+        { "Id": 14, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "ARBORDALE PLUS REFRESH VE", "MMNumber": "99A817", "ProductCode": "PEWNV153TZMS", "SSDName": "ARBORDALE PLUS REFRESH VE 15360GB E1.L 9.5 PCIE MSFT" },
+        { "Id": 15, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "ARBORDALE PLUS REFRESH VE", "MMNumber": "99A818", "ProductCode": "PEXNV153TZMS", "SSDName": "ARBORDALE PLUS REFRESH VE 15360GB EL18 PCIE MSFT" },
+        { "Id": 16, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "ARBORDALE PLUS SE REFRESH", "MMNumber": "999VMC", "ProductCode": "PF2KX038TZ", "SSDName": "ARBORDALE PLUS REFRESH SE 3840 GB 2.5 PCIE GEN4 DATA CENTER" },
+        { "Id": 17, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "CLIFFDALE RE ME", "MMNumber": "999PJA", "ProductCode": "PE2KE032T8D", "SSDName": "CLIFFDALE REFRESH 3.2 2.5 PCIE ME ES" },
+        { "Id": 18, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "CLIFFDALE REFRESH", "MMNumber": "954446", "ProductCode": "PE2KX020T8", "SSDName": "CLIFFDALE REFRESH 2TB 2.5 PCIE SE SSD" },
+        { "Id": 19, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "CLIFFDALE REFRESH", "MMNumber": "957130", "ProductCode": "PE2KX040T8", "SSDName": "CLIFFDALE REFRESH 4.0TB 2.5 PCIE SE SSD" },
+        { "Id": 20, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "CLIFFDALE REFRESH", "MMNumber": "958514", "ProductCode": "PE2KX010T8", "SSDName": "CLIFFDALE REFRESH 1TB 2.5 PCIE SE SSD" },
+        { "Id": 21, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "CLIFFDALE REFRESH", "MMNumber": "958522", "ProductCode": "PE2KX080T8", "SSDName": "CLIFFDALE REFRESH 8TB 2.5 PCIE SE SSD" },
+        { "Id": 22, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "CLIFFDALE REFRESH", "MMNumber": "962334", "ProductCode": "PELKX010T8", "SSDName": "CLIFFDALE REFRESH 1TB M.2 PCIE ENTERPRISE SSD SE SSD" },
+        { "Id": 23, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "CLIFFDALE REFRESH", "MMNumber": "962335", "ProductCode": "PELKX020T8", "SSDName": "CLIFFDALE REFRESH 2TB M.2 PCIE ENTERPRISE SSD SE SSD" },
+        { "Id": 24, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "CLIFFDALE REFRESH", "MMNumber": "962386", "ProductCode": "PE2KE016T8", "SSDName": "CLIFFDALE REFRESH 1.6TB 2.5 PCIE ME SSD" },
+        { "Id": 25, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "CLIFFDALE REFRESH", "MMNumber": "962417", "ProductCode": "PE2KE032T8", "SSDName": "CLIFFDALE REFRESH 3.2TB 2.5 PCIE ME SSD" },
+        { "Id": 26, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "CLIFFDALE REFRESH", "MMNumber": "963524", "ProductCode": "PE2KE076T8", "SSDName": "CLIFFDALE REFRESH 7.68TB 2.5 PCIE ME SSD" },
+        { "Id": 27, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "CLIFFDALE REFRESH", "MMNumber": "976873", "ProductCode": "PD2KS019T8", "SSDName": "CLIFFDALE REFRESH 1.92TB 2.5 DUAL PORT  PCIE SE2 SSD" },
+        { "Id": 28, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "CLIFFDALE REFRESH", "MMNumber": "976874", "ProductCode": "PD2KS038T8", "SSDName": "CLIFFDALE REFRESH 3.84TB 2.5 DUAL PORT  PCIE SE2 SSD" },
+        { "Id": 29, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "CLIFFDALE REFRESH", "MMNumber": "976875", "ProductCode": "PD2KS076T8", "SSDName": "CLIFFDALE REFRESH 7.68TB 2.5 DUAL PORT  PCIE SE2 SSD" },
+        { "Id": 30, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "CLIFFDALE REFRESH", "MMNumber": "977056", "ProductCode": "PD2KS153T8", "SSDName": "CLIFFDALE REFRESH 15.36TB 2.5 DUAL PORT  PCIE SE2 SSD" },
+        { "Id": 31, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "CLIFFDALE REFRESH", "MMNumber": "983774", "ProductCode": "PECKE064T8", "SSDName": "CLIFFDALE REFRESH 6.4TB AICX8 PCIE SSD ME SSD" },
+        { "Id": 32, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "CLIFFDALE REFRESH", "MMNumber": "999PJ8", "ProductCode": "PE2KX010T8D", "SSDName": "CLIFFDALE REFRESH 1TB 2.5 PCIE SE SSD ESD" },
+        { "Id": 33, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "CLIFFDALE REFRESH", "MMNumber": "999PJ9", "ProductCode": "PE2KX040T8D", "SSDName": "CLIFFDALE REFRESH 4.0TB 2.5 PCIE SE SSD ESD" },
+        { "Id": 34, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "CLIFFDALE REFRESH SE", "MMNumber": "977579", "ProductCode": "SSDPELKX960G8M2", "SSDName": "CLIFFDALE REFRESH SE 960GB M.2 110MM PCIE MSFT" },
+        { "Id": 35, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "CLIFFDALE REFRESH SE", "MMNumber": "977580", "ProductCode": "SSDPELKX019T8M2", "SSDName": "CLIFFDALE REFRESH SE 1.92TB M.2 110MM PCIE MSFT" },
+        { "Id": 36, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "CLIFFDALE REFRESH SE", "MMNumber": "984568", "ProductCode": "SSDPELKX038T8M2", "SSDName": "CLIFFDALE REFRESH SE 3.84TB M.2 110MM PCIE MSFT" },
+        { "Id": 37, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "CLIFFDALE REFRESH SE", "MMNumber": "999JJW", "ProductCode": "PEYKX040T8", "SSDName": "CLIFFDALE REFRESH SE DC P4510 E1.S 5.9MM 4000GB" },
+        { "Id": 38, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "CLIFFDALE REFRESH SE", "MMNumber": "999JJX", "ProductCode": "PEWKX153T8", "SSDName": "CLIFFDALE REFRESH SE DC P4510 E1.L 9.5MM 15360GB" },
+        { "Id": 39, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "CLIFFDALE REFRESH SE", "MMNumber": "999JJZ", "ProductCode": "PEXKX153T8", "SSDName": "CLIFFDALE REFRESH SE DC P4510 E1.L 18MM 15360GB" },
+        { "Id": 40, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "CLIFFDALE REFRESH SE", "MMNumber": "99A97M", "ProductCode": "PEWKX153T8MS", "SSDName": "CLIFFDALE REFRESH SE DC P4510 E1.L 9.5MM 15360GB MSFT" },
+        { "Id": 41, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "CLIFFDALE REFRESH VE", "MMNumber": "979156", "ProductCode": "PE2NV076T8", "SSDName": "CLIFFDALE REFRESH VE 7.68TB 2.5 PCIE SSD" },
+        { "Id": 42, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "CLIFFDALE REFRESH VE", "MMNumber": "979183", "ProductCode": "PE2NV153T8", "SSDName": "CLIFFDALE REFRESH VE 15.36TB 2.5 PCIE SSD" },
+        { "Id": 43, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "CLIFFDALE REFRESH VE", "MMNumber": "980942", "ProductCode": "PEXNV153T8", "SSDName": "CLIFFDALE REFRESH VE 15.36TB EDSFF18 PCIE SSD" },
+        { "Id": 44, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "CLIFFDALE REFRESH VE", "MMNumber": "99A2MZ", "ProductCode": "PEWNV153T801", "SSDName": "CLIFFDALE REFRESH VE 15.36TB EDSFF9 PCIE SSD LATCH" },
+        { "Id": 45, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "KEYSTONE HARBOR", "MMNumber": "999TRC", "ProductCode": "PEKNU512GZ", "SSDName": "KEYSTONE HARBOR 512GB M.2 80MM PCIE" },
+        { "Id": 46, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "KEYSTONE HARBOR", "MMNumber": "999TRJ", "ProductCode": "PEKNU010TZ", "SSDName": "KEYSTONE HARBOR 1024GB M.2 80MM PCIE" },
+        { "Id": 47, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "KEYSTONE HARBOR", "MMNumber": "999TRK", "ProductCode": "PEKNU020TZ", "SSDName": "KEYSTONE HARBOR 2048GB M.2 80MM PCIE" },
+        { "Id": 48, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "NEPTUNE HARBOR", "MMNumber": "976805", "ProductCode": "PEKNW512G8", "SSDName": "NEPTUNE HARBOR 512GB M.2 80MM PCIE CLIENT SSD" },
+        { "Id": 49, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "NEPTUNE HARBOR", "MMNumber": "976806", "ProductCode": "PEKNW010T8", "SSDName": "NEPTUNE HARBOR 1024GB M.2 80MM PCIE CLIENT SSD" },
+        { "Id": 50, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "NEPTUNE HARBOR", "MMNumber": "976807", "ProductCode": "PEKNW020T8", "SSDName": "NEPTUNE HARBOR 2048GB M.2 80MM PCIE CLIENT SSD" },
+        { "Id": 51, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "NEPTUNE HARBOR LV NON FDD", "MMNumber": "999PKT", "ProductCode": "SSDPEKNW512G8LV", "SSDName": "NEPTUNE HARBOR 512GB M.2 80MM PCIE CLIENT SSDLENOVO NON FDD" },
+        { "Id": 52, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "NEPTUNE HARBOR R", "MMNumber": "999J6C", "ProductCode": "PEKNW010T9", "SSDName": "NEPTUNE HARBOR R 1.024TB M.2 80MM PCIE CLIENT SSD" },
+        { "Id": 53, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "NEPTUNE HARBOR R", "MMNumber": "999JF3", "ProductCode": "PEKNW020T9", "SSDName": "NEPTUNE HARBOR R 2.048TB M.2 80MM PCIE CLIENT SSD" },
+        { "Id": 54, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "OX CREEK", "MMNumber": "99A887", "ProductCode": "PEK1A058GA", "SSDName": "OX CREEK 58GB M.2 PCIE SSD" },
+        { "Id": 60, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "YOUNGSVILLE  RR SE", "MMNumber": "999ZXD", "ProductCode": "SC2KB240GZ", "SSDName": "YOUNGSVILLE REFRESH REFRESH 240GB 2.5 SATA DATA CENTER SE SSD" },
+        { "Id": 61, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "YOUNGSVILLE  RR SE", "MMNumber": "999ZXF", "ProductCode": "SC2KB480GZ", "SSDName": "YOUNGSVILLE REFRESH REFRESH 480GB 2.5 SATA DATA CENTER SE SSD" },
+        { "Id": 62, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "YOUNGSVILLE  RR SE", "MMNumber": "999ZXH", "ProductCode": "SC2KB019TZ", "SSDName": "YOUNGSVILLE REFRESH REFRESH 1920GB 2.5 SATA DATA CENTER SE SSD" },
+        { "Id": 63, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "YOUNGSVILLE REFRESH", "MMNumber": "963368", "ProductCode": "SC2KB240G8", "SSDName": "YOUNGSVILLE REFRESH 240GB 2.5 SATA DATA CENTER SE SSD" },
+        { "Id": 64, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "YOUNGSVILLE REFRESH", "MMNumber": "963369", "ProductCode": "SC2KB480G8", "SSDName": "YOUNGSVILLE REFRESH 480GB 2.5 SATA DATA CENTER SE SSD" },
+        { "Id": 65, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "YOUNGSVILLE REFRESH", "MMNumber": "963370", "ProductCode": "SC2KB960G8", "SSDName": "YOUNGSVILLE REFRESH 960GB 2.5 SATA DATA CENTER SE SSD" },
+        { "Id": 66, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "YOUNGSVILLE REFRESH", "MMNumber": "963371", "ProductCode": "SC2KB019T8", "SSDName": "YOUNGSVILLE REFRESH 1920GB 2.5 SATA DATA CENTER SE SSD" },
+        { "Id": 67, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "YOUNGSVILLE REFRESH", "MMNumber": "963372", "ProductCode": "SC2KB038T8", "SSDName": "YOUNGSVILLE REFRESH 3840GB 2.5 SATA DATA CENTER SE SSD" },
+        { "Id": 68, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "YOUNGSVILLE REFRESH", "MMNumber": "963373", "ProductCode": "SC2KG240G8", "SSDName": "YOUNGSVILLE REFRESH 240GB 2.5 SATA DATA CENTER ME SSD" },
+        { "Id": 69, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "YOUNGSVILLE REFRESH", "MMNumber": "963374", "ProductCode": "SC2KG480G8", "SSDName": "YOUNGSVILLE REFRESH 480GB 2.5 SATA DATA CENTER ME SSD" },
+        { "Id": 70, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "YOUNGSVILLE REFRESH", "MMNumber": "963376", "ProductCode": "SC2KG960G8", "SSDName": "YOUNGSVILLE REFRESH 960GB 2.5 SATA DATA CENTER ME SSD" },
+        { "Id": 71, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "YOUNGSVILLE REFRESH", "MMNumber": "963377", "ProductCode": "SC2KG019T8", "SSDName": "YOUNGSVILLE REFRESH 1920GB 2.5 SATA DATA CENTER ME SSD" },
+        { "Id": 72, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "YOUNGSVILLE REFRESH", "MMNumber": "963398", "ProductCode": "SCKKB240G8", "SSDName": "YOUNGSVILLE REFRESH 240GB M.2 80MM SATA DATA CENTER SE SSD" },
+        { "Id": 73, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "YOUNGSVILLE REFRESH", "MMNumber": "963399", "ProductCode": "SCKKB480G8", "SSDName": "YOUNGSVILLE REFRESH 480GB M.2 80MM SATA DATA CENTER SE SSD" },
+        { "Id": 74, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "YOUNGSVILLE REFRESH", "MMNumber": "963400", "ProductCode": "SCKKB960G8", "SSDName": "YOUNGSVILLE REFRESH 960GB M.2 80MM SATA DATA CENTER SE SSD" },
+        { "Id": 75, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "YOUNGSVILLE REFRESH", "MMNumber": "963971", "ProductCode": "SC2KG038T8", "SSDName": "YOUNGSVILLE REFRESH 3840GB 2.5 SATA DATA CENTER ME SSD" },
+        { "Id": 76, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "YOUNGSVILLE REFRESH", "MMNumber": "964243", "ProductCode": "SC2KB076T8", "SSDName": "YOUNGSVILLE REFRESH 7680GB 2.5 SATA DATA CENTER SE SSD" },
+        { "Id": 77, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "YOUNGSVILLE REFRESH", "MMNumber": "964301", "ProductCode": "SC2KG076T8", "SSDName": "YOUNGSVILLE REFRESH 7680GB 2.5 SATA DATA CENTER ME SSD" },
+        { "Id": 78, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "YOUNGSVILLE RR", "MMNumber": "999ZXJ", "ProductCode": "SC2KB038TZ", "SSDName": "YOUNGSVILLE REFRESH REFRESH 3840GB 2.5 SATA DATA CENTER SE SSD" },
+        { "Id": 79, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "YOUNGSVILLE RR", "MMNumber": "999ZXL", "ProductCode": "SC2KG480GZ", "SSDName": "YOUNGSVILLE REFRESH REFRESH 480GB 2.5 SATA DATA CENTER ME SSD" },
+        { "Id": 80, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "YOUNGSVILLE RR", "MMNumber": "999ZXM", "ProductCode": "SC2KG960GZ", "SSDName": "YOUNGSVILLE REFRESH REFRESH 960GB 2.5 SATA DATA CENTER ME SSD" },
+        { "Id": 81, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "YOUNGSVILLE RR", "MMNumber": "999ZXT", "ProductCode": "SCKKB240GZ", "SSDName": "YOUNGSVILLE REFRESH REFRESH SE  240GB M.2 80MM SATA DATA CENTER SE SSD" },
+        { "Id": 82, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "YOUNGSVILLE RR", "MMNumber": "999ZXV", "ProductCode": "SCKKB480GZ", "SSDName": "YOUNGSVILLE REFRESH REFRESH SE  480GB M.2 80MM SATA DATA CENTER SE SSD" },
+        { "Id": 83, "WorkWeek": 1, "ODMDescription": "Pegatron", "SSDFamilyName": "YOUNGSVILLE SE", "MMNumber": "999ZXG", "ProductCode": "SC2KB960GZ", "SSDName": "YOUNGSVILLE REFRESH REFRESH 960GB 2.5 SATA DATA CENTER SE SSD" },
+        { "Id": 84, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "ALDERSTREAM", "MMNumber": "999WTA", "ProductCode": "PF21Q400GB", "SSDName": "ALDERSTREAM DC 400GB 2.5 PCIE" },
+        { "Id": 85, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "ALDERSTREAM", "MMNumber": "999WTL", "ProductCode": "PF21Q800GB", "SSDName": "ALDERSTREAM 800GB 2.5 PCIE" },
+        { "Id": 86, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "ALDERSTREAM", "MMNumber": "999WTM", "ProductCode": "PF21Q016TB", "SSDName": "ALDERSTREAM 1600GB 2.5 PCIE" },
+        { "Id": 87, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "ARBORDALE PLUS", "MMNumber": "9999GN", "ProductCode": "PF2KX038T9", "SSDName": "ARBORDALE PLUS 3840 GB 2.5 PCIE DATA CENTER" },
+        { "Id": 88, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "ARBORDALE PLUS", "MMNumber": "9999GP", "ProductCode": "PF2KX076T9", "SSDName": "ARBORDALE PLUS 7680 GB 2.5 PCIE DATA CENTER" },
+        { "Id": 89, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "ARBORDALE PLUS ME", "MMNumber": "999RN5", "ProductCode": "PFCKE064T9", "SSDName": "ARBORDALE PLUS ME 6400GB AIC" },
+        { "Id": 90, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "ARBORDALE PLUS R VE", "MMNumber": "999W24", "ProductCode": "PF2NV307TZ", "SSDName": "ARBORDALE PLUS REFRESH VE 30720 GB 2.5 PCIE DATA CENTER" },
+        { "Id": 91, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "ARBORDALE PLUS REFRESH SE", "MMNumber": "999VMD", "ProductCode": "PF2KX076TZ", "SSDName": "ARBORDALE PLUS REFRESH SE 7680 GB 2.5 PCIE GEN4 DATA CENTER" },
+        { "Id": 92, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "ARBORDALE PLUS REFRESH VE", "MMNumber": "999ZD3", "ProductCode": "PFWNV153TZ", "SSDName": "ARBORDALE PLUS REFRESH VE 15360GB E1.L 9.5 PCIE" },
+        { "Id": 93, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "ARBORDALE PLUS REFRESH VE", "MMNumber": "999ZDG", "ProductCode": "PF2NV153TZ", "SSDName": "ARBORDALE PLUS REFRESH VE 15360GB 2.5 PCIE" },
+        { "Id": 94, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "ARBORDALE PLUS REFRESH VE", "MMNumber": "999ZDW", "ProductCode": "PFXNV153TZ", "SSDName": "ARBORDALE PLUS REFRESH VE 15360GB EL18 PCIE" },
+        { "Id": 95, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "ARBORDALE PLUS REFRESH VE", "MMNumber": "99A817", "ProductCode": "PEWNV153TZMS", "SSDName": "ARBORDALE PLUS REFRESH VE 15360GB E1.L 9.5 PCIE MSFT" },
+        { "Id": 96, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "ARBORDALE PLUS REFRESH VE", "MMNumber": "99A818", "ProductCode": "PEXNV153TZMS", "SSDName": "ARBORDALE PLUS REFRESH VE 15360GB EL18 PCIE MSFT" },
+        { "Id": 97, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "ARBORDALE PLUS SE", "MMNumber": "999KLF", "ProductCode": "PF2KX019T9", "SSDName": "ARBORDALE PLUS SE 1920GB 2.5 PCIE" },
+        { "Id": 98, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "ARBORDALE PLUS SE REFRESH", "MMNumber": "999VMC", "ProductCode": "PF2KX038TZ", "SSDName": "ARBORDALE PLUS REFRESH SE 3840 GB 2.5 PCIE GEN4 DATA CENTER" },
+        { "Id": 99, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "BEAR COVE PLUS", "MMNumber": "999H7A", "ProductCode": "SSDSS2KW400G8", "SSDName": "BEAR COVE PLUS 400GB 2.5 SAS RI SSD" },
+        { "Id": 100, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "BEAR COVE PLUS", "MMNumber": "999H7C", "ProductCode": "SSDSS2KW800G8", "SSDName": "BEAR COVE PLUS P-3 DISABLED 800GB 2.5 SAS RI SSD" },
+        { "Id": 101, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "BEAR COVE PLUS", "MMNumber": "999H7D", "ProductCode": "SSDSS2KW016T8", "SSDName": "BEAR COVE PLUS 1600GB 2.5 SAS RI SSD" },
+        { "Id": 102, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "BEAR COVE PLUS", "MMNumber": "999H7F", "ProductCode": "SSDSS2KW032T8", "SSDName": "BEAR COVE PLUS 3200GB 2.5 SAS RI SSD" },
+        { "Id": 103, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "BEAR COVE PLUS", "MMNumber": "999H7H", "ProductCode": "SSDSS2KW480G8", "SSDName": "BEAR COVE PLUS 480GB 2.5 SAS RI SSD" },
+        { "Id": 104, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "BEAR COVE PLUS", "MMNumber": "999H7J", "ProductCode": "SSDSS2KW960G8", "SSDName": "BEAR COVE PLUS 960GB 2.5 SAS RI SSD" },
+        { "Id": 105, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "BEAR COVE PLUS", "MMNumber": "999H7M", "ProductCode": "SSDSS2KW076T8", "SSDName": "BEAR COVE PLUS 7680GB 2.5 SAS RI SSD" },
+        { "Id": 106, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "BEAR COVE PLUS", "MMNumber": "999HGP", "ProductCode": "SSDSS2KW150T8", "SSDName": "BEAR COVE PLUS 15TB 2.5 SAS RI SSD" },
+        { "Id": 107, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "BEAR COVE QUANTUM", "MMNumber": "999HAD", "ProductCode": "SSDSS2KW800G920", "SSDName": "BEAR COVE QUANTUM 800GB  2.5 SAS RI SSD" },
+        { "Id": 108, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "BEAR COVE QUANTUM", "MMNumber": "999HAF", "ProductCode": "SSDSS2KW016T920", "SSDName": "BEAR COVE QUANTUM 1600GB  2.5 SAS RI SSD" },
+        { "Id": 109, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "BEAR COVE QUANTUM", "MMNumber": "999HAG", "ProductCode": "SSDSS2KW032T920", "SSDName": "BEAR COVE QUANTUM 3200GB  2.5 SAS RI SSD" },
+        { "Id": 110, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "BEAR COVE QUANTUM", "MMNumber": "999HAH", "ProductCode": "SSDSS2KW064T920", "SSDName": "BEAR COVE QUANTUM 6400GB  2.5 SAS RI SSD" },
+        { "Id": 111, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "BEAR COVE QUANTUM", "MMNumber": "999HAJ", "ProductCode": "SSDSS2KW960G920", "SSDName": "BEAR COVE QUANTUM 960GB  2.5 SAS RI SSD" },
+        { "Id": 112, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "BEAR COVE QUANTUM", "MMNumber": "999HAL", "ProductCode": "SSDSS2KW019T920", "SSDName": "BEAR COVE QUANTUM 1920GB  2.5 SAS RI SSD" },
+        { "Id": 113, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "BEAR COVE QUANTUM", "MMNumber": "999HAN", "ProductCode": "SSDSS2KW038T920", "SSDName": "BEAR COVE QUANTUM 3840GB  2.5 SAS RI SSD" },
+        { "Id": 114, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "BEAR COVE QUANTUM", "MMNumber": "999HAP", "ProductCode": "SSDSS2KW076T920", "SSDName": "BEAR COVE QUANTUM 7680GB  2.5 SAS RI SSD" },
+        { "Id": 115, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "BEAR COVE QUANTUM", "MMNumber": "999HAR", "ProductCode": "SSDSS2KW153T920", "SSDName": "BEAR COVE QUANTUM 15TB 2.5 SAS RI SSD" },
+        { "Id": 116, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "CLIFFDALE RE ME", "MMNumber": "999PJA", "ProductCode": "PE2KE032T8D", "SSDName": "CLIFFDALE REFRESH 3.2 2.5 PCIE ME ES" },
+        { "Id": 117, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "CLIFFDALE REFRESH", "MMNumber": "954446", "ProductCode": "PE2KX020T8", "SSDName": "CLIFFDALE REFRESH 2TB 2.5 PCIE SE SSD" },
+        { "Id": 118, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "CLIFFDALE REFRESH", "MMNumber": "957130", "ProductCode": "PE2KX040T8", "SSDName": "CLIFFDALE REFRESH 4.0TB 2.5 PCIE SE SSD" },
+        { "Id": 119, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "CLIFFDALE REFRESH", "MMNumber": "958514", "ProductCode": "PE2KX010T8", "SSDName": "CLIFFDALE REFRESH 1TB 2.5 PCIE SE SSD" },
+        { "Id": 120, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "CLIFFDALE REFRESH", "MMNumber": "958522", "ProductCode": "PE2KX080T8", "SSDName": "CLIFFDALE REFRESH 8TB 2.5 PCIE SE SSD" },
+        { "Id": 121, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "CLIFFDALE REFRESH", "MMNumber": "962334", "ProductCode": "PELKX010T8", "SSDName": "CLIFFDALE REFRESH 1TB M.2 PCIE ENTERPRISE SSD SE SSD" },
+        { "Id": 122, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "CLIFFDALE REFRESH", "MMNumber": "962335", "ProductCode": "PELKX020T8", "SSDName": "CLIFFDALE REFRESH 2TB M.2 PCIE ENTERPRISE SSD SE SSD" },
+        { "Id": 123, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "CLIFFDALE REFRESH", "MMNumber": "962386", "ProductCode": "PE2KE016T8", "SSDName": "CLIFFDALE REFRESH 1.6TB 2.5 PCIE ME SSD" },
+        { "Id": 124, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "CLIFFDALE REFRESH", "MMNumber": "962417", "ProductCode": "PE2KE032T8", "SSDName": "CLIFFDALE REFRESH 3.2TB 2.5 PCIE ME SSD" },
+        { "Id": 125, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "CLIFFDALE REFRESH", "MMNumber": "963524", "ProductCode": "PE2KE076T8", "SSDName": "CLIFFDALE REFRESH 7.68TB 2.5 PCIE ME SSD" },
+        { "Id": 126, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "CLIFFDALE REFRESH", "MMNumber": "976873", "ProductCode": "PD2KS019T8", "SSDName": "CLIFFDALE REFRESH 1.92TB 2.5 DUAL PORT  PCIE SE2 SSD" },
+        { "Id": 127, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "CLIFFDALE REFRESH", "MMNumber": "976874", "ProductCode": "PD2KS038T8", "SSDName": "CLIFFDALE REFRESH 3.84TB 2.5 DUAL PORT  PCIE SE2 SSD" },
+        { "Id": 128, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "CLIFFDALE REFRESH", "MMNumber": "976875", "ProductCode": "PD2KS076T8", "SSDName": "CLIFFDALE REFRESH 7.68TB 2.5 DUAL PORT  PCIE SE2 SSD" },
+        { "Id": 129, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "CLIFFDALE REFRESH", "MMNumber": "977056", "ProductCode": "PD2KS153T8", "SSDName": "CLIFFDALE REFRESH 15.36TB 2.5 DUAL PORT  PCIE SE2 SSD" },
+        { "Id": 130, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "CLIFFDALE REFRESH", "MMNumber": "983774", "ProductCode": "PECKE064T8", "SSDName": "CLIFFDALE REFRESH 6.4TB AICX8 PCIE SSD ME SSD" },
+        { "Id": 131, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "CLIFFDALE REFRESH", "MMNumber": "999PJ8", "ProductCode": "PE2KX010T8D", "SSDName": "CLIFFDALE REFRESH 1TB 2.5 PCIE SE SSD ESD" },
+        { "Id": 132, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "CLIFFDALE REFRESH", "MMNumber": "999PJ9", "ProductCode": "PE2KX040T8D", "SSDName": "CLIFFDALE REFRESH 4.0TB 2.5 PCIE SE SSD ESD" },
+        { "Id": 133, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "CLIFFDALE REFRESH ME", "MMNumber": "962387", "ProductCode": "PE2KE064T8", "SSDName": "CLIFFDALE REFRESH ME 6.4TB 2.5 PCIE" },
+        { "Id": 134, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "CLIFFDALE REFRESH SE", "MMNumber": "977579", "ProductCode": "SSDPELKX960G8M2", "SSDName": "CLIFFDALE REFRESH SE 960GB M.2 110MM PCIE MSFT" },
+        { "Id": 135, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "CLIFFDALE REFRESH SE", "MMNumber": "977580", "ProductCode": "SSDPELKX019T8M2", "SSDName": "CLIFFDALE REFRESH SE 1.92TB M.2 110MM PCIE MSFT" },
+        { "Id": 136, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "CLIFFDALE REFRESH SE", "MMNumber": "984568", "ProductCode": "SSDPELKX038T8M2", "SSDName": "CLIFFDALE REFRESH SE 3.84TB M.2 110MM PCIE MSFT" },
+        { "Id": 137, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "CLIFFDALE REFRESH SE", "MMNumber": "999JJW", "ProductCode": "PEYKX040T8", "SSDName": "CLIFFDALE REFRESH SE DC P4510 E1.S 5.9MM 4000GB" },
+        { "Id": 138, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "CLIFFDALE REFRESH SE", "MMNumber": "999JJX", "ProductCode": "PEWKX153T8", "SSDName": "CLIFFDALE REFRESH SE DC P4510 E1.L 9.5MM 15360GB" },
+        { "Id": 139, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "CLIFFDALE REFRESH SE", "MMNumber": "999JJZ", "ProductCode": "PEXKX153T8", "SSDName": "CLIFFDALE REFRESH SE DC P4510 E1.L 18MM 15360GB" },
+        { "Id": 140, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "CLIFFDALE REFRESH SE", "MMNumber": "99A97M", "ProductCode": "PEWKX153T8MS", "SSDName": "CLIFFDALE REFRESH SE DC P4510 E1.L 9.5MM 15360GB MSFT" },
+        { "Id": 141, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "CLIFFDALE REFRESH VE", "MMNumber": "979156", "ProductCode": "PE2NV076T8", "SSDName": "CLIFFDALE REFRESH VE 7.68TB 2.5 PCIE SSD" },
+        { "Id": 142, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "CLIFFDALE REFRESH VE", "MMNumber": "979183", "ProductCode": "PE2NV153T8", "SSDName": "CLIFFDALE REFRESH VE 15.36TB 2.5 PCIE SSD" },
+        { "Id": 143, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "CLIFFDALE REFRESH VE", "MMNumber": "980941", "ProductCode": "PEWNV153T8", "SSDName": "CLIFFDALE REFRESH VE 15.36TB EDSFF9 PCIE SSD" },
+        { "Id": 144, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "CLIFFDALE REFRESH VE", "MMNumber": "980942", "ProductCode": "PEXNV153T8", "SSDName": "CLIFFDALE REFRESH VE 15.36TB EDSFF18 PCIE SSD" },
+        { "Id": 145, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "CLIFFDALE REFRESH VE", "MMNumber": "99A2MZ", "ProductCode": "PEWNV153T801", "SSDName": "CLIFFDALE REFRESH VE 15.36TB EDSFF9 PCIE SSD LATCH" },
+        { "Id": 169, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "KEYSTONE HARBOR", "MMNumber": "999TRC", "ProductCode": "PEKNU512GZ", "SSDName": "KEYSTONE HARBOR 512GB M.2 80MM PCIE" },
+        { "Id": 170, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "KEYSTONE HARBOR", "MMNumber": "999TRJ", "ProductCode": "PEKNU010TZ", "SSDName": "KEYSTONE HARBOR 1024GB M.2 80MM PCIE" },
+        { "Id": 171, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "KEYSTONE HARBOR", "MMNumber": "999TRK", "ProductCode": "PEKNU020TZ", "SSDName": "KEYSTONE HARBOR 2048GB M.2 80MM PCIE" },
+        { "Id": 179, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "NEPTUNE HARBOR", "MMNumber": "976805", "ProductCode": "PEKNW512G8", "SSDName": "NEPTUNE HARBOR 512GB M.2 80MM PCIE CLIENT SSD" },
+        { "Id": 180, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "NEPTUNE HARBOR", "MMNumber": "976806", "ProductCode": "PEKNW010T8", "SSDName": "NEPTUNE HARBOR 1024GB M.2 80MM PCIE CLIENT SSD" },
+        { "Id": 181, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "NEPTUNE HARBOR", "MMNumber": "976807", "ProductCode": "PEKNW020T8", "SSDName": "NEPTUNE HARBOR 2048GB M.2 80MM PCIE CLIENT SSD" },
+        { "Id": 182, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "NEPTUNE HARBOR LV NON FDD", "MMNumber": "999PKT", "ProductCode": "SSDPEKNW512G8LV", "SSDName": "NEPTUNE HARBOR 512GB M.2 80MM PCIE CLIENT SSDLENOVO NON FDD" },
+        { "Id": 183, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "NEPTUNE HARBOR R", "MMNumber": "999J6C", "ProductCode": "PEKNW010T9", "SSDName": "NEPTUNE HARBOR R 1.024TB M.2 80MM PCIE CLIENT SSD" },
+        { "Id": 184, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "NEPTUNE HARBOR R", "MMNumber": "999JF3", "ProductCode": "PEKNW020T9", "SSDName": "NEPTUNE HARBOR R 2.048TB M.2 80MM PCIE CLIENT SSD" },
+        { "Id": 190, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "YOUNGSVILLE  RR SE", "MMNumber": "999ZXD", "ProductCode": "SC2KB240GZ", "SSDName": "YOUNGSVILLE REFRESH REFRESH 240GB 2.5 SATA DATA CENTER SE SSD" },
+        { "Id": 191, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "YOUNGSVILLE  RR SE", "MMNumber": "999ZXF", "ProductCode": "SC2KB480GZ", "SSDName": "YOUNGSVILLE REFRESH REFRESH 480GB 2.5 SATA DATA CENTER SE SSD" },
+        { "Id": 192, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "YOUNGSVILLE  RR SE", "MMNumber": "999ZXH", "ProductCode": "SC2KB019TZ", "SSDName": "YOUNGSVILLE REFRESH REFRESH 1920GB 2.5 SATA DATA CENTER SE SSD" },
+        { "Id": 193, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "YOUNGSVILLE REFRESH", "MMNumber": "963368", "ProductCode": "SC2KB240G8", "SSDName": "YOUNGSVILLE REFRESH 240GB 2.5 SATA DATA CENTER SE SSD" },
+        { "Id": 194, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "YOUNGSVILLE REFRESH", "MMNumber": "963369", "ProductCode": "SC2KB480G8", "SSDName": "YOUNGSVILLE REFRESH 480GB 2.5 SATA DATA CENTER SE SSD" },
+        { "Id": 195, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "YOUNGSVILLE REFRESH", "MMNumber": "963370", "ProductCode": "SC2KB960G8", "SSDName": "YOUNGSVILLE REFRESH 960GB 2.5 SATA DATA CENTER SE SSD" },
+        { "Id": 196, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "YOUNGSVILLE REFRESH", "MMNumber": "963371", "ProductCode": "SC2KB019T8", "SSDName": "YOUNGSVILLE REFRESH 1920GB 2.5 SATA DATA CENTER SE SSD" },
+        { "Id": 197, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "YOUNGSVILLE REFRESH", "MMNumber": "963372", "ProductCode": "SC2KB038T8", "SSDName": "YOUNGSVILLE REFRESH 3840GB 2.5 SATA DATA CENTER SE SSD" },
+        { "Id": 198, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "YOUNGSVILLE REFRESH", "MMNumber": "963373", "ProductCode": "SC2KG240G8", "SSDName": "YOUNGSVILLE REFRESH 240GB 2.5 SATA DATA CENTER ME SSD" },
+        { "Id": 199, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "YOUNGSVILLE REFRESH", "MMNumber": "963374", "ProductCode": "SC2KG480G8", "SSDName": "YOUNGSVILLE REFRESH 480GB 2.5 SATA DATA CENTER ME SSD" },
+        { "Id": 200, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "YOUNGSVILLE REFRESH", "MMNumber": "963376", "ProductCode": "SC2KG960G8", "SSDName": "YOUNGSVILLE REFRESH 960GB 2.5 SATA DATA CENTER ME SSD" },
+        { "Id": 201, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "YOUNGSVILLE REFRESH", "MMNumber": "963377", "ProductCode": "SC2KG019T8", "SSDName": "YOUNGSVILLE REFRESH 1920GB 2.5 SATA DATA CENTER ME SSD" },
+        { "Id": 202, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "YOUNGSVILLE REFRESH", "MMNumber": "963398", "ProductCode": "SCKKB240G8", "SSDName": "YOUNGSVILLE REFRESH 240GB M.2 80MM SATA DATA CENTER SE SSD" },
+        { "Id": 203, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "YOUNGSVILLE REFRESH", "MMNumber": "963399", "ProductCode": "SCKKB480G8", "SSDName": "YOUNGSVILLE REFRESH 480GB M.2 80MM SATA DATA CENTER SE SSD" },
+        { "Id": 204, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "YOUNGSVILLE REFRESH", "MMNumber": "963400", "ProductCode": "SCKKB960G8", "SSDName": "YOUNGSVILLE REFRESH 960GB M.2 80MM SATA DATA CENTER SE SSD" },
+        { "Id": 205, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "YOUNGSVILLE REFRESH", "MMNumber": "963971", "ProductCode": "SC2KG038T8", "SSDName": "YOUNGSVILLE REFRESH 3840GB 2.5 SATA DATA CENTER ME SSD" },
+        { "Id": 206, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "YOUNGSVILLE REFRESH", "MMNumber": "964243", "ProductCode": "SC2KB076T8", "SSDName": "YOUNGSVILLE REFRESH 7680GB 2.5 SATA DATA CENTER SE SSD" },
+        { "Id": 207, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "YOUNGSVILLE REFRESH", "MMNumber": "964301", "ProductCode": "SC2KG076T8", "SSDName": "YOUNGSVILLE REFRESH 7680GB 2.5 SATA DATA CENTER ME SSD" },
+        { "Id": 208, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "YOUNGSVILLE RR", "MMNumber": "999ZXJ", "ProductCode": "SC2KB038TZ", "SSDName": "YOUNGSVILLE REFRESH REFRESH 3840GB 2.5 SATA DATA CENTER SE SSD" },
+        { "Id": 209, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "YOUNGSVILLE RR", "MMNumber": "999ZXL", "ProductCode": "SC2KG480GZ", "SSDName": "YOUNGSVILLE REFRESH REFRESH 480GB 2.5 SATA DATA CENTER ME SSD" },
+        { "Id": 210, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "YOUNGSVILLE RR", "MMNumber": "999ZXM", "ProductCode": "SC2KG960GZ", "SSDName": "YOUNGSVILLE REFRESH REFRESH 960GB 2.5 SATA DATA CENTER ME SSD" },
+        { "Id": 211, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "YOUNGSVILLE RR", "MMNumber": "999ZXT", "ProductCode": "SCKKB240GZ", "SSDName": "YOUNGSVILLE REFRESH REFRESH SE  240GB M.2 80MM SATA DATA CENTER SE SSD" },
+        { "Id": 212, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "YOUNGSVILLE RR", "MMNumber": "999ZXV", "ProductCode": "SCKKB480GZ", "SSDName": "YOUNGSVILLE REFRESH REFRESH SE  480GB M.2 80MM SATA DATA CENTER SE SSD" },
+        { "Id": 213, "WorkWeek": 1, "ODMDescription": "PTI Taiwan", "SSDFamilyName": "YOUNGSVILLE SE", "MMNumber": "999ZXG", "ProductCode": "SC2KB960GZ", "SSDName": "YOUNGSVILLE REFRESH REFRESH 960GB 2.5 SATA DATA CENTER SE SSD" },
+    ];
+
+    function refreshFields() {
+        $("#spnId").text(model.Id);
+        $("#spnVersion").text(model.Version);
+        $("#spnIsActive").text(model.IsActive);
+        $("#spnIsPOR").text(model.IsPOR);
+        $("#spnStatus").text(model.Status.Name);
+        $("#spnCreatedBy").text(model.CreatedByUserName ? model.CreatedByUserName : model.CreatedBy);
+        $("#spnCreatedOn").text(Nsga.Callisto.Dates.isoToLocaleString(model.CreatedOn));
+        $("#spnUpdatedBy").text(model.UpdatedByUserName ? model.UpdatedByUserName : model.UpdatedBy);
+        $("#spnUpdatedOn").text(Nsga.Callisto.Dates.isoToLocaleString(model.UpdatedOn));
+
+        //let statusName = model.Status.Name;
+        //if (statusName === "Draft" && userId === model.CreatedBy) {
+        //    $("#btnSubmit").removeClass("hide").addClass("show");
+        //    $("#btnCancel").removeClass("hide").addClass("show");
+        //}
+        //else {
+        //    $("#btnSubmit").removeClass("show").addClass("hide");
+        //    $("#btnCancel").removeClass("show").addClass("hide");
+        //    if (statusName == "Submitted" || statusName == "In Review") // TODO: and userId is a "reviewer"
+        //    {
+        //        $("#btnApprove").removeClass("hide").addClass("show");
+        //        $("#btnReject").removeClass("hide").addClass("show");
+        //    }
+        //    else {
+        //        $("#btnApprove").removeClass("show").addClass("hide");
+        //        $("#btnReject").removeClass("show").addClass("hide");
+        //    }
+        //}
+    }
+
+    var setStatus = function (statusType) {
+        var RequestStatus = new Object();
+        if (statusType === 1) {
+            RequestStatus.Id = 1;
+            RequestStatus.Name = "Draft";
+        } else if (statusType === 2) {
+            RequestStatus.Id = 2;
+            RequestStatus.Name = "Submitted";
+        } else if (statusType === 3) {
+            RequestStatus.Id = 3;
+            RequestStatus.Name = "In Review";
+        } else if (statusType === 4) {
+            RequestStatus.Id = 4;
+            RequestStatus.Name = "Rejected";
+        } else if (statusType === 5) {
+            RequestStatus.Id = 5;
+            RequestStatus.Name = "Cancelled";
+        } else if (statusType === 6) {
+            RequestStatus.Id = 6;
+            RequestStatus.Name = "Completed";
+        }
+        return RequestStatus;
+    };
+
+    //var submit1 = function () {
+    //    model.Status = setStatus(2);
+    //    refreshFields();
+    //    //Change status to Submitted
+    //    //Set the model.Status to new status
+    //    //refreshFields
+    //    //Display Review section
+    //    //$("#divReview").append(reviewDiv);
+    //}
+
+    $(document).ready(function () {
+
+        $("#tooltip").dxTooltip({
+            showEvent: "mouseenter",
+            hideEvent: "mouseleave",
+            closeOnOutsideClick: false,
+        });
+
+        // grdRecords
+        var config = Nsga.Callisto.Dx.dataGridDefaultConfig();
+        config.columns = [
+            {
+                caption: "Worksheet Row",
+                @*calculateCellValue: function (rowData) {
+                    return rowData.RecordNumber + @(specification.RowDataBegins) - 1;
+                },*@
+                dataField: "Id",
+                fixed: true,
+                fixedPosition: "left",
+            },
+            {
+                dataField: "ODMDescription",
+                caption: "ODM",
+            },
+            {
+                dataField: "SSDFamilyName",
+                caption: "Family Name",
+            },
+            {
+                dataField: "MMNumber",
+                caption: "MM Number",
+            },
+            {
+                dataField: "ProductCode",
+                caption: "Product Code",
+            },
+            {
+                dataField: "SSDName",
+                caption: "SSD Name",
+            },
+            {
+                caption: "",
+                cellTemplate: function (container, options) {
+                    $("<a>Details</a>").attr({ "href": "/Mat/ListMats/" + options.data["MMNumber"], "target": "_blank" }).appendTo(container);
+                },
+                allowFiltering: false,
+            },
+        ];
+        config.keyExpr = "Id";
+        config.dataSource = prfRecords;
+        $("#grdRecords").dxDataGrid(config);
+
+        refreshFields();
+
+    });
+
+
+</script>
+
+
+<div class="padeightpixel">
+    <div class="rightalign">
+        <div class="padeightpixel">
+            <span><a title="Click here to view all versions" id="lnkAllVersions" href="/Mat/ListPrfVersions/"><span class="imagelinkbutton bordered"><span class="fa fa-list-alt "></span><span class="margintwopixel">All Versions</span></span></a></span>
+        </div>
+    </div>
+    <div id="accDetails" class="accordion-label open">Details</div>
+    <div id="divDetails" class="accordion-panel" style="padding: 8px;">
+        <table style="width:96%; padding:2px;margin:2px;">
+            <tr>
+                <td style="width:25%"><label for="spnId" class="formlabel">Id</label></td>
+                <td style="width:25%"><span type="text" id="spnId"></span></td>
+                <td style="width:25%"><label for="spnCreatedBy" class="formlabel">Created By</label></td>
+                <td style="width:25%"><span type="text" id="spnCreatedBy"></span></td>
+            </tr>
+            <tr>
+                <td><label for="spnVersion" class="formlabel">Version</label></td>
+                <td><span type="text" id="spnVersion"></span></td>
+                <td><label for="spnCreatedOn" class="formlabel">Created On</label></td>
+                <td><span type="text" id="spnCreatedOn"></span></td>
+            </tr>
+            <tr>
+                <td><label for="spnIsActive" class="formlabel">Is Active?</label></td>
+                <td><span type="text" id="spnIsActive"></span></td>
+                <td><label for="spnUpdatedBy" class="formlabel">Updated By</label></td>
+                <td><span type="text" id="spnUpdatedBy"></span></td>
+            </tr>
+            <tr>
+                <td><label for="spnIsPOR" class="formlabel">Is POR?</label></td>
+                <td><span type="text" id="spnIsPOR"></span></td>
+                <td><label for="spnUpdatedOn" class="formlabel">Last Updated On</label></td>
+                <td><span type="text" id="spnUpdatedOn"></span></td>
+            </tr>
+            <tr>
+                <td><label for="spnStatus" class="formlabel">Status</label></td>
+                <td><span type="text" id="spnStatus"></span></td>
+                <td></td>
+                <td></td>
+            </tr>
+        </table>
+    </div>
+    @*<div id="accReview" class="accordion-label open">Review</div>
+        <div id="divReview" class="accordion-panel">
+            <div style="padding: 8px; width: 100%; text-align: center;"><button id="btnCancel" onclick="cancel()">Cancel</button>&nbsp;&nbsp;<button id="btnSubmit" onclick="submit1()">Submit</button></div>
+        </div>
+        <div id="accImportMessages" class="accordion-label open">Import Messages</div>
+        <div id="divImportMessages" class="accordion-panel">
+            <div id="grdImportMessages"></div>
+        </div>*@
+    <div id="accRecords" class="accordion-label open">Records</div>
+    <div id="divRecords" class="accordion-panel">
+        <div id="grdRecordsContainer" style="height: 100%; width: 98%; position: absolute; box-sizing: border-box;">
+            <div id="grdRecords"></div>
+        </div>
+    </div>
+</div>

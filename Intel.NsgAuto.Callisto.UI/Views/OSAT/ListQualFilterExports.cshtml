@@ -1,0 +1,317 @@
+﻿@model Intel.NsgAuto.Callisto.UI.Models.OSAT.ListQualFilterExportsModel
+
+@{
+    ViewBag.Title = "OSAT - Qual Filter Exports";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script type="text/javascript">
+
+    var entity = @(JsonHelper.Serialize(Model.Entity));
+    var designs = entity.Designs;
+    var designsArrayStore = new DevExpress.data.ArrayStore({
+        key: "Id",
+        data: designs,
+    });
+    var exports = entity.Exports;
+    var osats = entity.Osats;
+    var osatsArrayStore = new DevExpress.data.ArrayStore({
+        key: "Id",
+        data: osats,
+    });
+
+    function updateGridDataSource(records) {
+        var element = $("#grdRecords");
+        element.hide();
+        if (records) {
+            element.dxDataGrid("instance").option("dataSource", records);
+            element.show();
+        }
+    };
+
+    function allArrayIds(array) {
+        var result = [];
+        if (array) {
+            for (var i = 0; i < array.length; i++) {
+                result.push(array[i].Id);
+            }
+        }
+        return result;
+    }
+
+    function onCreateError(xhr) {
+        var result = null;
+        var message = "An unexpected error occurred. If the problem persists, contact support.";
+        if (xhr && xhr.responseJSON) {
+            result = xhr.responseJSON;
+            if (result.ExceptionMessage) message = result.ExceptionMessage;
+            else if (result.Message) message = result.Message;
+        }
+        Nsga.Callisto.Messages.showError(message);
+        return result;
+    }
+
+    function onCreateSuccess(result) {
+        window.location.href = "/OSAT/QualFilterExportDetails/" + result.Entity.Id;
+    }
+
+    function create() {
+        createEntity = null;
+        var isValid = false;
+        var comprehensive = $("#swhComprehensive").dxSwitch("instance").option("value");
+        if (comprehensive) {
+            isValid = true;
+        }
+        else {
+            var osatIds = $("#ddlOsats").dxDropDownBox("instance").option("value");
+            var designIds = $("#ddlDesigns").dxDropDownBox("instance").option("value");
+            if (designIds && designIds.length > 0 && osatIds && osatIds.length > 0) {
+                isValid = true;
+                createEntity = {
+                    DesignIds: designIds,
+                    OsatIds: osatIds,
+                };
+            }
+        }
+        if (isValid) {
+            Nsga.Callisto.Osat.createQualFilterExport(createEntity, onCreateSuccess, onCreateError);
+        }
+        else {
+            Nsga.Callisto.Messages.showError("You must select at least one OSAT and Design.");
+        }
+    }
+
+    function refreshFromComprehensive(comprehensive) {
+        var divComprehensive = $("#divComprehensive");
+        if (comprehensive) {
+            divComprehensive.hide();
+        }
+        else {
+            divComprehensive.show();
+        }
+    }
+
+    $("document").ready(function () {
+
+        var comprehensiveInitial = true;
+
+        $("#swhComprehensive").dxSwitch({
+            value: comprehensiveInitial,
+            onValueChanged: function (e) {
+                if (e) refreshFromComprehensive(e.value);
+            }
+        });
+
+        refreshFromComprehensive(comprehensiveInitial);
+
+        $("#ddlOsats").dxDropDownBox({
+            displayExpr: "Name",
+            valueExpr: "Id",
+            dataSource: osatsArrayStore,
+            value: allArrayIds(osats),
+            showClearButton: true,
+            contentTemplate: function (e) {
+                var value = e.component.option("value");
+                var divGrid = $("<div>").dxDataGrid({
+                    dataSource: e.component.getDataSource(),
+                    columns: [
+                        {
+                            dataField: "Name",
+                            caption: "Name",
+                        },
+                    ],
+                    hoverStateEnabled: true,
+                    scrolling: {
+                        mode: "virtual",
+                        showScrollbar: "always",
+                    },
+                    height: 100,
+                    selection: {
+                        mode: "multiple",
+                        showCheckBoxesMode: "always"
+                    },
+                    selectedRowKeys: value,
+                    
+                    onSelectionChanged: function (selectedItems) {
+                        var keys = selectedItems.selectedRowKeys;
+                        e.component.option("value", keys);
+                    },
+                });
+
+                var gridInstance = divGrid.dxDataGrid("instance");
+
+                e.component.on("valueChanged", function (args) {
+                    var value = args.value;
+                    gridInstance.selectRows(value, false);
+                });
+
+                return divGrid;
+            }
+        });
+
+        $("#ddlDesigns").dxDropDownBox({
+            displayExpr: "Name",
+            valueExpr: "Id",
+            dataSource: designsArrayStore,
+            value: allArrayIds(designs),
+            showClearButton: true,
+            contentTemplate: function (e) {
+                var value = e.component.option("value");
+                var divGrid = $("<div>").dxDataGrid({
+                    dataSource: e.component.getDataSource(),
+                    columns: [
+                        {
+                            dataField: "Name",
+                            caption: "Name",
+                        },
+                        {
+                            dataField: "DesignFamily.Name",
+                            caption: "Design Family",
+                        },
+                    ],
+                    hoverStateEnabled: true,
+                    //paging: { enabled: true, pageSize: 10 },
+                    filterRow: { visible: true },
+                    headerFilter: { visible: true },
+                    scrolling: {
+                        mode: "virtual",
+                        //showScrollbar: "always",
+                    },
+                    height: 600,
+                    selection: {
+                        mode: "multiple",
+                        showCheckBoxesMode: "always"
+                    },
+                    selectedRowKeys: value,
+                    onSelectionChanged: function (selectedItems) {
+                        var keys = selectedItems.selectedRowKeys;
+                        e.component.option("value", keys);
+                    },
+                });
+
+                var gridInstance = divGrid.dxDataGrid("instance");
+
+                e.component.on("valueChanged", function (args) {
+                    var value = args.value;
+                    gridInstance.selectRows(value, false);
+                });
+
+                return divGrid;
+            }
+        });
+
+        $("#btnPublish").dxButton({
+            text: "Publish",
+            onClick: function (e) {
+                create();
+            }
+        });
+
+        // grdRecords
+        config = Nsga.Callisto.Dx.dataGridDefaultConfig();
+        config.dataSource = exports;
+        config.columns = [
+            {
+                dataField: "CreatedByUserName",
+                caption: "Created By",
+                cellTemplate: function (container, options) {
+                    var cellValue = options.text ? options.text : options.data.CreatedBy;
+                    container.append("<div>" + cellValue + "</div>");
+                }
+            },
+            {
+                dataField: "CreatedOn",
+                caption: "Created On",
+                dataType: "datetime",
+                format: "MM/dd/yyyy hh:mm:ss a",
+            },
+            {
+                dataField: "GeneratedOn",
+                caption: "Files Generated On",
+                dataType: "datetime",
+                format: "MM/dd/yyyy hh:mm:ss a",
+            },
+            {
+                dataField: "DeliveredOn",
+                caption: "Files Delivered On",
+                dataType: "datetime",
+                format: "MM/dd/yyyy hh:mm:ss a",
+            },
+            {
+                caption: "Details",
+                allowFiltering: false,
+                cellTemplate: function (container, options) {
+                    $("<a> View Details </a>")
+                        .attr("href", "/OSAT/QualFilterExportDetails/" + options.data["Id"])
+                        .appendTo(container);
+                }
+            },
+            {
+                dataField: "FileName",
+                caption: "Download",
+                allowFiltering: false,
+                cellTemplate: function (container, options) {
+                    $("<a>" + options.text + "</a>")
+                        .attr("href", "/api/Osat/DownloadQualFilterExport/" + options.data["Id"])
+                        .appendTo(container);
+                }
+            },
+        ];
+        config.hoverStateEnabled = true;
+        config.onRowClick = function (e) {
+            if (e.rowType == "data") {
+                window.location.href = "/OSAT/QualFilterExportDetails/" + @MvcHtmlString.Create("e.data.Id");
+            }
+        };
+        $("#grdRecords").dxDataGrid(config);
+
+    });
+
+</script>
+
+<div id="divContent" class="content centered">
+    <div style="vertical-align: top;">
+        <div class="bordered padfourpixel marginfourpixel bluebox bglightblue" style="display:inline-block;vertical-align: top;width:940px;">
+            <div id="divForm" class="formwrapper">
+                <div class="formcontent display">
+                    <div class="infotext">
+                        <span class="infotext italic" style="font-size: 14px;">Items marked as <span class="mandatory">*</span> are required inputs</span>
+                    </div>
+                    <div class="dx-fieldset">
+                        <div class="dx-field">
+                            <div class="dx-field-label" style="width: 250px; font-size: 16px; display: inline-block;">Comprehensive <br /><div class='infotext'>Comprehensive On, displays all OSAT and Design<br /> by default</div></div>
+                            <div id="swhComprehensive" class="dx-field-value" style="width: 100px; display: inline-block;"></div>                            
+                        </div>
+                        <div id="divComprehensive">
+                            <div class="dx-field">
+                                <div class="dx-field-label required" style="width: 250px; font-size: 16px; display: inline-block;">OSATs</div>
+                                <div class="dx-field-value" style="width: 200px; display: inline-block;">
+                                    <div id="ddlOsats"></div>
+                                </div>
+                            </div>
+                            <div class="dx-field" style="display: inline-block;">
+                                <div class="dx-field-label required" style="width: 250px; font-size: 16px; display: inline-block;">Designs</div>
+                                <div class="dx-field-value" style="width: 500px; display: inline-block;">
+                                    <div id="ddlDesigns"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div style="text-align:right; vertical-align:middle;">
+                    <input id="btnPublish" type="button" value="Publish" style="padding-bottom:4px;padding-top:4px;" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="centeralign">
+    <div class="grid-wrapper" style="margin-top:4px;">
+        <div class="marginfourpixel">
+            <div class="gridcontainer">
+                <div id="grdRecords" style="margin-right:20px;margin-left:10px;"></div>
+            </div>
+        </div>
+    </div>
+</div>

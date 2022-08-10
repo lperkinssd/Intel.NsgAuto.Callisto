@@ -1,0 +1,709 @@
+﻿@model Intel.NsgAuto.Callisto.UI.Models.MATVersionModel
+@using ImportSpecification = Intel.NsgAuto.Callisto.Business.Core.ImportSpecifications.MATs
+
+@{
+    ViewBag.Title = "MAT Version Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style scoped>
+    td { padding: 2px; }
+    .dx-icon-find { color: #0071c5; }
+    .savereviewer { cursor: pointer; border: #cbd9e6 1px solid; padding: 7px; background-color: #f6f8f9; margin-left: -4px; border-left-style: none; }
+    .savereviewer-disabled { cursor: default; border: #cbd9e6 1px solid; padding: 7px; background-color: #f6f8f9; margin-left: -4px; border-left-style: none; }
+    .txtacomments { margin-left: 35px; }
+    .stagecomplete { color: green; }
+    .stagecurrent { color: dodgerblue; }
+    .stagerejected { color: red; }
+    .accordiontitle { font-weight: bold; font-size: 12px; color: #0071c5; text-decoration: none; }
+    .accordiontitle.rejected { color: red; }
+    .accordiontitle.approved { color: green; }
+    .accordiontitle.open { color: #000; }
+    .grouptitle { font-weight: bold; font-size: 12px; color: #808080; text-decoration: none; margin-left: 25px; }
+    .undecided { margin-left: 35px; font-style: italic; font-size: 11px; color: #4da1ef; }
+    .childaccordiontitle { font-weight: bold; font-size: 12px; color: #555; text-decoration: none; }
+    .childaccordiontitle.rejected { color: red; }
+    .childaccordiontitle.approved { color: green; }
+    .childaccordiontitle.open { color: blue; }
+    .childstepaccordion { margin-left: 20px; margin-right: 25px; }
+    .comments { margin-left: 35px; font-style: italic; font-size: 11px; }
+    .warningtext { color: #d06700; font-size: 11px; }
+    .Rejected { margin-left: 35px; font-size: 11px; color: #cb0305; }
+    .Approved { margin-left: 35px; font-size: 11px; color: #1f831b; }
+    .reviewactions { display: inline-block; }
+    .altRowCss { background-color: #f6f8f9; }
+    .groupwrapper { margin-bottom: 15px; }
+    .groupwrapper.Approved { }
+    .groupwrapper.Rejected { }
+    .dx-accordion-item-opened.dx-state-hover > .dx-accordion-item-title { border-color: #ddd !important; }
+    .reviewControls { width: 500px; }
+    .dx-dropdowneditor-icon { color: #0071c5; }
+    .disabledapprove { color: #f5f5f5; min-width: 50px; background-color: #dcdcdc; border: #e2e2e2 1px solid; min-height: 25px; padding: 5px; margin: 4px; margin-left: 0px; margin-right: 6px; font-size: 12px; }
+    .locked, .thumbsup, .thumbsdown { margin-right: 0px; border: #e2e2e2 1px solid; padding: 5px; margin-left: 15px; }
+    .bg-approved { background-color: #c8e6c8; }
+    .dx-accordion-item-opened .bg-open { background-color: #fefee0; border: #e2e2e2 1px solid; }
+    .dx-accordion-item-closed .bg-open { background-color: #e1edf5; border: #e2e2e2 1px solid; }
+    .noreviewsetup { color: red; text-align: center; }
+    .bcvi { font-size: 16px; color: #cb0305; }
+    .fa-exclamation { color: #cb0305; font-size: 10px; }
+    .dx-multiview-wrapper { padding-bottom: 4px; }
+    .dx-widget input, .dx-widget textarea { line-height: 20px; }
+    .input-rev-field { min-width: 50px !important; width: 50px; margin: 8px !important; padding: 4px !important; }
+    .dx-field-label { padding: 8px 8px 9px 0; }
+    .dx-multiview-wrapper { padding-bottom: 0px; }
+    input[type="text"] { min-width: 0; }
+</style>
+
+<script type="text/javascript">
+
+    var model = @(JsonHelper.Serialize(Model.Version));
+    var userId = "@(Html.Raw(Intel.NsgAuto.Web.Mvc.Core.Functions.GetLoggedInUserId()))";
+    var review = @(JsonHelper.Serialize(Model.Review));
+
+    function populateFields() {
+        $("#spnId").text(model.Id);
+        $("#spnVersion").text(model.Version);
+        $("#spnIsActive").text(model.IsActive);
+        $("#spnIsPOR").text(model.IsPOR);
+        $("#spnStatus").text(model.Status.Name);
+        $("#spnCreatedBy").text(model.CreatedBy);
+        $("#spnCreatedOn").text(Nsga.Callisto.Dates.isoToLocaleString(model.CreatedOn));
+        $("#spnUpdatedBy").text(model.UpdatedBy);
+        $("#spnUpdatedOn").text(Nsga.Callisto.Dates.isoToLocaleString(model.UpdatedOn));
+        let statusName = model.Status.Name;
+        if (statusName === "Draft" && userId === model.CreatedBy) {
+            $("#btnSubmit").removeClass("hide").addClass("show");
+            $("#btnCancel").removeClass("hide").addClass("show");
+        }
+        else {
+            $("#btnSubmit").removeClass("show").addClass("hide");
+            $("#btnCancel").removeClass("show").addClass("hide");
+            if (statusName == "Submitted" || statusName == "In Review") // TODO: and userId is a "reviewer"
+            {
+                $("#btnApprove").removeClass("hide").addClass("show");
+                $("#btnReject").removeClass("hide").addClass("show");
+            }
+            else {
+                $("#btnApprove").removeClass("show").addClass("hide");
+                $("#btnReject").removeClass("show").addClass("hide");
+            }
+        }
+    }
+
+    function onError(xhr, status) {
+        var message = "An unexpected error occurred. If the problem persists, contact support.";
+        if (xhr && xhr.responseJSON) {
+            if (xhr.responseJSON.ExceptionMessage) message = xhr.responseJSON.ExceptionMessage;
+            else if (xhr.responseJSON.Message) message = xhr.responseJSON.Message;
+        }
+        Nsga.Callisto.Messages.showError(message);
+        if (result.Entity) {
+            model = result.Entity;
+            populateFields();
+        }
+    }
+
+    function onChangeStatus(result) {
+        model = result.Entity;
+        populateFields();
+        updateReview(model);
+    }
+
+    //function onApprove() {
+    //    Nsga.Callisto.MATVersions.approve(model.Id, onChangeStatus, onError);
+    //}
+
+    function onCancel() {
+        Nsga.Callisto.MATVersions.cancel(model.Id, onChangeStatus, onError);
+    }
+
+    //function onReject()
+    //{
+    //    Nsga.Callisto.MATVersions.reject(model.Id, onChangeStatus, onError);
+    //}
+
+    function onSubmit() {
+        Nsga.Callisto.MATVersions.submit(model.Id, onChangeStatus, onError);
+    }
+
+    function updateGridDataSource(records) {
+        var element = $("#grdRecords");
+        element.hide();
+        if (records) {
+            element.dxDataGrid("instance").option("dataSource", records);
+            element.show();
+        }
+    }
+
+    var updateReview = function (response) {
+        if (response && response.Status) {
+            requestReview = response.Review;
+            // This is commented out because requestReview does not hav
+            // a RequestStatus object
+            //if (requestReview.IsCompleted) {
+            //    request.RequestStatus = setStatus(6);  //Completed
+            //    updateRequest();
+            //    return;
+            //}
+
+            var s = $('#spnStatus').text();
+            if (isRejected(requestReview)) {
+                document.location.href = "/MATVersions/List";
+                return;
+            }
+            //If approval process is past stage 1, no more cancel option.
+            if (requestReview.ReviewSteps && requestReview.ReviewSteps.length > 0) {
+                if (!requestReview.ReviewSteps[0].IsCurrentStage) {
+                    $('#btnCancel').hide();
+                }
+            }
+            //If we have reached here, we have had at least one review.
+            //Make sure UI status is updated from Submitted to In Review.
+            //var s = $('#spnStatus').text();
+            if (s === 'Submitted') {
+                var tempStatus = setStatus(3);
+                $('#spnStatus').text(tempStatus.Status);
+            }
+            //Update the accordions
+            var acc = $("#accordionContainer").dxAccordion('instance');
+            if (acc)
+                acc.option('dataSource', requestReview.ReviewSteps);
+        }
+        else {
+            var errMsg = "An error occurred in the system, contact support.  ";
+            if (response.Messages) {
+                errMsg += response.Messages[0].Result;
+            }
+            Nsga.Callisto.Messages.showError(errMsg);
+        }
+
+    }
+
+    var isRejected = function (requestReview) {
+        var rejected = false;  //assume no rejections
+        if (requestReview) {   //if  there are steps, look for any step with a reject.  If yes, then its a reject
+            for (var s = 0; s < requestReview.ReviewSteps.length; s++) {
+                if (requestReview.ReviewSteps[s].StatusText === 'rejected') {
+                    rejected = true;
+                    break;  //break out of the parent steps for loop, cause we found a reject
+                }
+                else if (requestReview.ReviewSteps[s].ChildSteps) {
+                    for (var c = 0; c < requestReview.ReviewSteps[s].ChildSteps.length; c++) {
+                        if (requestReview.ReviewSteps[s].ChildSteps[c].StatusText === 'rejected') {
+                            rejected = true;
+                            break;  //break out of the childSteps for loop cause we found a reject
+                        }
+                    }
+                    if (rejected)
+                        break;  //if a childStep was rejected, then break out of the parent Steps for loop
+                }
+            }
+        }
+        return rejected;
+    };
+
+    var setStatus = function (statusType) {
+        var RequestStatus = new Object();
+        if (statusType === 1) {
+            RequestStatus.Id = 1;
+            RequestStatus.Status = "Draft";
+        } else if (statusType === 2) {
+            RequestStatus.Id = 2;
+            RequestStatus.Status = "Submitted";
+        } else if (statusType === 3) {
+            RequestStatus.Id = 3;
+            RequestStatus.Status = "In Review";
+        } else if (statusType === 4) {
+            RequestStatus.Id = 4;
+            RequestStatus.Status = "Rejected";
+        } else if (statusType === 5) {
+            RequestStatus.Id = 5;
+            RequestStatus.Status = "Cancelled";
+        } else if (statusType === 6) {
+            RequestStatus.Id = 6;
+            RequestStatus.Status = "Completed";
+        }
+        return RequestStatus;
+    };
+
+    var requestReview = model.Review;
+
+    $("document").ready(function () {
+        populateFields();
+        // Bind the fucntions to events
+        // Bind the events to the buttons
+        $("#btnSubmit").bind("click", onSubmit);
+        $("#btnCancel").bind("click", onCancel);
+        //$("#btnApprove").bind("click", onApprove);
+        //$("#btnReject").bind("click", onReject);
+        var records = null;
+        @if (Model.MATs != null)
+        {
+        <text>
+        records = @(JsonHelper.Serialize(Model.MATs));
+        </text>
+        }
+        $("#grdRecords").dxDataGrid({
+            dataSource: records,
+            keyExpr: "Id",
+            height: function () { return $(window).height() * .9 },
+            columnAutoWidth: true,
+            showColumnLines: true,
+            showRowLines: true,
+            rowAlternationEnabled: true,
+            showBorders: true,
+            wordWrapEnabled: true,
+            headerFilter: { visible: true },
+            filterRow: { visible: true },
+            loadPanel: { enabled: true },
+            paging: { enabled: false },
+            scrolling: {
+                showScrollbar: "always",
+            },
+            columnFixing: {
+                enabled: true
+            },
+            editing: {
+                mode: "row",
+                allowUpdating: false,
+                allowDeleting: false,
+                allowAdding: false,
+            },
+            columns: [
+                {
+                    caption: "@(Html.Raw(ImportSpecification.ColumnNames.SSDId))",
+                    dataField: "MATSsdId.Name",
+                    alignment: "left",
+                    fixed: true,
+                    fixedPosition: "left"
+                },
+                {
+                    caption: "@(Html.Raw(ImportSpecification.ColumnNames.DesignId))",
+                    dataField: "MATDesignId.Name",
+                    alignment: "left",
+                    fixed: true,
+                    fixedPosition: "left"
+                },
+                {
+                    caption: "@(Html.Raw(ImportSpecification.ColumnNames.Scode))",
+                    dataField: "Scode",
+                    fixed: true,
+                    fixedPosition: "left"
+                },
+                {
+                    caption: "@(Html.Raw(ImportSpecification.ColumnNames.MediaIPN))",
+                    dataField: "MediaIPN",
+                    fixed: true,
+                    fixedPosition: "left"
+                },
+                {
+                    caption: "@(Html.Raw(ImportSpecification.ColumnNames.MediaType))",
+                    dataField: "MediaType",
+                    fixed: true,
+                    fixedPosition: "left"
+                },
+                {
+                    caption: "@(Html.Raw(ImportSpecification.ColumnNames.DeviceName))",
+                    dataField: "DeviceName",
+                    fixed: true,
+                    fixedPosition: "left"
+                },
+            ],
+            masterDetail: {
+                enabled: true,
+                template: function (container, options) {
+                    var dsAttributes = options.data.Attributes;
+                    $("<div />")
+                        .dxDataGrid({
+                            columnAutoWidth: true,
+                            showBorders: true,
+                            rowAlternationEnabled: true,
+                            width: "500px",
+                            columnAutoWidth: true,
+                            showColumnLines: true,
+                            showRowLines: true,
+                            rowAlternationEnabled: true,
+                            showBorders: true,
+                            wordWrapEnabled: true,
+                            headerFilter: { visible: true },
+                            filterRow: { visible: true },
+                            loadPanel: { enabled: true },
+                            paging: { enabled: false },
+                            scrolling: {
+                                showScrollbar: "always",
+                            },
+                            columnFixing: {
+                                enabled: true
+                            },
+                            columns: [
+                                {
+                                    caption: "Attributes",
+                                    dataField: "NameDisplay",
+                                    fixed: true,
+                                    fixedPosition: "left"
+                                },
+                                {
+                                    caption: "Value",
+                                    dataField: "Value",
+                                    fixed: true,
+                                    fixedPosition: "left"
+                                },
+                                {
+                                    caption: "Operator",
+                                    dataField: "Operator",
+                                    fixed: true,
+                                    fixedPosition: "left"
+                                }
+                            ],
+                            dataSource: dsAttributes
+                        }).appendTo(container);
+                }
+            }
+        });
+    });
+
+    var getReviewDecision = function (stageId, groupId, reviewerId, comment) {
+        var ReviewDecision = new Object();
+        ReviewDecision.VersionId = model.Id;
+        ReviewDecision.ReviewStageId = stageId;
+        ReviewDecision.ReviewGroupId = groupId;
+        ReviewDecision.ReviewReviewerId = reviewerId;
+        ReviewDecision.Comment = comment;
+        ReviewDecision.IsApproved = false;
+        ReviewDecision.ReviewedOn = new Date();
+        return ReviewDecision;
+    };
+
+    var hasComment = function (commentTxt) {
+        var yesno = true;
+        if (commentTxt.val().length === 0) {
+            Nsga.Callisto.Messages.showError("Please provide a comment");
+            commentTxt.focus();
+            yesno = false;
+        }
+        return yesno;
+    };
+
+    // Either an Approve or Reject button has been pressed.
+    // Make sure they have entered a comment.  If not, display
+    // error and focus on correct Comment Text Box
+    var submitReviewDecision = function (e, element) {
+        var btnChk = $(element);
+
+        if (btnChk) {
+            var btnDiv = btnChk.closest(".groupwrapper");
+            if (btnDiv) {
+                var commentTxt = btnDiv.find(".reviewTxt");
+
+                if (commentTxt) {
+                    if (hasComment(commentTxt)) {
+                        var reviewButton = btnChk.find(".decision");
+                        //var decision = (reviewButton.val() === 'Approve');
+                        var stageId = reviewButton.attr('data-stageid');
+                        var groupId = reviewButton.attr('data-groupid');
+                        var reviewerId = reviewButton.attr('data-reviewerid');
+
+                        if (reviewButton.val() === 'Approve') {
+                            Nsga.Callisto.MATVersions.approve(
+                                JSON.stringify(getReviewDecision(stageId, groupId, reviewerId, commentTxt.val())),
+                                onChangeStatus,
+                                onError);
+                        } else {
+                            Nsga.Callisto.MATVersions.reject(
+                                JSON.stringify(getReviewDecision(stageId, groupId, reviewerId, commentTxt.val())),
+                                onChangeStatus,
+                                onError);
+                        }
+                    }
+                }
+            }
+        }
+    };
+
+    var reviewStageTemplate = function (data, index, element) {
+
+        var isNotCancelled = model.Status.Name !== "Cancelled";
+        var reviewStageStatus = data["StatusText"];
+        var reviewStage = data["ReviewStage"]; // review stage
+        var reviewGroupReviewers = data['ReviewGroupReviewers']; // review group reviewers
+        // render the group(s) and reviewers with review decision
+        var groupWrapper;
+        var reviewGroupReviewer, reviewers, reviewer, approvalStatus, group;
+        //var divReviewPending = $("<div class='undecided ' >Review pending.</div>");
+        var divReviewers;
+        var reviewerNames = [];
+        var requestId = model.Id;
+        for (var g=0; g < reviewGroupReviewers.length; g++) {
+            reviewerNames = [];
+            groupWrapper = $("<div class='groupwrapper' />");
+            // Get the review group
+            reviewGroupReviewer = reviewGroupReviewers[g]; // 1-1 with group (reviewer.ReviewGroup) represents one review group
+            group = reviewGroupReviewer.ReviewGroup;
+            var groupStatus;
+            if (group) {
+                groupStatus = group.ReviewStatusText;
+                groupWrapper.append($("<div class='grouptitle' />").text(group.GroupName));
+                divReviewers = $("<div  class='undecided ' ></div>");
+                groupWrapper.append(divReviewers);
+            }
+            // Get the reviewers with in the current group
+            reviewers = reviewGroupReviewer.Reviewers;
+            for (var a=0; a < reviewers.length; a++) {
+                // Get the reviewer
+                reviewer = reviewers[a];
+                if (reviewer) {
+                    // ReviewStatus
+                    if (reviewer.ReviewStatusText === "open") {
+                        //If this group has not made a decision, then list the approver, otherwise don't list it cause its been approved
+                        if (reviewGroupReviewer.ReviewGroup.ReviewStatusText === "open"){
+                            reviewerNames.push(reviewer.Employee.Name);
+                        }
+                    } else {
+                        // if (reviewer.ReviewStatusText) {
+                        var decision = (reviewer.ReviewStatusText === "approved") ? "Approved" : "Rejected";// Ideal if we use IsApproved TO DO
+                        ////groupWrapper.append($("<input data-stageid='" + reviewStage.Id + "'  data-groupid='" + group.Id + "' class='btnchecklist showinline floatright' style='margin-right:8px;' type='button' value='View Check List' />")
+                        ////        .bind("click", function(e) {
+                        ////            var btnChekList = this;
+                        ////            var el = $(this);
+                        ////            var stageId = el.attr('data-stageid');
+                        ////            var groupId = el.attr('data-groupid');
+                        ////            showCheckList(e, btnChekList, stageId, groupId, requestId);
+                        ////        }));
+                        var commentDate;
+                        if (reviewer.ReviewDate.search("Date") === -1)
+                            commentDate = new Date(reviewer.ReviewDate);
+                        else
+                            commentDate = new Date(parseInt(reviewer.ReviewDate.substr(6))); // TO DO: This might cause problem. new Date() converts the date to local date. we have users in US and China.
+
+                        groupWrapper.append(
+                                $("<div class='"+decision+"' />")
+                                    .text(decision + " by " + reviewer.Employee.Name + " On: "
+                                    + commentDate.toLocaleDateString("en-US", {day:'2-digit', month: 'short', year: 'numeric'})
+                                    + " with following comments:"));
+
+                        // TO DO: 
+                        groupWrapper.append($("<div class='comments display' />").text('"' + reviewer.Comment + '"'));
+
+                        //}
+                        //else {
+                        //    //no decision was made
+                        //    if (!isNotCancelled) {
+                        //        groupWrapper.append($("<div class='comments display' />").text('There was no decision when the request was cancelled.'));
+                        //    }
+                        //}
+                    }
+                }
+                // If review has not been completed (reviewStageStatus = open), then render the review controls & UX
+                if (reviewStageStatus === "open") {
+                    if( groupStatus === "open" && isNotCancelled) {
+                        //Only display the voting buttons if:  1) This stage has not been reviewed yet, 2) The reviewer is the currently logged in user, 3) This stage is current stage to vote on.
+                        var curUserIdsid = "@Html.Raw(Intel.NsgAuto.Web.Mvc.Core.Functions.GetCurrentUserIdSid())";
+                        if ((reviewer.Idsid === curUserIdsid) &&
+                                    (data["IsCurrentStage"] === true)
+                            ) {
+                            var divSecond = $("<div class='reviewControls showinline' />");
+                            divSecond.append($("<div class='txtacomments showinline' />").append(
+                                $("<div class='caption' style='margin-left:1px;font-size: 12px;' >You are a reviewer for " + group.GroupName
+                                +". Input comments below, and Provide your decision:<span class='mandatory' >*</span></div><textarea class='reviewTxt' data-idsid-txt='" + reviewer.idsid
+                                + "' style='margin-right:8px;' rows='3' cols='50'></textarea>")));
+                            divSecond.appendTo(groupWrapper);
+                            var divReviewSection = $("<div class='reviewactions showinline'/>");
+
+                            // check list
+                            //////divReviewSection.append($("<input data-groupid=" + group.Id + " class='btnchecklist showinline' style='margin-right:8px;' type='button' value='Check List' />")
+                            //////    .bind("click", function(e) {
+                            //////        var btnChekList = this;
+                            //////        var gid = $(this).attr('data-groupid');
+                            //////        showCheckList(e, btnChekList, reviewStage.Id, gid, requestId);
+                            //////    }));
+
+                            //add data-attributes to be used later
+                            divReviewSection.attr('data-reviewerId', reviewer.Id).attr('data-reviewStageId', reviewStage.Id).attr('data-groupid', group.Id);
+                            // reject
+                            divReviewSection.append($("<span class='reject-wrapper'><span class='thumbsdown fa fa-thumbs-down' style='color:red;'></span><input class='rejectBtn showinline decision' data-reviewerid='" + reviewer.Id + "' data-stageid='" + reviewStage.Id + "' data-groupid='" + group.Id + "' type='button' value='Reject'/></span>")
+                                .bind("click", function(e) {
+                                    var btnReject = this;
+                                    //// TODO: request.RequestStatus = setStatus(4);
+                                    //// $('#spnStatus').text(model.Status.Name);
+                                    submitReviewDecision(e, btnReject);
+                                }));
+                            // Approve section
+                            //if (!group.IsCheckListCompleted)
+                            //{
+                            //    divReviewSection.append(getDisabledApproveControl());
+                            //}else{
+                            divReviewSection.append(getApproveControl(reviewer.Id, reviewStage.Id, group.Id));
+                            //}
+                            divReviewSection.appendTo(groupWrapper);
+                        }
+                    } //if groupStatus === open
+                }//If reviewStageStatus === open
+                // append all reviewer names
+                if (reviewerNames.length > 0) {
+                    divReviewers.text("Assigned Reviewers : " + reviewerNames.join(';  '));
+                }
+            }
+            // add the group to the step
+            element.append(groupWrapper);
+        }
+    };
+
+    var getApproveControl = function (reviewerId, reviewStageId, reviewGroupId) {
+        var btnApprove = $("<span class='approve-wrapper'><span class='thumbsup fa fa-thumbs-up' style='color:green;'></span><input class='approveBtn showinline decision'  data-reviewerid='" + reviewerId + "' data-stageid='" + reviewStageId + "' data-groupid='" + reviewGroupId + "' style='margin-right:8px;' type='button' value='Approve'/></span>");
+        btnApprove.bind("click", function (e) {
+            submitReviewDecision(e, btnApprove);
+        });
+        return btnApprove;
+    };
+
+    var getDisabledApproveControl = function () {
+        var spnApprove = $("<span class='disabledapprove-wrapper'><span class='locked fa fa-lock'></span><span class='disabledapprove disabled' >Approve</span></span>");
+        spnApprove.hover(function (e) {
+            $("#tooltip").dxTooltip({
+                target: spnApprove,
+                showEvent: "mouseenter",
+                hideEvent: "mouseleave",
+                contentTemplate: function (data) {
+                    data.html("<div>Click to approve.</div>");
+                }
+            });
+        });
+        return spnApprove;
+    };
+
+
+    $(function () {
+        if (!requestReview)
+            return;
+
+        var reviewSteps = requestReview.ReviewSteps;
+
+        if (reviewSteps) {
+            if (reviewSteps.length > 0) {
+                $("#accordionContainer").dxAccordion({
+                    dataSource: reviewSteps,
+                    multiple: true,
+                    collapsible: true,
+
+                    itemTitleTemplate:
+                        // Accordion header. Displays color changes to cue review status
+                        function (itemData, itemIndex, itemElement) {
+                            var status = (itemData.StatusText) ? itemData.StatusText : 'open';
+                            itemElement.addClass('bg-' + status);
+                            itemElement.append($("<div class='accordiontitle " + status + " ' >" + itemData.ReviewStage.StageName + "</div>"));
+                        },
+                    itemTemplate:
+                        // Item template
+                        function (itemData, itemIndex, itemElement) {
+                            //Don't think i need these
+                            var reviewStage = itemData["ReviewStage"]; // review stage
+                            var reviewGroupReviewers = itemData['ReviewGroupReviewers']; // review group reviewers
+                            //Don't think i need these
+                            var childSteps = itemData['ChildSteps'];
+                            //if we have child steps, no approval and no groups at the parent level
+                            if (childSteps && childSteps.length > 0) {
+
+                                var divChildAccordion = $("<div class='childstepwrapper childstepaccordion bglightergray' />")
+                                    .dxAccordion({
+                                        dataSource: childSteps,
+                                        multiple: true,
+                                        collapsible: true,
+                                        itemTitleTemplate:
+                                            // Accordion header. Displays color changes to cue review status
+                                            function (childStepData, childItemIndex, childItemElement) {
+                                                var status = (childStepData.StatusText) ? childStepData.StatusText : 'open';
+                                                childItemElement.append($("<div class='childaccordiontitle " + status + " ' >" + childStepData.ReviewStage.StageName + "</div>"));
+                                            },
+                                        itemTemplate:
+                                            // Item template
+                                            function (childItemData, childItemIndex, childItemElement) {
+                                                reviewStageTemplate(childItemData, childItemIndex, childItemElement);
+                                            },
+                                        onItemRendered: function (dataItem) {
+                                            var i = dataItem.itemIndex;
+                                            var el = this;
+                                            el.expandItem(i);
+                                        }
+                                    }).appendTo(itemElement);
+                            }
+                            else {
+                                reviewStageTemplate(itemData, itemIndex, itemElement);
+                            }
+                        },
+                    onItemRendered: function (dataItem) {
+                        var i = dataItem.itemIndex;
+                        var container = this;
+                        container.collapseItem(i);
+                        var isCurrent = dataItem.itemData["IsCurrentStage"];
+                        if (isCurrent && isCurrent === true)
+                            container.expandItem(i);
+                    }
+                });
+            } else {
+                $("#accordionContainer").append($("<div class='noreviewsetup'><span class='fa fa-stop-circle' aria-hidden='true'></span>No review work flow configured. Contact <a href='mailto:callistosupport@domain.com?Subject=Configure Workflow for Media Attributes Table versions.' target='_top'>Callisto Support Team</a> to set this up.</div>"));
+            }
+        }
+        ////if (requestReview.ReviewSteps && requestReview.ReviewSteps.length > 0) {
+        ////    if (!requestReview.ReviewSteps[0].IsCurrentStage) {
+        ////        $('#btnCancel').hide();
+        ////    }
+        ////}
+    });
+
+
+</script>
+
+<div class="padeightpixel">
+    <div class="rightalign">
+        <div class="padeightpixel">
+            <span><a title="Click here to view all versions" id="lnkViewAll" href="/MATVersions/List/"><span class="imagelinkbutton bordered"><span class="fa fa-list-alt "></span><span class="margintwopixel">All Versions</span> </span></a></span>
+        </div>
+    </div>
+    <div id="accDetails" class="accordion-label open margintwopixel">Details</div>
+    <div id="divDetails" class="accordion-panel" style="padding: 8px;">
+        <table class="bluebox padfourpixel" style="width:60%; margin:auto;">
+            <tr>
+                <td style="width:25%"><label for="spnId" class="formlabel padfourpixel">Id</label></td>
+                <td style="width:25%"><span type="text" id="spnId"></span></td>
+                <td style="width:25%"><label for="spnCreatedBy" class="formlabel">Created By</label></td>
+                <td style="width:25%"><span type="text" id="spnCreatedBy"></span></td>
+            </tr>
+            <tr>
+                <td><label for="spnVersion" class="formlabel padfourpixel">Version</label></td>
+                <td><span type="text" id="spnVersion"></span></td>
+                <td><label for="spnCreatedOn" class="formlabel">Created On</label></td>
+                <td><span type="text" id="spnCreatedOn"></span></td>
+            </tr>
+            <tr>
+                <td><label for="spnIsActive" class="formlabel padfourpixel">Is Active?</label></td>
+                <td><span type="text" id="spnIsActive"></span></td>
+                <td><label for="spnUpdatedBy" class="formlabel">Updated By</label></td>
+                <td><span type="text" id="spnUpdatedBy"></span></td>
+            </tr>
+            <tr>
+                <td><label for="spnIsPOR" class="formlabel padfourpixel">Is POR?</label></td>
+                <td><span type="text" id="spnIsPOR"></span></td>
+                <td><label for="spnUpdatedOn" class="formlabel">Last Updated On</label></td>
+                <td><span type="text" id="spnUpdatedOn"></span></td>
+            </tr>
+            <tr>
+                <td><label for="spnStatus" class="formlabel padfourpixel">Status</label></td>
+                <td><span type="text" id="spnStatus"></span></td>
+                <td class="padfourpixel"><button id="btnSubmit" class="hide">Submit For Review</button>&nbsp;&nbsp;<button id="btnCancel" class="hide">Cancel</button></td>
+                <td></td>
+            </tr>
+        </table>
+    </div>
+    @if (Model.Version.Status.Name != "Draft")
+    {
+    <div id="accReview" class="accordion-label open">Review</div>
+    <div id="divReview" class="accordion-panel">
+        <!--<div style="padding: 8px; width: 100%; text-align: center;"><button id="btnApprove" class="hide">Approve</button>&nbsp;&nbsp;<button id="btnReject" class="hide">Reject</button></div> -->
+        <div id="accordionContainer"></div>
+    </div>
+    }
+    <div id="accMATs" class="accordion-label open margintwopixel">Media Attributes Table (MAT)</div>
+    <div id="divMATs" class="accordion-panel">
+        <div id="grdRecords"></div>
+    </div>
+</div>
+

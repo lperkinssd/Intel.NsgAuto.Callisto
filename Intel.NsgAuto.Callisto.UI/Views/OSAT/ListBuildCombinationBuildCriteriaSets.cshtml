@@ -1,0 +1,156 @@
+﻿@{
+    ViewBag.Title = "OSAT - Build Criteria Set Versions";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style scoped>
+    .dx-row {
+        cursor: pointer;
+    }
+</style>
+
+<script type="text/javascript">
+
+    var entity = @(JsonHelper.Serialize(Model.Entity));
+    var buildCombination = entity.BuildCombination;
+    var buildCriteriaSets = entity.BuildCriteriaSets;
+
+    $(document).ready(function () {
+
+        $("#tooltip").dxTooltip({
+            showEvent: "mouseenter",
+            hideEvent: "mouseleave",
+            closeOnOutsideClick: false,
+        });
+
+        // grdBuildCombination
+        var config = Nsga.Callisto.Dx.dataGridDefaultConfig();
+        config.dataSource = buildCombination ? [buildCombination] : null;
+        config.filterRow = { visible: false };
+        config.keyExpr = "Id";
+        config.headerFilter = { visible: false };
+        config.columns = [
+            {
+                dataField: "IntelLevel1PartNumber",
+                caption: "Intel Level 1 Part Number",
+            },
+            {
+                dataField: "IntelProdName",
+                caption: "Intel Product Name",
+            },
+            {
+                dataField: "MaterialMasterField",
+                caption: "MM Number",
+            },
+            {
+                dataField: "IntelMaterialPn",
+                caption: "Intel Part Name",
+            },
+            {
+                dataField: "DeviceName",
+                caption: "Device Name",
+            },
+            {
+                dataField: "AssyUpi",
+                caption: "Assembly UPI",
+            },
+            {
+                dataField: "PartUseType.Abbreviation",
+                caption: "ES/Prod"
+            },
+            {
+                dataField: "IsActive",
+                caption: "Is Active?",
+                falseText: "N",
+                trueText: "Y",
+                alignment: "center",
+                showEditorAlways: false,
+            },
+            {
+                dataField: "Mpp",
+                caption: "MPP"
+            },
+        ];
+        $("#grdBuildCombination").dxDataGrid(config);
+
+        // grdRecords
+        config = Nsga.Callisto.Dx.dataGridDefaultConfig();
+        config.columns = [
+            {
+                dataField: "Version",
+                caption: "Version",
+            },
+            {
+                dataField: "IsPOR",
+                caption: "Is POR",
+                falseText: "N",
+                trueText: "Y",
+                alignment: "center",
+                showEditorAlways: false,
+            },
+            {
+                dataField: "Status.Name",
+                caption: "Status",
+            },
+            {
+                dataField: "CreatedByUserName",
+                caption: "Created By",
+                cellTemplate: function (container, options) {
+                    var cellValue = options.text ? options.text : options.data.CreatedBy;
+                    container.append("<div>" + cellValue + "</div>");
+                }
+            },
+            {
+                dataField: "CreatedOn",
+                caption: "Created On",
+                dataType: "datetime",
+                format: "MM/dd/yyyy hh:mm:ss a",
+            },
+            {
+                caption: "",
+                cellTemplate: function (container, options) {
+                    $("<a>Details</a>").attr({ "href": "/OSAT/BuildCriteriaSetDetails/" + options.data["Id"], "target": "_blank" }).appendTo(container);
+                },
+                allowFiltering: false,
+            },
+        ];
+        config.hoverStateEnabled = true;
+        config.onRowClick = function (e) {
+            if (e.rowType == "data") {
+                window.open('/OSAT/BuildCriteriaSetDetails/' + e.data.Id, "_blank");
+            }
+        };
+        // using the row tooltip technique given by the devexpress support team
+        // https://supportcenter.devexpress.com/ticket/details/t383731/dxdatagrid-tooltip-on-row
+        config.onRowPrepared = function (e) {
+            if (e.rowType == "data") {
+                e.rowElement.mousemove(function () {
+                $("#tooltip").dxTooltip("instance").show(e.rowElement);
+                });
+            }
+        };
+        config.keyExpr = "Id";
+        config.dataSource = buildCriteriaSets;
+        $("#grdRecords").dxDataGrid(config);
+
+    });
+
+</script>
+
+
+<div class="padeightpixel">
+    <div id="accBuildCombination" class="accordion-label open">Part Details</div>
+    <div id="divBuildCombination" class="accordion-panel">
+        <div id="grdBuildCombination"></div>
+    </div>
+    <div id="accCriterias" class="accordion-label open">Build Criteria Set Versions</div>
+    <div id="divCriterias" class="accordion-panel">
+        <div class="centeralign">
+            <div id="indicator"></div>
+        </div>
+        <div>
+            <div id="tooltip">Click to view the details for this item</div>
+            <div id="grdRecords"></div>
+        </div>
+    </div>
+</div>

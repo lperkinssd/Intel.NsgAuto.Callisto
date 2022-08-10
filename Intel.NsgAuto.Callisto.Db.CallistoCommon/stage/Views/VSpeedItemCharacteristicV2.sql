@@ -1,0 +1,1 @@
+﻿CREATE VIEW [stage].[VSpeedItemCharacteristicV2] AS SELECT * FROM [stage].[ItemCharacteristicV2] WITH (NOLOCK);

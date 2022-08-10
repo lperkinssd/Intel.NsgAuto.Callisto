@@ -1,0 +1,128 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30711.63
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Intel.NsgAuto.Callisto.Business", "Intel.NsgAuto.Callisto.Business\Intel.NsgAuto.Callisto.Business.csproj", "{AC902E5E-52D6-4126-BB64-70170D9F9B19}"
+EndProject
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "Intel.NsgAuto.Callisto.Db.Callisto", "Intel.NsgAuto.Callisto.Db.Callisto\Intel.NsgAuto.Callisto.Db.Callisto.sqlproj", "{4905FCF4-F193-4DF1-8B7B-85A36AF3E408}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Intel.NsgAuto.Callisto.UI", "Intel.NsgAuto.Callisto.UI\Intel.NsgAuto.Callisto.UI.csproj", "{34713FD6-4111-43DE-B161-6469DEDDA342}"
+	ProjectSection(ProjectDependencies) = postProject
+		{AC902E5E-52D6-4126-BB64-70170D9F9B19} = {AC902E5E-52D6-4126-BB64-70170D9F9B19}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Intel.NsgAuto.Callisto.UnitTests", "Intel.NsgAuto.Callisto.UnitTests\Intel.NsgAuto.Callisto.UnitTests.csproj", "{12E8C42D-7052-446D-A556-A48BE54AFBBC}"
+EndProject
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "Intel.NsgAuto.Callisto.Db.CallistoCommon", "Intel.NsgAuto.Callisto.Db.CallistoCommon\Intel.NsgAuto.Callisto.Db.CallistoCommon.sqlproj", "{439B648A-45E0-44E3-BF1B-1FD5F79C2602}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Intel.NsgAuto.Callisto.App.OsatQfExport", "Intel.NsgAuto.Callisto.App.OsatQfExport\Intel.NsgAuto.Callisto.App.OsatQfExport.csproj", "{60A20F76-2684-444D-ACED-F95797576E8E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Intel.NsgAuto.Callisto.App.OsatQfImport", "Intel.NsgAuto.Callisto.App.OsatQfImport\Intel.NsgAuto.Callisto.App.OsatQfImport.csproj", "{10D6385B-4D53-47BC-B1A2-0C72D47C424A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Intel.NsgAuto.Callisto.App.OdmQfPublisher", "Intel.NsgAuto.Callisto.App.OdmQfPublisher\Intel.NsgAuto.Callisto.App.OdmQfPublisher.csproj", "{DEF4C572-2F06-4894-AC57-62213CB4BD52}"
+	ProjectSection(ProjectDependencies) = postProject
+		{AC902E5E-52D6-4126-BB64-70170D9F9B19} = {AC902E5E-52D6-4126-BB64-70170D9F9B19}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Intel.NsgAuto.Callisto.App.OdmQfSLotTracker", "Intel.NsgAuto.Callisto.App.OdmQfSLotTracker\Intel.NsgAuto.Callisto.App.OdmQfSLotTracker.csproj", "{FE36512A-4594-47A2-9783-8C0470934AA5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Integration|Any CPU = Integration|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AC902E5E-52D6-4126-BB64-70170D9F9B19}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AC902E5E-52D6-4126-BB64-70170D9F9B19}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AC902E5E-52D6-4126-BB64-70170D9F9B19}.Integration|Any CPU.ActiveCfg = Integration|Any CPU
+		{AC902E5E-52D6-4126-BB64-70170D9F9B19}.Integration|Any CPU.Build.0 = Integration|Any CPU
+		{AC902E5E-52D6-4126-BB64-70170D9F9B19}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AC902E5E-52D6-4126-BB64-70170D9F9B19}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4905FCF4-F193-4DF1-8B7B-85A36AF3E408}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4905FCF4-F193-4DF1-8B7B-85A36AF3E408}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4905FCF4-F193-4DF1-8B7B-85A36AF3E408}.Integration|Any CPU.ActiveCfg = Integration|Any CPU
+		{4905FCF4-F193-4DF1-8B7B-85A36AF3E408}.Integration|Any CPU.Build.0 = Integration|Any CPU
+		{4905FCF4-F193-4DF1-8B7B-85A36AF3E408}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4905FCF4-F193-4DF1-8B7B-85A36AF3E408}.Release|Any CPU.Build.0 = Release|Any CPU
+		{34713FD6-4111-43DE-B161-6469DEDDA342}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{34713FD6-4111-43DE-B161-6469DEDDA342}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{34713FD6-4111-43DE-B161-6469DEDDA342}.Integration|Any CPU.ActiveCfg = Integration|Any CPU
+		{34713FD6-4111-43DE-B161-6469DEDDA342}.Integration|Any CPU.Build.0 = Integration|Any CPU
+		{34713FD6-4111-43DE-B161-6469DEDDA342}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{34713FD6-4111-43DE-B161-6469DEDDA342}.Release|Any CPU.Build.0 = Release|Any CPU
+		{12E8C42D-7052-446D-A556-A48BE54AFBBC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{12E8C42D-7052-446D-A556-A48BE54AFBBC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{12E8C42D-7052-446D-A556-A48BE54AFBBC}.Integration|Any CPU.ActiveCfg = Integration|Any CPU
+		{12E8C42D-7052-446D-A556-A48BE54AFBBC}.Integration|Any CPU.Build.0 = Integration|Any CPU
+		{12E8C42D-7052-446D-A556-A48BE54AFBBC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{12E8C42D-7052-446D-A556-A48BE54AFBBC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{439B648A-45E0-44E3-BF1B-1FD5F79C2602}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{439B648A-45E0-44E3-BF1B-1FD5F79C2602}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{439B648A-45E0-44E3-BF1B-1FD5F79C2602}.Integration|Any CPU.ActiveCfg = Integration|Any CPU
+		{439B648A-45E0-44E3-BF1B-1FD5F79C2602}.Integration|Any CPU.Build.0 = Integration|Any CPU
+		{439B648A-45E0-44E3-BF1B-1FD5F79C2602}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{439B648A-45E0-44E3-BF1B-1FD5F79C2602}.Release|Any CPU.Build.0 = Release|Any CPU
+		{60A20F76-2684-444D-ACED-F95797576E8E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{60A20F76-2684-444D-ACED-F95797576E8E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{60A20F76-2684-444D-ACED-F95797576E8E}.Integration|Any CPU.ActiveCfg = Debug|Any CPU
+		{60A20F76-2684-444D-ACED-F95797576E8E}.Integration|Any CPU.Build.0 = Debug|Any CPU
+		{60A20F76-2684-444D-ACED-F95797576E8E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{60A20F76-2684-444D-ACED-F95797576E8E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{10D6385B-4D53-47BC-B1A2-0C72D47C424A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{10D6385B-4D53-47BC-B1A2-0C72D47C424A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{10D6385B-4D53-47BC-B1A2-0C72D47C424A}.Integration|Any CPU.ActiveCfg = Debug|Any CPU
+		{10D6385B-4D53-47BC-B1A2-0C72D47C424A}.Integration|Any CPU.Build.0 = Debug|Any CPU
+		{10D6385B-4D53-47BC-B1A2-0C72D47C424A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{10D6385B-4D53-47BC-B1A2-0C72D47C424A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DEF4C572-2F06-4894-AC57-62213CB4BD52}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DEF4C572-2F06-4894-AC57-62213CB4BD52}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DEF4C572-2F06-4894-AC57-62213CB4BD52}.Integration|Any CPU.ActiveCfg = Debug|Any CPU
+		{DEF4C572-2F06-4894-AC57-62213CB4BD52}.Integration|Any CPU.Build.0 = Debug|Any CPU
+		{DEF4C572-2F06-4894-AC57-62213CB4BD52}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DEF4C572-2F06-4894-AC57-62213CB4BD52}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FE36512A-4594-47A2-9783-8C0470934AA5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE36512A-4594-47A2-9783-8C0470934AA5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE36512A-4594-47A2-9783-8C0470934AA5}.Integration|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE36512A-4594-47A2-9783-8C0470934AA5}.Integration|Any CPU.Build.0 = Debug|Any CPU
+		{FE36512A-4594-47A2-9783-8C0470934AA5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE36512A-4594-47A2-9783-8C0470934AA5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {858E3B3A-3FE4-412C-A907-37EF2D93E751}
+	EndGlobalSection
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 9
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = http://prdfmtfsvap03.amr.corp.intel.com:8080/tfs/nsg%20treadstone
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = Intel.NsgAuto.Callisto.Business\\Intel.NsgAuto.Callisto.Business.csproj
+		SccProjectName1 = Intel.NsgAuto.Callisto.Business
+		SccLocalPath1 = Intel.NsgAuto.Callisto.Business
+		SccProjectUniqueName2 = Intel.NsgAuto.Callisto.Db.Callisto\\Intel.NsgAuto.Callisto.Db.Callisto.sqlproj
+		SccProjectName2 = Intel.NsgAuto.Callisto.Db.Callisto
+		SccLocalPath2 = Intel.NsgAuto.Callisto.Db.Callisto
+		SccProjectUniqueName3 = Intel.NsgAuto.Callisto.UI\\Intel.NsgAuto.Callisto.UI.csproj
+		SccProjectName3 = Intel.NsgAuto.Callisto.UI
+		SccLocalPath3 = Intel.NsgAuto.Callisto.UI
+		SccProjectUniqueName4 = Intel.NsgAuto.Callisto.UnitTests\\Intel.NsgAuto.Callisto.UnitTests.csproj
+		SccProjectName4 = Intel.NsgAuto.Callisto.UnitTests
+		SccLocalPath4 = Intel.NsgAuto.Callisto.UnitTests
+		SccProjectUniqueName5 = Intel.NsgAuto.Callisto.Db.CallistoCommon\\Intel.NsgAuto.Callisto.Db.CallistoCommon.sqlproj
+		SccProjectName5 = Intel.NsgAuto.Callisto.Db.CallistoCommon
+		SccLocalPath5 = Intel.NsgAuto.Callisto.Db.CallistoCommon
+		SccProjectUniqueName6 = Intel.NsgAuto.Callisto.App.OsatQfImport\\Intel.NsgAuto.Callisto.App.OsatQfImport.csproj
+		SccProjectName6 = Intel.NsgAuto.Callisto.App.OsatQfImport
+		SccLocalPath6 = Intel.NsgAuto.Callisto.App.OsatQfImport
+		SccProjectUniqueName7 = Intel.NsgAuto.Callisto.App.OdmQfPublisher\\Intel.NsgAuto.Callisto.App.OdmQfPublisher.csproj
+		SccProjectName7 = Intel.NsgAuto.Callisto.App.OdmQfPublisher
+		SccLocalPath7 = Intel.NsgAuto.Callisto.App.OdmQfPublisher
+		SccProjectUniqueName8 = Intel.NsgAuto.Callisto.App.OdmQfSLotTracker\\Intel.NsgAuto.Callisto.App.OdmQfSLotTracker.csproj
+		SccProjectName8 = Intel.NsgAuto.Callisto.App.OdmQfSLotTracker
+		SccLocalPath8 = Intel.NsgAuto.Callisto.App.OdmQfSLotTracker
+	EndGlobalSection
+EndGlobal

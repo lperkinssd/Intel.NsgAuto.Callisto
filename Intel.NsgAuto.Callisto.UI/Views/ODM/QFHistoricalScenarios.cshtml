@@ -1,0 +1,1374 @@
+﻿@model Intel.NsgAuto.Callisto.UI.Models.ODMModel
+
+@{
+    ViewBag.Title = "ODM - QF Historical Scenarios";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .redforecolor {
+        color: red !important;
+    }
+
+    #scrolledtabs {
+        margin-top: 20px;
+    }
+
+    #tabs {
+        margin-top: 4px;
+        width: 95%;
+    }
+    /*#grdRecords { height: 440px; }*/
+    .dx-tabs {
+        table-layout: fixed;
+    }
+
+    .content {
+        text-align: justify;
+        margin-top: 5px;
+    }
+
+    .caption {
+        font-size: 12px;
+        padding: 2px;
+    }
+
+    .left-aligned {
+        text-align: left;
+    }
+
+    .dx-tab.dx-tab-selected {
+        background-color: #5b9bd5;
+        color: #f5f5f5;
+    }
+
+    .dx-tab-selected .dx-icon {
+        color: #f5f5f5 !important;
+    }
+
+    .flagcolorcss {
+        color: red;
+    }
+
+    .dx-icon-save {
+        font: 20px/1 DXIcons;
+    }
+
+    .dx-field-label {
+        text-align: left;
+        color: #0123b4;
+        vertical-align: middle;
+        font-size: 12px;
+        width: 15%;
+    }
+
+    .dx-datagrid-header-panel .dx-toolbar {
+        margin-bottom: 1px;
+    }
+
+    .dx-datagrid-header-panel > .dx-icon-export-excel-button {
+        float: left !important
+    }
+
+    .dx-popup-title {
+        text-align: center;
+        position: relative;
+        color: red;
+    }
+
+    .gridContainer {
+        height: 440px;
+    }
+
+    .gridcontainer {
+        height: 100%;
+        width: 99.6%;
+        position: absolute;
+    }
+
+    .gridcontainer {
+        box-sizing: border-box;
+    }
+
+    .gridbox {
+        width: 98%;
+        position: absolute;
+        box-sizing: border-box;
+        height: 300px !important
+    }
+
+    .lnkslot {
+        text-decoration: underline !important;
+    }
+
+    .dx-datagrid-headers .editable-column {
+        background-color: lightgreen;
+    }
+</style>
+<script>
+    var tabsInstance = null;
+    var latestScenarioId;
+    var scenarioVersions = [];
+    var scenarioObj = null;
+    var showExcludeColumn = false;
+    var actions = null;
+    var reasons = null;
+    var tempId = 0;
+    var currentPageIndex = 0;
+    var tabs = [
+        {
+            id: tempId++,
+            text: "PRF",
+            icon: "fas fa-chart-line",
+            content: "PRF Results grid",
+            width: "125px"
+        },
+        {
+            id: tempId++,
+            text: "MAT",
+            icon: "fas fa-funnel-dollar",
+            content: "MAT grid",
+            width: "125px"
+        },
+        {
+            id: tempId++,
+            text: "Non Qualified Media",
+            icon: "fas fa-thumbs-down",//<i class="fas fa-thumbs-down"></i>< i class= "fas fa-handshake-slash" ></i >< i class= "fas fa-handshake-alt-slash" ></i >
+            content: "QF Results grid",
+            width: "150px"
+        },
+        {
+            id: tempId++,
+            text: "Qualified Media",
+            icon: "fas fa-handshake",
+            content: "QF Results grid",
+            width: "150px"
+        },
+        {
+            id: tempId++,
+            text: "Lot Dispositions",
+            icon: "fas fa-not-equal",
+            content: "Comparisons (Lot Dispositions) grid",
+            width: "200px"
+        }
+    ];
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    var showProgress = function () {
+        $("#importIndicator").dxLoadIndicator("instance").option("visible", true);
+    };
+    var hideProgress = function () {
+        $("#importIndicator").dxLoadIndicator("instance").option("visible", false);
+    };
+
+    function createDownloadFileName() {
+        var separator = " - ";
+        var scenarioText = ddlScenarios.option("text").split(":");
+        var retVal = scenarioText[1].trim() + separator + scenarioText[0].trim() + separator + scenarioText[2].trim() + separator + tabsInstance.option("selectedItem").text;
+        return retVal;
+    //    return `${scenarioText[1].trim()} - ${scenarioText[0].trim()} - ${scenarioText[2].trim()} - ${tabsInstance.option("selectedItem").text}`;
+    };
+
+    function displayComps(records) {
+        var config = Nsga.Callisto.Dx.dataGridDefaultConfig();
+
+        config.columns = [
+            {
+                caption: "ODM Name",
+                dataField: "SubConName",
+                headerCellTemplate: function (header, info) {
+                    $('<div>').html("ODM<br/>Name").appendTo(header);
+                },
+                alignment: "left",
+                width: "85px",
+                allowEditing: false,
+                fixed: true,
+                fixedPosition: "left",
+                cssClass: "fixedcolumn"
+            },
+            {
+                caption: "SSD ID",
+                dataField: "SsdId",
+                alignment: "left",
+                width: "105px",
+                allowEditing: false,
+                fixed: true,
+                fixedPosition: "left",
+                cssClass: "fixedcolumn"
+            },
+            {
+                caption: "Inventory Location",
+                dataField: "InventoryLocation",
+                headerCellTemplate: function (header, info) {
+                    $('<div>').html("Inventory<br/>Location").appendTo(header);
+                },
+                alignment: "left",
+                width: "100px",
+                allowEditing: false,
+                fixed: true,
+                fixedPosition: "left",
+                cssClass: "fixedcolumn"
+            },
+            {
+                caption: "MM Number",
+                dataField: "MMNumber",
+                headerCellTemplate: function (header, info) {
+                    $('<div>').html("MM<br/>Number").appendTo(header);
+                },
+                alignment: "left",
+                width: "85px",
+                allowEditing: false,
+                fixed: true,
+                fixedPosition: "left",
+                cssClass: "fixedcolumn"
+            },
+            {
+                caption: "Location Type",
+                dataField: "LocationType",
+                headerCellTemplate: function (header, info) {
+                    $('<div>').html("Location<br/>Type").appendTo(header);
+                },
+                alignment: "left",
+                width: "85px",
+                allowEditing: false,
+                fixed: true,
+                fixedPosition: "left",
+                cssClass: "fixedcolumn"
+            },
+            {
+                caption: "Category",
+                dataField: "Category",
+                alignment: "left",
+                width: "95px",
+                allowEditing: false,
+                fixed: true,
+                fixedPosition: "left",
+                cssClass: "fixedcolumn"
+            },
+            {
+                caption: "Design ID",
+                dataField: "DesignId",
+                headerCellTemplate: function (header, info) {
+                    $('<div>').html("Design<br/>ID").appendTo(header);
+                },
+                width: "75px",
+                allowEditing: false,
+                fixed: true,
+                fixedPosition: "left",
+                cssClass: "fixedcolumn"
+            },
+            {
+                caption: "S Code",
+                dataField: "SCode",
+                width: "75px",
+                allowEditing: false,
+                fixed: true,
+                fixedPosition: "left",
+                cssClass: "fixedcolumn"
+            },
+            {
+                caption: "S-Lot",
+                dataField: "SLot",
+                width: "85px",
+                fixed: true,
+                fixedPosition: "left",
+                cssClass: "fixedcolumn",
+                cellTemplate: function (container, options) {
+                    $('<a class="lnkslot" data-sLot=' + options.data['SLot'] + ' data-mediaIPN=' + options.data['MediaIPN'] + ' data-sCode=' + options.data['SCode'] + ' data-odmName=' + options.data['SubConName'] + ' >' + options.data['SLot'] + '</a>')
+                        .attr('href', 'JavaScript:void(0);')
+                        .bind("click", function (element) {
+                            var _self = $(this);
+                            var sLot = _self.attr('data-sLot');
+                            var mediaIPN = _self.attr('data-mediaIPN');
+                            var sCode = _self.attr('data-sCode');
+                            var odmName = _self.attr('data-odmName');
+                            Nsga.Callisto.Odm.getOdmLotWipDetails(sLot, mediaIPN, sCode, odmName, onGetOdmLotWipDetailsSuccess, onGetOdmLotWipDetailsError);
+                        })
+                        .appendTo(container);
+                }
+            },
+            {
+                caption: "Media IPN",
+                dataField: "MediaIPN",
+                allowEditing: false,
+                width: "95px",
+                fixed: true,
+                fixedPosition: "left",
+                cssClass: "fixedcolumn"
+            },
+            {
+                caption: "Por Major Probe Program Revision",
+                dataField: "PorMajorProbeProgramRevision",
+                headerCellTemplate: function (header, info) {
+                    $('<div>').html("Por Major Probe<br/>Program Revision").appendTo(header);
+                },
+                width: "155px",
+                allowEditing: false
+            },
+            {
+                caption: "Actual Major Probe Program Revision",
+                dataField: "ActualMajorProbeProgramRevision",
+                headerCellTemplate: function (header, info) {
+                    $('<div>').html("Actual Major Probe<br/>Program Revision").appendTo(header);
+                },
+                width: "145px",
+                allowEditing: false
+            },
+            {
+                caption: "Por Burn Tape Revision",
+                dataField: "PorBurnTapeRevision",
+                headerCellTemplate: function (header, info) {
+                    $('<div>').html("Por Burn Tape<br/>Revision").appendTo(header);
+                },
+                width: "135px",
+                allowEditing: false
+            },
+            {
+                caption: "Actual Burn Tape Revision",
+                dataField: "ActualBurnTapeRevision",
+                headerCellTemplate: function (header, info) {
+                    $('<div>').html("Actual Burn Tape<br/>Revision").appendTo(header);
+                },
+                width: "135px",
+                allowEditing: false
+            },
+            {
+                caption: "Por Cell Revision",
+                dataField: "PorCellRevision",
+                headerCellTemplate: function (header, info) {
+                    $('<div>').html("Por Cell<br/>Revision").appendTo(header);
+                },
+                width: "105px",
+                allowEditing: false
+            },
+            {
+                caption: "Actual Cell Revision",
+                dataField: "ActualCellRevision",
+                headerCellTemplate: function (header, info) {
+                    $('<div>').html("Actual Cell<br/>Revision").appendTo(header);
+                },
+                width: "105px",
+                allowEditing: false
+            },
+            {
+                caption: "Por Custom Testing Required",
+                dataField: "PorCustomTestingRequired",
+                headerCellTemplate: function (header, info) {
+                    $('<div>').html("Por Custom<br/>Testing Required").appendTo(header);
+                },
+                width: "135px",
+                allowEditing: false
+            },
+            {
+                caption: "Actual Custom Testing Required",
+                dataField: "ActualCustomTestingRequired",
+                headerCellTemplate: function (header, info) {
+                    $('<div>').html("Actual Custom<br/>Testing Required").appendTo(header);
+                },
+                width: "135px",
+                allowEditing: false
+            },
+            {
+                caption: "Por Fab Conv Id",
+                dataField: "PorFabConvId",
+                headerCellTemplate: function (header, info) {
+                    $('<div>').html("Por Fab<br/>Conv Id").appendTo(header);
+                },
+                //width: "95px",
+                allowEditing: false
+            },
+            {
+                caption: "Actual Fab Conv Id",
+                dataField: "ActualFabConvId",
+                headerCellTemplate: function (header, info) {
+                    $('<div>').html("Actual Fab<br/>Conv Id").appendTo(header);
+                },
+                width: "95px",
+                allowEditing: false
+            },
+            {
+                caption: "Por Fab Excr Id",
+                dataField: "PorFabExcrId",
+                //width: "155px",
+                allowEditing: false
+            },
+            {
+                caption: "Actual Fab Excr Id",
+                dataField: "ActualFabExcrId",
+                headerCellTemplate: function (header, info) {
+                    $('<div>').html("Actual Fab<br/>Excr Id").appendTo(header);
+                },
+                width: "95px",
+                allowEditing: false
+            },
+            {
+                caption: "Por Product Grade",
+                dataField: "PorProductGrade",
+                headerCellTemplate: function (header, info) {
+                    $('<div>').html("Por Product<br/>Grade").appendTo(header);
+                },
+                //width: "105px",
+                allowEditing: false
+            },
+            {
+                caption: "Actual Product Grade",
+                dataField: "ActualProductGrade",
+                headerCellTemplate: function (header, info) {
+                    $('<div>').html("Actual Product<br/>Grade").appendTo(header);
+                },
+                //width: "105px",
+                allowEditing: false
+            },
+            {
+                caption: "Por Reticle Wave Id",
+                dataField: "PorReticleWaveId",
+                headerCellTemplate: function (header, info) {
+                    $('<div>').html("Por Reticle<br/>Wave Id").appendTo(header);
+                },
+                //width: "175px",
+                allowEditing: false
+            },
+            {
+                caption: "Actual Reticle Wave Id",
+                dataField: "ActualReticleWaveId",
+                headerCellTemplate: function (header, info) {
+                    $('<div>').html("Actual Reticle<br/>Wave Id").appendTo(header);
+                },
+                //width: "105px",
+                allowEditing: false
+            },
+            {
+                caption: "Por Fab Facility",
+                dataField: "PorFabFacility",
+                headerCellTemplate: function (header, info) {
+                    $('<div>').html("Por Fab<br/>Facility").appendTo(header);
+                },
+                //width: "135px",
+                allowEditing: false
+            },
+            {
+                caption: "Actual Fab Facility",
+                dataField: "ActualFabFacility",
+                headerCellTemplate: function (header, info) {
+                    $('<div>').html("Actual Fab<br/>Facility").appendTo(header);
+                },
+                width: "95px",
+                allowEditing: false
+            },
+            {
+                caption: "Por Probe Rev",
+                dataField: "PorProbeRev",
+                headerCellTemplate: function (header, info) {
+                    $('<div>').html("Por<br/>Probe Rev").appendTo(header);
+                },
+                width: "95px",
+                allowEditing: false
+            },
+            {
+                caption: "Actual Probe Rev",
+                dataField: "ActualProbeRev",
+                headerCellTemplate: function (header, info) {
+                    $('<div>').html("Actual<br/>Probe Rev").appendTo(header);
+                },
+                width: "95px",
+                allowEditing: false
+            },
+            {
+                dataField: "LotDispositionReason",
+                caption: "Reason",
+                allowSorting: false,
+                allowClearing: true,
+                //width: 280,
+            },
+            {
+                dataField: "LotDispositionDisplayText",
+                caption: "Action",
+                allowSorting: false,
+                allowClearing: true,
+                //width: 155,
+            },
+            {
+                dataField: "Notes",
+                caption: "Notes",
+                allowSorting: false,
+                width: "200px"
+            },
+            {
+                dataField: "UpdatedBy",
+                caption: "Updated By",
+                //width: "105px"
+            },
+            {
+                dataField: "UpdatedOn",
+                caption: "Updated On",
+                dataType: "datetime",
+                format: "MM/dd/yyyy hh:mm:ss a",
+                //width: "165px"
+            },
+
+        ];
+
+        config.keyExpr = "Id";
+        config.scrolling = {
+            mode: "always"
+        };
+        config.dataSource = records;
+        var mergedConfig2 = $.extend(config,
+            {
+                columnAutoWidth: true,
+                showColumnLines: true,
+                showRowLines: true,
+                rowAlternationEnabled: true,
+                showBorders: true,
+                wordWrapEnabled: false,
+                headerFilter: { visible: true },
+                filterRow: { visible: true },
+                loadPanel: { enabled: true },
+                paging: { enabled: true, pageSize: 15 },
+                onRowPrepared: function (e) {
+                    e.rowElement.css({ height: 30 });
+                },
+                filterPanel: { visible: false },
+                scrolling: {
+                    showScrollbar: "always",
+                },
+                columnFixing: {
+                    enabled: false
+                },
+                export: {
+                    enabled: true,
+                    fileName: createDownloadFileName(),
+                    allowExportSelectedData: false
+                },
+            });
+
+        $("#grdLotDispositions").dxDataGrid(mergedConfig2);
+
+        var clearFilterBtn = $('<div class="showinline floatleft">').dxButton({
+            icon: 'revert',
+            text: 'Clear Filters',
+            visible: true,
+            id: "btnClearFilters",
+            onClick: function () {
+                clearFilter();
+            }
+        });
+
+        $("#grdLotDispositions").find('.dx-toolbar-item-content').append(clearFilterBtn);
+        clearFilterBtn.hide();
+
+        $("#grdLotDispositions").dxDataGrid({
+            onContentReady: function (e) {
+                var filter = e.component.getCombinedFilter();
+                if (filter) {
+                    //Filter is applied
+                    clearFilterBtn.show();
+                }
+                else {
+                    //Filter is not applied
+                    clearFilterBtn.hide();
+                }
+            }
+        });
+
+    };
+
+    var onGetOdmLotWipDetailsSuccess = function (results) {
+        if (results) {
+            var popup;
+            // display the data in a grid in a pop up
+            var popupOptions = {
+                width: "1000px",
+                height: "600px",
+                contentTemplate: function () {
+                    var dataGridOptions = {
+                        columns: [
+                            {
+                                dataField: "MediaLotId",
+                                width: "115px"
+                            },
+                            {
+                                dataField: "SubConName",
+                                width: "120px"
+                            },
+                            {
+                                dataField: "IntelPartNumber",
+                                width: "125px"
+                            },
+                            {
+                                dataField: "LocationType",
+                                width: "120px"
+                            },
+                            {
+                                dataField: "InventoryLocation",
+                                width: "120px"
+                            },
+                            {
+                                dataField: "Category",
+                                width: "85px"
+                            },
+                            {
+                                dataField: "MmNumber",
+                                width: "90px"
+                            },
+                            {
+                                dataField: "TimeEntered",
+                                dataType: "datetime",
+                                width: "170px",
+                                format: "MM/dd/yyyy hh:mm:ss a"
+                            }
+                        ],
+                        dataSource: results,
+                        columnAutoWidth: true,
+                        showColumnLines: true,
+                        showRowLines: true,
+                        rowAlternationEnabled: true,
+                        showBorders: true,
+                        wordWrapEnabled: false,
+                        headerFilter: { visible: true },
+                        filterRow: { visible: true },
+                        loadPanel: { enabled: true },
+                        paging: { enabled: true, pageSize: 10 },
+                        filterPanel: { visible: false },
+                        columnFixing: {enabled: false},
+                    };
+
+                    var datagrid = $("<div />").dxDataGrid(dataGridOptions);
+
+                    var btnClose = $("<div class='btnWipDetailsClose floatright' style='margin-top:20px;' />").dxButton({
+                        icon: "close",
+                        text: "Close",
+                        width: 105,
+                        onClick: function (e) {
+                            popup.hide();
+                        }
+                    });
+
+                    return $("<div />").append(datagrid).append(btnClose);
+                },
+                showTitle: true,
+                title: "WIP Details",
+                visible: false,
+                dragEnabled: false,
+                closeOnOutsideClick: false
+            }
+
+            if (popup) {
+                popup.option("contentTemplate", popupOptions.contentTemplate.bind(this));
+            } else {
+                popup = $("#divWipDetailsPopup").dxPopup(popupOptions).dxPopup("instance");
+            }
+
+            popup.show();
+        }
+    };
+
+    var onGetOdmLotWipDetailsError = function (xhr, err) {
+       // display an error message
+    };
+
+    function displayMats(records) {
+        let config = Nsga.Callisto.Dx.dataGridDefaultConfig();
+
+        config.columns = [
+            {
+                dataField: "SSDId",
+                caption: "SSD Id",
+                width: "85px",
+            },
+            {
+                dataField: "DesignId",
+                caption: "Design Id",
+                headerCellTemplate: function (header, info) {
+                    $('<div>').html("Design<br/>Id").appendTo(header);
+                },
+                width: "75px",
+            },
+            {
+                dataField: "Scode",
+                caption: "Scode",
+                width: "80px",
+            },
+            {
+                dataField: "CellRevision",
+                caption: "Cell Revision",
+                headerCellTemplate: function (header, info) {
+                    $('<div>').html("Cell<br/>Revision").appendTo(header);
+                },
+                width: "105px",
+            },
+            {
+                dataField: "MPPR",
+                caption: "Major Probe Program Revision",
+                headerCellTemplate: function (header, info) {
+                    $('<div>').html("Major Probe<br/>Program Revision").appendTo(header);
+                },
+                width: "135px",
+            },
+            {
+                dataField: "ProbeRevision",
+                caption: "Probe Revision",
+                headerCellTemplate: function (header, info) {
+                    $('<div>').html("Probe<br/>Revision").appendTo(header);
+                },
+                width: "85px",
+            },
+            {
+                dataField: "BurnTapeRevision",
+                caption: "Burn Tape Revision",
+                headerCellTemplate: function (header, info) {
+                    $('<div>').html("Burn Tape<br/>Revision").appendTo(header);
+                },
+                width: "95px",
+            },
+            {
+                dataField: "CustomTestingRequired",
+                caption: "Custom Testing Required",
+                headerCellTemplate: function (header, info) {
+                    $('<div>').html("Custom Testing<br/>Required").appendTo(header);
+                },
+                width: "125px",
+            },
+            {
+                dataField: "CustomTestingRequired2",
+                caption: "Custom Testing Required2",
+                headerCellTemplate: function (header, info) {
+                    $('<div>').html("Custom Testing<br/>Required2").appendTo(header);
+                },
+                width: "125px",
+            },
+            {
+                dataField: "ProductGrade",
+                caption: "Product Grade",
+                headerCellTemplate: function (header, info) {
+                    $('<div>').html("Product<br/>Grade").appendTo(header);
+                },
+                width: "85px",
+            },
+            {
+                dataField: "PrbConvId",
+                caption: "Prb Conv Id",
+                headerCellTemplate: function (header, info) {
+                    $('<div>').html("Prb Conv<br/>Id").appendTo(header);
+                },
+                width: "95px",
+            },
+            {
+                dataField: "FabConvId",
+                caption: "Fab Conv Id",
+                width: "195px",
+            },
+            {
+                dataField: "FabExcrId",
+                caption: "Fab Excr Id",
+                width: "185px",
+            },
+            {
+                dataField: "MediaType",
+                caption: "Media Type",
+                headerCellTemplate: function (header, info) {
+                    $('<div>').html("Media<br/>Type").appendTo(header);
+                },
+                width: "75px",
+            },
+            {
+                dataField: "MediaIPN",
+                caption: "Media IPN",
+                width: "95px",
+            },
+            {
+                dataField: "DeviceName",
+                caption: "Device Name",
+                width: "125px",
+            },
+            {
+                dataField: "ReticleWaveId",
+                caption: "Reticle Wave Id",
+                width: "175px",
+           },
+            {
+                dataField: "FabFacility",
+                caption: "Fab Facility",
+                width: "135px",
+            },
+            {
+                dataField: "CreatedOn",
+                caption: "Created Date",
+                dataType: "date",
+                format: "MM/dd/yyyy hh:mm:ss a",
+                width: "105px",
+            },
+            {
+                dataField: "CreatedBy",
+                caption: "Created By",
+                headerCellTemplate: function (header, info) {
+                    $('<div>').html("Created<br/>By").appendTo(header);
+                },
+                width: "85px",
+            },
+        ];
+        config.dataSource = records;
+        var mergedConfig2 = $.extend(config,
+            {
+                height: 600, //function () { return $(window).height() * .7 },
+                columnAutoWidth: true,
+                showColumnLines: true,
+                showRowLines: true,
+                rowAlternationEnabled: true,
+                showBorders: true,
+                wordWrapEnabled: false,
+                headerFilter: { visible: true },
+                filterRow: { visible: true },
+                loadPanel: { enabled: true },
+                paging: { enabled: true, pageSize: 15 },
+                filterPanel: { visible: false },
+                scrolling: {
+                    showScrollbar: "always",
+                },
+                columnFixing: {
+                    enabled: false
+                },
+                export: {
+                    enabled: true,
+                    fileName: createDownloadFileName(),
+                    allowExportSelectedData: false
+                },
+            });
+        $("#grdMat").dxDataGrid(mergedConfig2);
+    };
+
+    function displayPrfs(records) {
+        var config = Nsga.Callisto.Dx.dataGridDefaultConfig();
+        config.columns = [
+            {
+                dataField: "ODMDescription",
+                caption: "ODM",
+            },
+            {
+                dataField: "SSDFamilyName",
+                caption: "Family Name",
+            },
+            {
+                dataField: "MMNumber",
+                caption: "MM Number",
+            },
+            {
+                dataField: "ProductCode",
+                caption: "Product Code",
+            },
+            {
+                dataField: "SSDName",
+                caption: "SSD Name",
+                width: "185px",
+            },
+            {
+                dataField: "CreatedOn",
+                caption: "Created Date",
+                dataType: "date",
+                format: "MM/dd/yyyy hh:mm:ss a",
+            },
+            {
+                dataField: "CreatedBy",
+                caption: "Created By",
+            },
+        ];
+        config.dataSource = records;
+        var mergedConfig2 = $.extend(config,
+            {
+                //height: 600, //function () { return $(window).height() * .7 },
+                columnAutoWidth: true,
+                showColumnLines: true,
+                showRowLines: true,
+                rowAlternationEnabled: true,
+                showBorders: true,
+                wordWrapEnabled: false,
+                headerFilter: { visible: true },
+                filterRow: { visible: true },
+                loadPanel: { enabled: true },
+                paging: { enabled: true, pageSize: 15 },
+                filterPanel: { visible: false },
+                scrolling: {
+                    showScrollbar: "always",
+                },
+                columnFixing: {
+                    enabled: false
+                },
+                export: {
+                    enabled: true,
+                    fileName: createDownloadFileName(),
+                    allowExportSelectedData: false
+                },
+            });
+        // If the scenario id in the scenarioObj is same as that in the
+        $("#grdPrf").dxDataGrid(mergedConfig2);
+    };
+
+    function displayQfExceptions(records) {
+        let config = Nsga.Callisto.Dx.dataGridDefaultConfig();
+        config.columns = [
+            {
+                dataField: "OdmName",
+                caption: "ODM",
+            },
+            {
+                dataField: "SCode",
+                caption: "MM Number",
+                width: "120px"
+            },
+            {
+                dataField: "SLot",
+                caption: "S-Lot",
+                width: "100px"
+            },
+            {
+                dataField: "MediaIpn",
+                caption: "OSAT IPN",
+            },
+            {
+                dataField: "SSD_Id",
+                caption: "SSD Id",
+                width: "200px"
+            },
+            {
+                dataField: "DesignId",
+                caption: "Design Id",
+                width: "100px"
+            },
+            {
+                dataField: "DeviceName",
+                caption: "Device Name",
+            },
+            {
+                dataField: "MediaType",
+                caption: "Media Type",
+                width: "100px"
+            },
+            {
+                type: "buttons",
+                width: "65px",
+                buttons: [{
+                    hint: "View Lot Dispositions.",
+                    icon: "far fa-arrow-alt-circle-right",
+                    text: "...",
+                    visible: true,
+                    onClick: function (e) {
+                        // Create the filter expression
+                        var filterExpression = [
+                            ["SubConName", "=", e.row.data.OdmName],
+                            "and",
+                            ["SCode", "=", e.row.data.SCode],
+                            "and",
+                            ["SLot", "=", e.row.data.SLot],
+                            "and",
+                            ["MediaIPN", "=", e.row.data.MediaIpn]
+                        ];
+
+                        gotoLotDispositions(filterExpression);
+                    }
+                }
+                ]
+            }
+        ];
+
+        config.keyExpr = "";
+        config.dataSource = records;
+
+        var mergedConfig2 = $.extend(config,
+            {
+                height: 600, //function () { return $(window).height() * .7 },
+                columnAutoWidth: true,
+                showColumnLines: true,
+                showRowLines: true,
+                rowAlternationEnabled: true,
+                showBorders: true,
+                wordWrapEnabled: false,
+                headerFilter: { visible: true },
+                filterRow: { visible: true },
+                loadPanel: { enabled: true },
+                paging: { enabled: false },
+                filterPanel: { visible: false },
+                scrolling: {
+                    showScrollbar: "always",
+                },
+                columnFixing: {
+                    enabled: false
+                },
+                export: {
+                    enabled: true,
+                    fileName: createDownloadFileName(),
+                    allowExportSelectedData: false
+                },
+            });
+        $("#grdNonQualifiedExceptions").dxDataGrid(mergedConfig2);
+    };
+
+    function displayRawQfs(records) {
+       let config = Nsga.Callisto.Dx.dataGridDefaultConfig();
+
+        config.columns = [
+            {
+                dataField: "OdmName",
+                caption: "ODM",
+            },
+             {
+                dataField: "MMNum",
+                caption: "MM Number",
+            },
+           {
+                dataField: "SLot",
+                caption: "S-Lot",
+            },
+            {
+                dataField: "OsatIpn",
+                caption: "OSAT IPN",
+            },
+            {
+                type: "buttons",
+                width: "65px",
+                buttons: [{
+                    hint: "View Lot Dispositions.",
+                    icon: "far fa-arrow-alt-circle-right",
+                    text: "...",
+                    visible: true,
+                    onClick: function (e) {
+                        // Create the filter expression
+                        var filterExpression = [
+                            ["SubConName", "=", e.row.data.OdmName],
+                            "and",
+                            ["SCode", "=", e.row.data.MMNum],
+                            "and",
+                            ["SLot", "=", e.row.data.SLot],
+                            "and",
+                            ["MediaIPN", "=", e.row.data.OsatIpn]
+                        ];
+
+                        gotoLotDispositions(filterExpression);
+                    }
+                }
+                ]
+            }
+
+        ];
+
+        config.keyExpr = "";
+        config.dataSource = records;
+
+        var mergedConfig2 = $.extend(config,
+            {
+                height: 600, //function () { return $(window).height() * .7 },
+                columnAutoWidth: true,
+                showColumnLines: true,
+                showRowLines: true,
+                rowAlternationEnabled: true,
+                showBorders: true,
+                wordWrapEnabled: false,
+                headerFilter: { visible: true },
+                filterRow: { visible: true },
+                loadPanel: { enabled: true },
+                paging: { enabled: true, pageSize: 15 },
+                filterPanel: { visible: false },
+                scrolling: {
+                    showScrollbar: "always",
+                },
+                columnFixing: {
+                    enabled: false
+                },
+                export: {
+                    enabled: true,
+                    fileName: createDownloadFileName(),
+                    allowExportSelectedData: false
+                },
+            });
+        $("#grdNonQualified").dxDataGrid(mergedConfig2);
+    };
+    var hideGrids = function () {
+        $("#grdPrf").hide();
+        $("#grdMat").hide();
+        $("#grdNonQualified").hide();
+        $("#grdNonQualifiedExceptions").hide();
+        $("#grdLotDispositions").hide();
+    };
+    var displayTabContent = function(id) {
+        showProgress();
+        tabsInstance.option("selectedIndex", id);
+        tabsInstance.option("visible", true);
+        hideGrids();
+        var tabIndex = -1;
+        // Show only the grid for the active tab
+        switch (id) {
+            case ++tabIndex:
+                $("#grdPrf").show();
+                break;
+            case ++tabIndex:
+                $("#grdMat").show();
+                break;
+            /*
+            case 2:
+                $("#grdOdmWip").show();
+                break;
+            case 3:
+                $("#grdLotShip").show();
+                break;
+            */
+            case ++tabIndex:
+                displayRawQfs(scenarioObj.NonQualifiedsRaw);
+                $("#grdNonQualified").show();
+                break;
+            case ++tabIndex:
+                displayQfExceptions(scenarioObj.NonQualifiedMediaExceptions);
+                $("#grdNonQualifiedExceptions").show();
+                break;
+            case ++tabIndex:
+                //displayComps(scenarioObj.Comparisons);
+                $("#grdLotDispositions").show();
+                break;
+            default:
+                $("#grdLotDispositions").show();
+                break;
+        }
+        hideProgress();
+        $(".dx-icon-export-excel-button").html($("<span class='exporttoexceltext'>Export To Excel</span>"));
+    };
+
+    function formatIntlDate(dt) {
+        let separator = "-";
+        let dd = new Date(dt);
+        let retVal = dd.getDate() + separator + months[dd.getMonth()] + separator + dd.getFullYear();
+        return retVal;
+        //return `${dd.getDate()}-${months[dd.getMonth()]}-${dd.getFullYear()}`;
+    };
+
+    function formatIntlDateTime(dt) {
+        let separator = ":";
+        let space = " ";
+        let dd = new Date(dt);
+        let retVal = formatIntlDate(dt) + space + dd.getHours() + separator + dd.getMinutes() + separator + dd.getSeconds();
+        return retVal;
+        //return `${formatIntlDate(dt)} ${dd.getHours()}:${dd.getMinutes()}:${dd.getSeconds()}`;
+    };
+
+    var onGetOdmQualFilterScenarioHistoricalVersionsSuccess = function (records) {
+        if (records && records.length > 0) {
+            if (records[0]) {
+                latestScenarioId = records[0].Id;
+                displayScenarioVersions(records);
+                ddlScenarios.option("value", latestScenarioId);
+            }
+        }
+        hideProgress();
+    };
+    var displayScenarioVersions = function (scenarioVersions) {
+        var ddlScenarios = $("#ddlScenarios").dxSelectBox("instance");
+        ddlScenarios.option("dataSource", scenarioVersions);
+    }
+
+    function onError(xhr, status) {
+        hideProgress();
+        Nsga.Callisto.Messages.showError("An unexpected error occurred. If the problem persists, contact support.");
+    };
+
+    var getScenarioVersions = function () {
+        showProgress();
+        Nsga.Callisto.Odm.getOdmQualFilterScenarioHistoricalVersions(onGetOdmQualFilterScenarioHistoricalVersionsSuccess, onError);
+    };
+
+    var reset= function() {
+        $("#ddlScenarios").dxSelectBox("instance").option('value', latestScenarioId);
+        submit1();
+    };
+
+    function showScenarioDetails() {
+        if (scenarioObj && scenarioObj.Version && scenarioObj.Version.DailyId && scenarioObj.Version.CreatedBy && scenarioObj.Version.CreatedOn) {
+            var version = scenarioObj.Version.DailyId;
+            var user = scenarioObj.Version.CreatedBy;
+            var d = scenarioObj.Version.CreatedOn;
+            var crafted = "";
+            if (d) {
+                crafted = formatIntlDateTime(d);
+            }
+            $(".caption").text("ODM QF Scenario details for version : " + version + " by " + user + " on " + crafted + " PST ");
+        }
+        else {
+            $(".caption").text("");
+        }
+    };
+
+    var onGetQualFilterScenarioSuccess = function (result) {
+        var tabIndex = -1;
+        scenarioObj = result;
+        if (scenarioObj) {
+            //var version = scenarioObj.Version.Id;
+            var version = scenarioObj.Version;
+            reasons = scenarioObj.LotDispositionReasons;
+            actions = scenarioObj.LotDispositionActions;
+
+            // Decide to show Save button in the comparison grid
+            showExcludeColumn = (version.Id === latestScenarioId);
+            // display who created and when
+            showScenarioDetails();
+            // set the tab captions
+            tabs[++tabIndex].text = (version && version.PrfVersion) ? "PRF v" + version.PrfVersion  : "PRF";
+            tabs[++tabIndex].text = (version && version.MatVersion) ? "MAT v" + version.MatVersion : "MAT";
+            //tabs[++tabIndex].text = (version && version.OdmWipSnapshotVersion) ? "Odm Wip v" + version.OdmWipSnapshotVersion : "Odm Wip";
+            //tabs[++tabIndex].text = (version && version.LotShipSnapshotVersion) ? "Lot Ship v" + version.LotShipSnapshotVersion : "Lot Ship";
+            tabs[++tabIndex].text = (version && version.DailyId) ? "Non Qualified Media v" + version.DailyId : "Non Qualified Media";
+            tabs[++tabIndex].text = (version && version.DailyId) ? "Qualified Media v" + version.DailyId : "Qualified Media";
+            tabs[++tabIndex].text = (version && version.DailyId) ? "Lot Dispositions v" + version.DailyId : "Lot Dispositions";
+            // re-bind the tabs to the datasource
+            tabsInstance.option("dataSource", tabs);
+            // Select the lot disposition tab as the default selected one
+            displayComps(scenarioObj.Comparisons);
+            displayTabContent(tabIndex);
+
+            displayPrfs(scenarioObj.Prfs);
+            displayMats(scenarioObj.Mats);
+            hideProgress();
+        }
+    };
+
+    function submit1() {
+        var id = ddlScenarios.option("value");
+        if (id) {
+            showProgress();
+            Nsga.Callisto.Odm.getQualFilterHistoricalScenario(id, onGetQualFilterScenarioSuccess, onError);
+        } else {
+            Nsga.Callisto.Messages.showWarning("No data available.");
+        }
+    };
+
+    var onScenarioChanged = function (value) {
+        // if user changes the scenario selection, then hide the tabs - so that they need to click on submit
+        $(".caption").text("");
+        hideTabs();
+        hideGrids();
+    };
+
+    var clearFilter = function () {
+        var lotDispositionsGrid = $("#grdLotDispositions").dxDataGrid("instance");
+        lotDispositionsGrid.clearFilter();
+    };
+
+    var unblockUI = function () {
+        document.body.style.cursor = "default";
+        hideProgress();
+    }
+
+    var blockUI = function () {
+        document.body.style.cursor = "wait";
+        showProgress();
+    }
+
+    var gotoLotDispositions = function (filterExpression) {
+        const lotDispTabIndex = 4;
+        showProgress();
+        hideGrids();
+
+        // Get the grid
+        var lotDispositionsGrid = $("#grdLotDispositions").dxDataGrid("instance");
+        // clear any previous filters
+        lotDispositionsGrid.clearFilter();
+        // apply the new filter
+        lotDispositionsGrid.filter(filterExpression);
+        // show the clear filters button
+        $("#btnClearFilters").visible = true;
+        // show the grid now
+        $("#grdLotDispositions").show();
+
+        tabsInstance.option("selectedIndex", lotDispTabIndex);
+        tabsInstance.option("visible", true);
+        hideProgress();
+    };
+
+    var hideTabs = function () {
+        tabsInstance.option("visible", false);
+    }
+
+    $("document").ready(function () {
+        $("#importIndicator").dxLoadIndicator({ visible: false });
+        ddlScenarios = $("#ddlScenarios").dxSelectBox({
+            dataSource: scenarioVersions,
+            displayExpr: function (item) {
+                var result = null;
+                if (item) {
+                    result = formatIntlDate(item.CreatedOn) + ": Scenario: " + item.DailyId;
+                }
+                return result;
+            },
+            valueExpr: "Id",
+            searchEnabled: true,
+            width: "220px",
+            placeholder: "Select",
+            onValueChanged: function (e) {
+                if (e.event !== undefined) { // only enter this block if the value was changed by the user (not programatically)
+                    onScenarioChanged(e.value);
+                }
+            }
+        }).dxSelectBox("instance");
+        getScenarioVersions();
+
+        tabsInstance = $("#tabs > .tabs-container").dxTabs({
+            dataSource: tabs,
+            selectedIndex: 0,
+            onItemClick: function (e) {
+                displayTabContent(e.itemData.id);
+            }
+        }).dxTabs("instance");
+        hideTabs();
+
+    });
+
+</script>
+
+<div class="fixed centered bluebox">
+    <div class="rightalign padfourpixel">
+        <div class="padfourpixel">
+            <span><a title="Click here to manage Media Attributes" id="lnkMAT" href="/ODM/MAT/"><span class="imagelinkbutton bordered"><span class="fa fa-list-alt "></span><span class="margintwopixel">Manage Media Attributes</span> </span></a></span>
+            <span><a title="Click here to manage PRF" id="lnkPRF" href="/ODM/PRF/"><span class="imagelinkbutton bordered"><span class="fa fa-list-alt "></span><span class="margintwopixel">Manage PRF</span> </span></a></span>
+            <span><a title="Qual Filters Scenarios & Results" id="lnkPRF" href="/ODM/QFScenarios/"><span class="imagelinkbutton bordered"><span class="fa fa-list-alt "></span><span class="margintwopixel">Qual Filters Scenarios & Results</span> </span></a></span>
+            <span><a title="Click here to go to Manual Lot Dispositioning" id="lnkManualDisposition" href="/ODM/Dispositions/"><span class="imagelinkbutton bordered"><span class="fa fa-list-alt "></span><span class="margintwopixel">Manual Dispositioning</span> </span></a></span>
+        </div>
+    </div>
+    <div style="margin:5px;vertical-align: top;" class="bluebox bglightblue padeightpixel">
+        <div class="">
+            <div class="infotext">
+                <span class="fas fa-exclamation-circle" style="font-size:14px;"></span>To view existing data for any historical scenario, select scenario &amp; click submit.
+            </div>
+            <div id="divScenarios" class="showinline" style="width: 100%;">
+                <!-- version -->
+                <div class="showinline" style="width: 35%; margin-top:8px;">
+                    <div class="dx-field-label">Scenario</div>
+                    <div class="colon floatleft" style="margin-top: 8px;"></div>
+                    <div class="inlineblock">
+                        <div id="ddlScenarios" style="display:inline-block;"></div>
+                    </div>
+                </div>
+                <!--actions-->
+                <div class="showinline" style=" width: 60%; margin-top: 10px; vertical-align: top;">
+                    <span class="marginfourpixel"><input id="btnSubmit" type="button" value="Submit" onclick="submit1()" style="" /></span>
+                </div>
+            </div>
+            <div class="showinline floatleft" style="margin-top:10px;">
+                <div class="caption scenariodetials"></div>
+            </div>
+        </div>
+    </div>
+    <div style="width:960px;display: block;clear: both;text-align: center;">
+        <div id="importIndicator" style="text-align:center;"></div>
+    </div>
+</div>
+
+<div class="fluid" style="margin-top:2px;">
+    <div id="tabs">
+        <div class="tabs-container" style=""></div>
+        <div>
+            <div class="marginfourpixel gridcontainer">
+                <div id="grdPrf" class="" style="margin-right:10px;margin-left:10px;margin-bottom:10px;display:none;"></div>
+                <div id="grdMat" class="" style="margin-right:10px;margin-left:10px;margin-bottom:10px;display:none;"></div>
+                <div id="grdNonQualified" class="" style="margin-right:10px;margin-left:10px;margin-bottom:10px;display:none;"></div>
+                <div id="grdNonQualifiedExceptions" class="" style="margin-right:10px;margin-left:10px;margin-bottom:10px;display:none;"></div>
+                <div id="grdLotDispositions" class="" style="margin-right:10px;margin-left:10px;margin-bottom:10px;display:none;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="divWipDetailsPopup"></div>

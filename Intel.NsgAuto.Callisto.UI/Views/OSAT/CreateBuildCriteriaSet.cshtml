@@ -1,0 +1,1054 @@
+﻿@{
+    ViewBag.Title = "Create OSAT QF Build Criteria Set";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script>
+
+    var enforceAttributeTypeValues = false;
+    var useAttributeTypeValues = false;
+
+    var entity = @(JsonHelper.Serialize(Model.Entity));
+    var attributeDataTypes = entity.AttributeDataTypes;
+    var attributeTypes = entity.AttributeTypes;
+    var attributeTypeValues = entity.AttributeTypeValues;
+    var buildCombination = entity.BuildCombination; // build combination associated with any ids in the url
+    var buildCombinations = entity.BuildCombinations;
+    var buildCombinationsFiltered = buildCombination ? [buildCombination] : buildCombinations.filter(function () { return true; }); // create a copy
+    var buildCriteriaSet = entity.BuildCriteriaSet; // if the url has an id specified, this is the build criteria associated with that id
+    var designs = entity.Designs;
+    var setTemplates = entity.SetTemplates;
+    var osats = entity.Osats;
+    var startFromItems = [
+        { Id: 1, Name: "Existing Version" },
+        { Id: 2, Name: "Template" },
+        { Id: 3, Name: "Scratch" },
+    ];
+    var versions = entity.Versions;
+
+    // dictionaries for fast/easy lookups
+    var dictAttributeTypeValues = []; // { AttributeType.Id: [AttributeTypeValues] }
+    var dictDesigns = {}; // { Design.Id: Design }
+    var dictFilterOperations = {}; // { AttributeDataType.Name: [ComparisonOperations] }
+    var dictSetTemplates = {}; // { BuildCriteriaSetTemplate.DesignFamilyId: BuildCriteriaSetTemplate }
+    var dictVersions = {}; // { BuildCriteriaSet.Id: BuildCriteriaSet }
+
+    var initialized = false;
+    var isOsatCriteriaAuthor = @(Intel.NsgAuto.Web.Mvc.Core.Functions.IsOsatCriteriaAuthor() ? "true" : "false");
+    var buildCriteriaObjects;
+    var ddlAssyUpis;
+    var ddlOsats;
+    var ddlDesigns;
+    var ddlDeviceNames;
+    var ddlIntelLevel1PartNumbers;
+    var ddlIntelMaterialPns;
+    var ddlIntelProdNames;
+    var ddlMaterialMasterFields;
+    var ddlPartUseTypes;
+    var ddlStartFrom;
+    var ddlVersions;
+    var fbFields;
+    var spnIsActive;
+    var spnMpp;
+    var txtComment;
+
+    // initialize certain variables above
+    updateDictAttributeTypeValues();
+    updateDictDesigns();
+    updateDictFilterOperations();
+    updateDictSetTemplates();
+    updateDictVersions();
+    updateFbFields(); // must come after updateDictFilterOperations()
+
+    function updateDictAttributeTypeValues() {
+        dictAttributeTypeValues = {};
+        for (var i = 0; i < attributeTypes.length; i++) {
+            var values = [];
+            for (var j = 0; j < attributeTypeValues.length; j++) {
+                if (attributeTypes[i].Id === attributeTypeValues[j].AttributeTypeId) {
+                    values.push(attributeTypeValues[j]);
+                }
+            }
+            dictAttributeTypeValues[attributeTypes[i].Id] = values;
+        }
+    }
+
+    function updateDictDesigns() {
+        dictDesigns = {};
+        for (var i = 0; i < designs.length; i++) {
+            dictDesigns[designs[i].Id] = designs[i];
+        }
+    }
+
+    function updateDictFilterOperations() {
+        dictFilterOperations = {};
+        if (attributeDataTypes) {
+            for (var i = 0; i < attributeDataTypes.length; i++) {
+                var operations = [];
+                for (var j = 0; j < attributeDataTypes[i].ComparisonOperations.length; j++) {
+                    operations.push(attributeDataTypes[i].ComparisonOperations[j].Key);
+                }
+                dictFilterOperations[attributeDataTypes[i].Name] = operations;
+            }
+        }
+    }
+
+    function updateDictSetTemplates() {
+        dictSetTemplates = {};
+        for (var i = 0; i < setTemplates.length; i++) {
+            dictSetTemplates[setTemplates[i].DesignFamily.Id] = setTemplates[i];
+        }
+    }
+
+    function updateDictVersions() {
+        dictVersions = {};
+        for (var i = 0; i < versions.length; i++) {
+            dictVersions[versions[i].Id] = versions[i];
+        }
+    }
+
+    function updateFbFields() {
+        fbFields = [];
+        if (attributeTypes) {
+            for (var i = 0; i < attributeTypes.length; i++) {
+                var item = {
+                    caption: attributeTypes[i].NameDisplay,
+                    dataField: attributeTypes[i].Name,
+                    dataType: attributeTypes[i].DataType.Name,
+                    filterOperations: dictFilterOperations[attributeTypes[i].DataType.Name],
+                }
+                if (useAttributeTypeValues || enforceAttributeTypeValues) {
+                    item.editorOptions = {
+                        dataSource: dictAttributeTypeValues[attributeTypes[i].Id],
+                        valueExpr: "Value",
+                        displayExpr: "ValueDisplay",
+                    };
+                    if (enforceAttributeTypeValues) {
+                        item.lookup = {
+                            dataSource: dictAttributeTypeValues[attributeTypes[i].Id],
+                            valueExpr: "Value",
+                            displayExpr: "ValueDisplay",
+                        };
+                    }
+                }
+                fbFields.push(item);
+            };
+        }
+    }
+
+    function onError(xhr) {
+        var result = null;
+        var message = "An unexpected error occurred. If the problem persists, contact support.";
+        if (xhr && xhr.responseJSON) {
+            result = xhr.responseJSON;
+            if (result.ExceptionMessage) message = result.ExceptionMessage;
+            else if (result.Message) message = result.Message;
+        }
+        Nsga.Callisto.Messages.showError(message);
+        return result;
+    }
+
+    function onSuccessBuildCriteriaSetAndVersions(result) {
+        var id = null;
+        versions = result.Versions;
+        updateDictVersions();
+        buildCriteriaSet = result.buildCriteriaSet;
+        if (buildCriteriaSet) id = buildCriteriaSet.Id;
+        ddlVersions.option("dataSource", versions);
+        ddlVersions.option("value", id);
+        updateFilterSetFrom(buildCriteriaSet);
+    }
+
+    function onSuccessGetBuildCombinations(result) {
+        buildCombinations = result;
+        resetFilters();
+    }
+
+
+    function clearFilter() {
+        updateFilterSetFrom(null);
+    }
+
+    function clearVersions() {
+        ddlVersions.option("dataSource", []);
+        ddlVersions.option("value", null);
+    }
+
+    function updateUiFromSelections() {
+        if (initialized) {
+            var clearFilterBool = true;
+            var clearVersionsBool = true;
+            var sufficientSelections = false;
+            var osatId = ddlOsats.option("value");
+            var designId = ddlDesigns.option("value");
+            var startFromId = ddlStartFrom.option("value");
+            var design = dictDesigns[designId];
+            var designFamilyId = null;
+            if (design && buildCombinationsFiltered.length === 1) {
+                if (design.DesignFamily) designFamilyId = design.DesignFamily.Id;
+                sufficientSelections = true;
+            }
+            if (startFromId == 1) { // Existing Version
+                if (sufficientSelections) {
+                    clearFilterBool = false;
+                    clearVersionsBool = false;
+                    Nsga.Callisto.Osat.getBuildCriteriaSetAndVersions(buildCombinationsFiltered[0].Id, onSuccessBuildCriteriaSetAndVersions, onError);
+                }
+            }
+            else if (startFromId == 2) { // Template
+                if (designFamilyId) {
+                    clearFilterBool = false;
+                    updateFilterSetFrom(dictSetTemplates[designFamilyId]);
+                }
+            }
+            if (clearVersionsBool) {
+                clearVersions();
+            }
+            if (clearFilterBool) {
+                clearFilter();
+            }
+        }
+    }
+
+    function onSuccessBuildCriteriaSet(result) {
+        buildCriteriaSet = result;
+        updateFilterSetFrom(result);
+    }
+
+    function versionSelected(id) {
+        if (initialized && id) {
+            onSuccessBuildCriteriaSet(entity.BuildCriteriaSet);
+            Nsga.Callisto.Osat.getBuildCriteriaSet(id, onSuccessBuildCriteriaSet, onError);
+        }
+    }
+
+    function updateDdlDataSource(ddl, dataSource, clearSelectedValue) {
+        var newValue = null;
+        var existingValue = ddl.option("value");
+        ddl.option("dataSource", dataSource);
+        if (dataSource && !clearSelectedValue) {
+            if (dataSource.length === 1) {
+                newValue = dataSource[0].Value;
+            }
+            else {
+                for (var i = 0; i < dataSource.length; i++) {
+                    if (dataSource[i].Value === existingValue) {
+                        newValue = existingValue;
+                        break;
+                    }
+                }
+            }
+        }
+        ddl.option("value", newValue);
+        ddl.option("isValid", true);
+        return newValue;
+    }
+
+    function createDataSourceFromItemsProperty(items, selectedProperty, subPropertyValue, subPropertyDisplay) {
+        var dataSource = [];
+        if (items) {
+            for (var i = 0; i < items.length; ++i) {
+                var currentItem = items[i][selectedProperty];
+                if (currentItem) {
+                    var currentValue = subPropertyValue ? currentItem[subPropertyValue] : currentItem;
+                    var currentDisplay = subPropertyDisplay ? currentItem[subPropertyDisplay] : currentItem;
+                    if (dataSource.filter(function (x) { return x.Value === currentValue; }).length === 0) {
+                        dataSource.push({ Display: currentDisplay, Value: currentValue});
+                    }
+                }
+            }
+        }
+        return dataSource;
+    }
+
+    function updateItemsFilterDataSources(items, clearSelectedValue) {
+        updateDdlDataSource(ddlAssyUpis, createDataSourceFromItemsProperty(items, "AssyUpi"), clearSelectedValue);
+        updateDdlDataSource(ddlDeviceNames, createDataSourceFromItemsProperty(items, "DeviceName"), clearSelectedValue);
+        updateDdlDataSource(ddlIntelLevel1PartNumbers, createDataSourceFromItemsProperty(items, "IntelLevel1PartNumber"), clearSelectedValue);
+        updateDdlDataSource(ddlIntelMaterialPns, createDataSourceFromItemsProperty(items, "IntelMaterialPn"), clearSelectedValue);
+        updateDdlDataSource(ddlIntelProdNames, createDataSourceFromItemsProperty(items, "IntelProdName"), clearSelectedValue);
+        updateDdlDataSource(ddlMaterialMasterFields, createDataSourceFromItemsProperty(items, "MaterialMasterField"), clearSelectedValue);
+        updateDdlDataSource(ddlPartUseTypes, createDataSourceFromItemsProperty(items, "PartUseType", "Id", "Name"), clearSelectedValue);
+        var isActive = "";
+        var mpp = "";
+        if (items && items.length === 1) {
+            isActive = items[0].IsActive ? "Y" : "N";
+            mpp = items[0].Mpp;
+        }
+        spnIsActive.text(isActive);
+        spnMpp.text(mpp);
+    }
+
+    function resetFilters() {
+        clearFilter();
+        clearVersions();
+        buildCombinationsFiltered = buildCombinations.filter(function () { return true; }); // create a copy
+        updateItemsFilterDataSources(buildCombinationsFiltered, true);
+    }
+
+    function updateUiFromStartFrom(id) {
+        var divVersions = $("#divVersions");
+        if (id == 1) { // Existing Version
+            divVersions.show();
+        }
+        else {
+            divVersions.hide();
+        }
+        if (initialized) {
+            updateUiFromSelections();
+        }
+    }
+
+    function disposeCriteria(item) {
+        item.CriteriaFilterBuilder.dispose();
+        item.NameTextBox.dispose();
+        item.RemoveButton.dispose();
+    }
+
+    function removeCriteria(item) {
+        for (var index = 0; index < buildCriteriaObjects.length; index++) {
+            if (item === buildCriteriaObjects[index]) break;
+        }
+        if (index < buildCriteriaObjects.length) {
+            disposeCriteria(item);
+            buildCriteriaObjects.splice(index, 1);
+            item.Container.remove();
+        }
+    }
+
+    function updateFilterSetFrom(source) {
+        if (buildCriteriaObjects) {
+            for (var i = 0; i < buildCriteriaObjects.length; i++) {
+                disposeCriteria(buildCriteriaObjects[i]);
+            }
+        }
+        buildCriteriaObjects = [];
+        var divBuildCriteriaFilters = $("#divBuildCriteriaFilters");
+        divBuildCriteriaFilters.empty();
+        if (!source) {
+            source = { BuildCriterias: [ {} ] };
+        }
+        var items = [];
+        if (source.hasOwnProperty("BuildCriterias")) {
+            items = source.BuildCriterias;
+        }
+        else if (source.hasOwnProperty("Templates")) {
+            items = source.Templates;
+        }
+        for (var index = 0; index < items.length; index++) {
+            var item = items[index];
+            var filterValue = [];
+            if (item && item.Conditions) {
+                var condition;
+                var conditionValue;
+                for (var i = 0; i < item.Conditions.length; i++) {
+                    condition = item.Conditions[i];
+                    conditionValue = condition.Value;
+                    if (condition.ComparisonOperation.OperandType.Id === 3) { // 3 = List
+                        if (conditionValue) {
+                            if (includes(conditionValue, ",")) {
+                                conditionValue = conditionValue.split(",");
+                            }
+                            else {
+                                conditionValue = [conditionValue];
+                            }
+                        }
+                        else {
+                            conditionValue = [];
+                        }
+                    }
+                    if (i > 0) filterValue.push("and");
+                    filterValue.push([condition.AttributeType.Name, condition.ComparisonOperation.Key, conditionValue]);
+                }
+            }
+            addBuildCriteria(item.Name, filterValue);
+        }
+    }
+
+    function addBuildCriteria(buildCriteriaName, filterValue) {
+        if (!buildCriteriaObjects) {
+            buildCriteriaObjects = [];
+        }
+        var divBuildCriteriaFilters = $("#divBuildCriteriaFilters");
+        if (!buildCriteriaName) {
+            buildCriteriaName = "Criteria " + (buildCriteriaObjects.length + 1);
+        }
+        var config = createFilterBuilderConfig();
+        if (filterValue) {
+            config.value = filterValue;
+        }
+        var buildCriteriaObject = {};
+        var containerElement = $("<div>");
+        var headerElement = $("<div>");
+        var textBoxElement = $("<div style='display: inline-block;'>").dxTextBox({ value: buildCriteriaName, width: "250px" });
+        var buttonElement = $("<div style='display: inline-block; vertical-align: top;'>").dxButton({ icon: "trash", onClick: function () { removeCriteria(buildCriteriaObject); } });
+        var filterElement = $("<div>").dxFilterBuilder(config);
+        divBuildCriteriaFilters.append(containerElement);
+        containerElement.append(headerElement);
+        headerElement.append(textBoxElement);
+        headerElement.append(buttonElement);
+        containerElement.append(filterElement);
+        buildCriteriaObject.Container = containerElement;
+        buildCriteriaObject.CriteriaFilterBuilder = filterElement.dxFilterBuilder("instance");
+        buildCriteriaObject.NameTextBox = textBoxElement.dxTextBox("instance");
+        buildCriteriaObject.RemoveButton = buttonElement.dxButton("instance");
+        buildCriteriaObjects.push(buildCriteriaObject);
+    }
+
+    function cancel() {
+        window.location.href = "/OSAT/DesignSummary/";
+    }
+
+    function onCreateSuccess(result) {
+        window.location.href = "/OSAT/BuildCriteriaSetDetails/" + result.Entity;
+    }
+
+    function create() {
+        if (!buildCombinationsFiltered || buildCombinationsFiltered.length !== 1) throw "Build combination could not be determined";
+        var createEntity = {
+            BuildCombinationId: buildCombinationsFiltered[0].Id,
+            BuildCriterias: [],
+            Comment: txtComment.val().trim(),
+        };
+        for (var bcIndex = 0; bcIndex < buildCriteriaObjects.length; bcIndex++) {
+            var itemBuildCriteria = buildCriteriaObjects[bcIndex];
+            var buildCriteria = {
+                Name: itemBuildCriteria.NameTextBox.option("value"),
+                Conditions: [],
+            };
+            var filterValue = itemBuildCriteria.CriteriaFilterBuilder.option("value");
+            if (filterValue && Array.isArray(filterValue)) { // if the filter has a non null value and is an array then populate the array createEntity.Conditions
+                if (filterValue.length > 0 && !Array.isArray(filterValue[0])) filterValue = [filterValue]; // fix for filter value with only a single condition
+                for (var i = 0; i < filterValue.length; i++) {
+                    // this is how the devExtreme filter builder value works:
+                    // the value is an array with each element being one of the following:
+                    // (1) a group operation: "and", "or" (we are currently only allowing "and" in this implementation, i.e. config.groupOperations == ["and"])
+                    // (2) an array with each element being one of the following:
+                    //    (a) a group operation: "and", "or" (we are currently disallowing any group operations at this level in this in this implementation, i.e. config.maxGroupLevel == 0)
+                    //    (b) an array, say item, representing the filter condition with the following elements:
+                    //        item[0] is the field (AttributeType.Name)
+                    //        item[1] is the operation (ComparisonOperation.Key)
+                    //        item[2] is the condition value(s) which is either: null (no values), a string (single value), or an array containing the values (multiple values)
+                    var item = filterValue[i];
+                    if (item && Array.isArray(item) && item.length >= 2) {
+                        var conditionValue = null;
+                        // if there is a non-null condition value, convert it to a comma delimited string
+                        if (item.length >= 3) {
+                            if (Array.isArray(item[2])) {
+                                conditionValue = item[2].join(",");
+                            }
+                            else {
+                                conditionValue = item[2];
+                            }
+                        }
+                        var condition = {
+                            BuildCriteriaOrdinal: bcIndex + 1,
+                            AttributeTypeName: item[0],
+                            ComparisonOperationKey: item[1],
+                            Value: conditionValue,
+                        };
+                        buildCriteria.Conditions.push(condition);
+                    }
+                }
+            }
+            createEntity.BuildCriterias.push(buildCriteria);
+        }
+        Nsga.Callisto.Osat.createBuildCriteriaSet(createEntity, onCreateSuccess, onError);
+    }
+
+    function fbEditorTemplateAutocomplete(conditionInfo) {
+        var config = {
+            dataSource: conditionInfo.field.editorOptions.dataSource,
+            displayExpr: conditionInfo.field.editorOptions.displayExpr,
+            maxItemCount: 100,
+            minSearchLength: 0,
+            onValueChanged: function (e) {
+                conditionInfo.setValue(e.value ? e.value : null);
+            },
+            openOnFieldClick: true,
+            value: conditionInfo.value,
+            valueExpr: conditionInfo.field.editorOptions.valueExpr,
+            width: "auto",
+        };
+        return $("<div>").dxAutocomplete(config);
+    }
+
+    function fbEditorTemplateTagBox(conditionInfo) {
+        var config = {
+            value: conditionInfo.value,
+            searchEnabled: true,
+            onValueChanged: function (e) {
+                conditionInfo.setValue(e.value && e.value.length ? e.value : null);
+            },
+            width: "auto",
+            dropDownOptions: { minWidth: 300 },
+        };
+        if (enforceAttributeTypeValues || useAttributeTypeValues) {
+            config.items = conditionInfo.field.editorOptions.dataSource;
+            config.valueExpr = conditionInfo.field.editorOptions.valueExpr;
+            config.displayExpr = conditionInfo.field.editorOptions.displayExpr;
+            config.showSelectionControls = true;
+            config.applyValueMode = "useButtons";
+            /*
+            config.acceptCustomValue = true;
+            config.onCustomItemCreating = function (args) {
+                var newValue = args.text,
+                    component = args.component,
+                    currentItems = component.option("items");
+                var newItem = { Value: newValue, ValueDisplay: newValue };
+                currentItems.unshift(newItem);
+                component.option("items", currentItems);
+                args.customItem = newItem;
+            }
+            */
+        }
+        else {
+            config.acceptCustomValue = true;
+            // TODO: remove this block later?
+            // begin block
+            config.onCustomItemCreating = function (args) {
+                var newValue = args.text,
+                    component = args.component,
+                    currentItems = component.option("items");
+                currentItems.unshift(newValue);
+                component.option("items", currentItems);
+                args.customItem = newValue;
+            };
+            // end block
+        }
+        return $("<div>").dxTagBox(config);
+    }
+
+    function createFilterBuilderConfig() {
+        return {
+            fields: fbFields,
+            maxGroupLevel: 0,
+            groupOperations: ["and"],
+            customOperations: [
+                {
+                    name: "contains",
+                    caption: "Contains",
+                    icon: "contains",
+                    editorTemplate: fbEditorTemplateAutocomplete,
+                },
+                {
+                    name: "notcontains",
+                    caption: "Does not contain",
+                    icon: "doesnotcontain",
+                    editorTemplate: fbEditorTemplateAutocomplete,
+                },
+                {
+                    name: "in",
+                    caption: "Is in",
+                    icon: "check",
+                    editorTemplate: fbEditorTemplateTagBox,
+                    calculateFilterExpression: function (filterValue, field) {
+                        return filterValue && filterValue.length
+                            && Array.prototype.concat.apply([], filterValue.map(function (value) {
+                                return [[field.dataField, "=", value], "or"];
+                            })).slice(0, -1);
+                    }
+                },
+                {
+                    name: "notin",
+                    caption: "Is not in",
+                    icon: "close",
+                    editorTemplate: fbEditorTemplateTagBox,
+                    calculateFilterExpression: function (filterValue, field) {
+                        return filterValue && filterValue.length
+                            && Array.prototype.concat.apply([], filterValue.map(function (value) {
+                                return [[field.dataField, "<>", value], "and"];
+                            })).slice(0, -1);
+                    }
+                },
+            ],
+            onEditorPreparing: function (e) {
+                if (enforceAttributeTypeValues) {
+                    return; // use defaults
+                }
+                else if (useAttributeTypeValues) {
+                    e.editorName = "dxAutocomplete";
+                    e.editorOptions.maxItemCount = 100;
+                    e.editorOptions.minSearchLength = 0;
+                    e.editorOptions.openOnFieldClick = true;
+                }
+            },
+        };
+    }
+
+    $("document").ready(function () {
+
+        var initialValues = {
+            //placeholder
+            Osat: buildCombination ? buildCombination.OsatId : null,
+            Design: buildCombination ? buildCombination.Design.Id : null,
+            IntelProdName: buildCombination ? buildCombination.IntelProdName : null,
+            MaterialMasterField: buildCombination ? buildCombination.MaterialMasterField : null,
+            IntelLevel1PartNumber: buildCombination ? buildCombination.IntelLevel1PartNumber : null,
+            IntelMaterialPn: buildCombination ? buildCombination.IntelMaterialPn : null,
+            DeviceName: buildCombination ? buildCombination.DeviceName : null,
+            AssyUpi: buildCombination ? buildCombination.AssyUpi : null,
+            PartUseType: buildCombination && buildCombination.PartUseType ? buildCombination.PartUseType.Id : null,
+            Mpp: buildCombination ? buildCombination.Mpp : "",
+            IsActive: buildCombination ? (buildCombination.IsActive ? "Y" : "N") : "",
+            StartFrom: 1, // Existing Version
+            VersionId: buildCriteriaSet ? buildCriteriaSet.Id : null,
+        };
+
+        var initialDataSources = {
+            Osat: osats,
+            Design: designs,
+            IntelProdName: buildCombinationsFiltered ? createDataSourceFromItemsProperty(buildCombinationsFiltered, "IntelProdName") : null,
+            MaterialMasterField: buildCombinationsFiltered ? createDataSourceFromItemsProperty(buildCombinationsFiltered, "MaterialMasterField") : null,
+            IntelLevel1PartNumber: buildCombinationsFiltered ? createDataSourceFromItemsProperty(buildCombinationsFiltered, "IntelLevel1PartNumber") : null,
+            IntelMaterialPn: buildCombinationsFiltered ? createDataSourceFromItemsProperty(buildCombinationsFiltered, "IntelMaterialPn") : null,
+            DeviceName: buildCombinationsFiltered ? createDataSourceFromItemsProperty(buildCombinationsFiltered, "DeviceName") : null,
+            AssyUpi: buildCombinationsFiltered ? createDataSourceFromItemsProperty(buildCombinationsFiltered, "AssyUpi") : null,
+            PartUseType: buildCombinationsFiltered ? createDataSourceFromItemsProperty(buildCombinationsFiltered, "PartUseType", "Id", "Name") : null,
+        }
+
+     
+
+     ddlOsats = $("#ddlOsats").dxSelectBox({
+            items: initialDataSources.Osat,
+            value: initialValues.Osat,
+            displayExpr: "Name",
+            valueExpr: "Id",
+            searchEnabled: true,
+            width: "100px",
+            placeholder: "Select",
+            onValueChanged: function (e) {
+                 $("#ddlDesigns").dxSelectBox("instance").option("value",null);
+                 var validator = $("#ddlDesigns").dxValidator("instance");
+                 validator.reset();
+                 resetFilters();
+            }
+        }).dxValidator({
+            validationRules: [{
+                type: "required",
+                message: "Osat is required",
+            }],
+        }).dxSelectBox("instance");
+
+        ddlDesigns = $("#ddlDesigns").dxSelectBox({
+            items: initialDataSources.Design,
+            value: initialValues.Design,
+            displayExpr: "Name",
+            valueExpr: "Id",
+            searchEnabled: true,
+            width: "100px",
+            placeholder: "Select",
+            onValueChanged: function (e) {
+                if (e.event !== undefined && e.value) { // only enter this block if the value was changed by the user (not programatically)
+                    Nsga.Callisto.Osat.getBuildCombinations3(e.value,$("#ddlOsats").dxSelectBox("instance").option("value"),null, onSuccessGetBuildCombinations, onError);
+                }
+            }
+        }).dxValidator({
+            validationRules: [{
+                type: "required",
+                message: "Design is required",
+            }],
+        }).dxSelectBox("instance");
+
+        ddlIntelProdNames = $("#ddlIntelProdNames").dxSelectBox({
+            items: initialDataSources.IntelProdName,
+            value: initialValues.IntelProdName,
+            displayExpr: "Display",
+            valueExpr: "Value",
+            searchEnabled: true,
+            width: "375px",
+            placeholder: "Select",
+            onValueChanged: function (e) {
+                if (e.event !== undefined) { // only enter this block if the value was changed by the user (not programatically)
+                    buildCombinationsFiltered = buildCombinationsFiltered.filter(function (x) { return x.IntelProdName === e.value; });
+                    updateItemsFilterDataSources(buildCombinationsFiltered, false);
+                    updateUiFromSelections();
+                }
+            }
+        }).dxValidator({
+            validationRules: [{
+                type: "required",
+                message: "Intel Product Name is required",
+            }],
+        }).dxSelectBox("instance");
+
+        ddlMaterialMasterFields = $("#ddlMaterialMasterFields").dxSelectBox({
+            items: initialDataSources.MaterialMasterField,
+            value: initialValues.MaterialMasterField,
+            displayExpr: "Display",
+            valueExpr: "Value",
+            searchEnabled: true,
+            width: "100px",
+            placeholder: "Select",
+            onValueChanged: function (e) {
+                if (e.event !== undefined) { // only enter this block if the value was changed by the user (not programatically)
+                    buildCombinationsFiltered = buildCombinationsFiltered.filter(function (x) { return x.MaterialMasterField === e.value; });
+                    updateItemsFilterDataSources(buildCombinationsFiltered, false);
+                    updateUiFromSelections();
+                }
+            }
+        }).dxValidator({
+            validationRules: [{
+                type: "required",
+                message: "MM Number is required",
+            }],
+        }).dxSelectBox("instance");
+
+        ddlIntelLevel1PartNumbers = $("#ddlIntelLevel1PartNumbers").dxSelectBox({
+            items: initialDataSources.IntelLevel1PartNumber,
+            value: initialValues.IntelLevel1PartNumber,
+            displayExpr: "Display",
+            valueExpr: "Value",
+            searchEnabled: true,
+            width: "165px",
+            placeholder: "Select",
+            onValueChanged: function (e) {
+                if (e.event !== undefined) { // only enter this block if the value was changed by the user (not programatically)
+                    buildCombinationsFiltered = buildCombinationsFiltered.filter(function (x) { return x.IntelLevel1PartNumber === e.value; });
+                    updateItemsFilterDataSources(buildCombinationsFiltered, false);
+                    updateUiFromSelections();
+                }
+            }
+        }).dxValidator({
+            validationRules: [{
+                type: "required",
+                message: "Intel Level 1 Part Name is required",
+            }],
+        }).dxSelectBox("instance");
+
+        ddlIntelMaterialPns = $("#ddlIntelMaterialPns").dxSelectBox({
+            items: initialDataSources.IntelMaterialPn,
+            value: initialValues.IntelMaterialPn,
+            displayExpr: "Display",
+            valueExpr: "Value",
+            searchEnabled: true,
+            width: "120px",
+            placeholder: "Select",
+            onValueChanged: function (e) {
+                if (e.event !== undefined) { // only enter this block if the value was changed by the user (not programatically)
+                    buildCombinationsFiltered = buildCombinationsFiltered.filter(function (x) { return x.IntelMaterialPn === e.value; });
+                    updateItemsFilterDataSources(buildCombinationsFiltered, false);
+                    updateUiFromSelections();
+                }
+            }
+        }).dxValidator({
+            validationRules: [{
+                type: "required",
+                message: "Intel Part Name is required",
+            }],
+        }).dxSelectBox("instance");
+
+        ddlDeviceNames = $("#ddlDeviceNames").dxSelectBox({
+            items: initialDataSources.DeviceName,
+            value: initialValues.DeviceName,
+            displayExpr: "Display",
+            valueExpr: "Value",
+            searchEnabled: true,
+            width: "200px",
+            placeholder: "Select",
+            onValueChanged: function (e) {
+                if (e.event !== undefined) { // only enter this block if the value was changed by the user (not programatically)
+                    buildCombinationsFiltered = buildCombinationsFiltered.filter(function (x) { return x.DeviceName === e.value; });
+                    updateItemsFilterDataSources(buildCombinationsFiltered, false);
+                    updateUiFromSelections();
+                }
+            }
+        }).dxValidator({
+            validationRules: [{
+                type: "required",
+                message: "Device Name is required",
+            }],
+        }).dxSelectBox("instance");
+
+        ddlAssyUpis = $("#ddlAssyUpis").dxSelectBox({
+            items: initialDataSources.AssyUpi,
+            value: initialValues.AssyUpi,
+            displayExpr: "Display",
+            valueExpr: "Value",
+            searchEnabled: true,
+            width: "200px",
+            placeholder: "Select",
+            onValueChanged: function (e) {
+                if (e.event !== undefined) { // only enter this block if the value was changed by the user (not programatically)
+                    buildCombinationsFiltered = buildCombinationsFiltered.filter(function (x) { return x.AssyUpi === e.value; });
+                    updateItemsFilterDataSources(buildCombinationsFiltered, false);
+                    updateUiFromSelections();
+                }
+            }
+        }).dxValidator({
+            validationRules: [{
+                type: "required",
+                message: "Assembly UPI is required",
+            }],
+        }).dxSelectBox("instance");
+
+        ddlPartUseTypes = $("#ddlPartUseTypes").dxSelectBox({
+            items: initialDataSources.PartUseType,
+            value: initialValues.PartUseType,
+            displayExpr: "Display",
+            valueExpr: "Value",
+            searchEnabled: true,
+            width: "200px",
+            placeholder: "Select",
+            onValueChanged: function (e) {
+                if (e.event !== undefined) { // only enter this block if the value was changed by the user (not programatically)
+                    buildCombinationsFiltered = buildCombinationsFiltered.filter(function (x) { return (x.PartUseType && x.PartUseType.Id === e.value); });
+                    updateItemsFilterDataSources(buildCombinationsFiltered, false);
+                    updateUiFromSelections();
+                }
+            }
+        }).dxValidator({
+            validationRules: [{
+                type: "required",
+                message: "ES/Prod is required",
+            }],
+        }).dxSelectBox("instance");
+
+        spnMpp = $("#spnMpp");
+        spnMpp.text(initialValues.Mpp);
+
+        spnIsActive = $("#spnIsActive");
+        spnIsActive.text(initialValues.IsActive);
+
+        ddlStartFrom = $("#ddlStartFrom").dxSelectBox({
+            items: startFromItems,
+            value: initialValues.StartFrom,
+            displayExpr: "Name",
+            valueExpr: "Id",
+            searchEnabled: true,
+            width: "150px",
+            placeholder: "Select",
+            onValueChanged: function (e) {
+                if (e.event !== undefined) { // only enter this block if the value was changed by the user (not programatically)
+                    updateUiFromStartFrom(e.value);
+                }
+            }
+        }).dxSelectBox("instance");
+
+        ddlVersions = $("#ddlVersions").dxSelectBox({
+            items: versions,
+            value: initialValues.VersionId,
+            displayExpr: "Name",
+            valueExpr: "Id",
+            searchEnabled: true,
+            width: "250px",
+            placeholder: "Select",
+            onValueChanged: function (e) {
+                if (e.event !== undefined) { // only enter this block if the value was changed by the user (not programatically)
+                    versionSelected(e.value);
+                }
+            }
+        }).dxSelectBox("instance");
+
+        txtComment = $("#txtComment");
+
+        updateFilterSetFrom(buildCriteriaSet);
+
+        $("#btnReset").dxButton({
+            text: "Reset",
+            onClick: function (e) {
+                resetFilters();
+            },
+        });
+
+        $("#btnAddCriteria").dxButton({
+            text: "Add Criteria",
+            onClick: function (e) {
+                addBuildCriteria();
+            },
+        });
+
+        $("#btnCancel").dxButton({
+            text: "Cancel",
+            onClick: function (e) {
+                cancel();
+            },
+        });
+
+        if (isOsatCriteriaAuthor) {
+            $("#btnCancel").dxButton({
+                text: "Cancel",
+                onClick: function (e) {
+                    cancel();
+                },
+            });
+
+            $("#btnCreate").dxButton({
+                text: "Save",
+                onClick: function (e) {
+                    var result = e.validationGroup.validate();
+                    if (result.isValid) {
+                        create();
+                    }
+                },
+            });
+        }
+        else {
+            $("#btnCancel").hide();
+            $("#btnCreate").hide();
+        }
+
+        initialized = true;
+
+    });
+
+</script>
+
+<div>
+    <div class="formwrapper fixed centered" style="width:960px;">
+        <div class="bluebox padeightpixel marginfourpixel">
+            <div>
+                <div class="bluebox bglightblue padeightpixel">
+                    <div class="" style="width:940px;display:inline;">
+                        <div class="infotext">
+                            <span class="infotext italic">Items marked as <span class="mandatory">*</span> are required inputs</span>
+                        </div>
+                        <div>
+                            <div id="divValidationSummary" style="margin-left: 150px;"></div>
+                        </div>
+                        <div class="display formrow">
+                            <!-- intel product names -->
+                            <div class="showinline" style="margin-top:8px;width:560px;">
+                                <div class="dx-field-label required" style="width:150px;">Osat</div>
+                                <div style="display:inline-block;" class="forminput">
+                                    <div id="ddlOsats"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="display formrow">
+                            <!-- designs -->
+                            <div class="showinline" style="margin-top:8px;width:100%;">
+                                <div class="dx-field-label required" style="width:150px;">Design</div>
+                                <div style="display:inline-block;" class="forminput">
+                                    <div id="ddlDesigns" style="display:inline-block;"></div>
+                                    <div id="btnReset" style="display:inline-block; vertical-align: top;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="display formrow">
+                            <!-- intel product names -->
+                            <div class="showinline" style="margin-top:8px;width:560px;">
+                                <div class="dx-field-label required" style="width:150px;">Intel Product Name</div>
+                                <div style="display:inline-block;" class="forminput">
+                                    <div id="ddlIntelProdNames"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="display formrow">
+                            <!-- intel level 1 part numbers -->
+                            <div class="showinline" style="margin-top:8px;width:450px;">
+                                <div class="dx-field-label required" style="width:150px;">Intel Level 1 Part Number</div>
+                                <div style="display:inline-block;" class="forminput">
+                                    <div id="ddlIntelLevel1PartNumbers"></div>
+                                </div>
+                            </div>
+                            <!-- assembly upis -->
+                            <div class="showinline" style="margin-top:8px;width:450px;">
+                                <div class="dx-field-label required" style="width:125px;">Assembly UPI</div>
+                                <div style="display:inline-block;" class="forminput">
+                                    <div id="ddlAssyUpis"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="display formrow">
+                            <!-- device names -->
+                            <div class="showinline" style="margin-top:8px;width:450px;">
+                                <div class="dx-field-label required" style="width:150px;">Device Name</div>
+                                <div style="display:inline-block;" class="forminput">
+                                    <div id="ddlDeviceNames"></div>
+                                </div>
+                            </div>
+                            <!-- mpps -->
+                            <div class="showinline" style="margin-top:8px;width:450px;vertical-align: top;">
+                                <div class="dx-field-label" style="width:125px;">MPP</div>
+                                <div style="display:inline-block; margin-top: 8px;">
+                                    <span id="spnMpp"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="display formrow">
+                            <!-- part use types -->
+                            <div class="showinline" style="margin-top:8px;width:450px;">
+                                <div class="dx-field-label required" style="width:150px;">ES / Prod</div>
+                                <div style="display:inline-block;" class="forminput">
+                                    <div id="ddlPartUseTypes"></div>
+                                </div>
+                            </div>
+                            <!-- is active -->
+                            <div class="showinline" style="margin-top:8px;width:450px;vertical-align: top;">
+                                <div class="dx-field-label" style="width:125px;">Is Active?</div>
+                                <div style="display:inline-block; margin-top: 8px;">
+                                    <span id="spnIsActive"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="display formrow">
+                            <!-- material master fields -->
+                            <div class="showinline" style="margin-top:8px;width:450px;">
+                                <div class="dx-field-label required" style="width:150px;">MM Number</div>
+                                <div style="display:inline-block;" class="forminput">
+                                    <div id="ddlMaterialMasterFields"></div>
+                                </div>
+                            </div>
+                            <!-- intel part numbers -->
+                            <div class="showinline" style="margin-top:8px;width:410px;">
+                                <div class="dx-field-label required" style="width:125px;">Intel Part Number</div>
+                                <div style="display:inline-block;" class="forminput">
+                                    <div id="ddlIntelMaterialPns"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- start from -->
+                        <div class="display formrow">
+                            <div class="showinline" style="margin-top:8px;width:100%;">
+                                <div class="dx-field-label" style="width:150px;">Start From</div>
+                                <div style="display:inline-block;" class="forminput">
+                                    <div id="ddlStartFrom"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- versions; display only if start from = Existing Version -->
+                        <div id="divVersions" class="display formrow">
+                            <div class="showinline" style="margin-top:8px;width:100%;">
+                                <div class="dx-field-label" style="width:150px;">Existing Versions</div>
+                                <div style="display:inline-block;" class="forminput">
+                                    <div id="ddlVersions"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- build criteria -->
+                        <div id="divBuildCriterias" class="display formrow">
+                            <div class="showinline" style="margin-top:8px;width:100%;">
+                                <div class="dx-field-label" style="width:150px;">Build Criteria</div>
+                                <div style="display:inline-block;" class="forminput">
+                                    <div id="divBuildCriteriaFilters"></div>
+                                    <div id="btnAddCriteria"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- comment -->
+                        <div class="display formrow">
+                            <div class="showinline" style="margin-top:8px;width:100%;">
+                                <div class="dx-field-label" style="width:150px;">Comment</div>
+                                <div style="display:inline-block;" class="forminput">
+                                    <textarea id="txtComment" name="txtComment" rows="5" cols="100"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div>
+            <!-- A section for all the actions -->
+            <div class="bluebox padeightpixel bglightblue marginfourpixel" style="margin-top:8px;">
+                <div class=" padeightpixel">
+                    <div class="rightalign">
+                        <div id="btnCancel"></div>
+                        <div id="btnCreate" class="submitbutton"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

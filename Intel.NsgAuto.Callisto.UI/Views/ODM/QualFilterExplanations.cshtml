@@ -1,0 +1,330 @@
+﻿@model Intel.NsgAuto.Callisto.UI.Models.OdmExplainabilityReportModel
+
+@{
+    ViewBag.Title = "ODM QF - Qual Filter Explanations";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style scoped>
+    .widgetrow {
+        margin-top: 25px;
+        display: block;
+        padding: 4px;
+    }
+
+    .widgetbox { /*display:inline-block;height:250px; */
+        float: left;
+        width: auto;
+        margin: 4px;
+    }
+
+    .widgetboxheader {
+        margin: 0px;
+        padding: 10px;
+        border-bottom: 1px solid #dcdcdc;
+    }
+
+    .widgetbox li {
+        margin: 4px;
+    }
+
+    .gridbox {
+        width: auto;
+    }
+    .gridcontainer { height: 100%; width: 99.6%; position: absolute; }
+    .gridcontainer { box-sizing: border-box; }
+</style>
+
+<script type="text/javascript">
+    var badSlots = @(JsonHelper.Serialize(Model.BadSlots));
+    var explanations = @(JsonHelper.Serialize(Model.Explanations));
+
+    $("document").ready(function () {
+        var config1 = Nsga.Callisto.Dx.dataGridDefaultConfig();
+        
+        config1.columns = [
+            {
+                caption: "Bad S-Lots",
+                dataField: "Name",
+                width: "300px",
+                alignment: "left",
+                fixed: true,
+                fixedPosition: "left"
+           }
+        ];
+
+        config1.export = {
+            enabled: true,
+            fileName: "Bad_S-Lots",
+        };
+
+        config1.keyExpr = "Name";
+        config1.dataSource = badSlots;
+        $("#grdBadSlots").dxDataGrid(config1);
+
+        var config2 = Nsga.Callisto.Dx.dataGridDefaultConfig();
+        config2.columns = [
+            {
+                caption: "Sub Con Name",
+                dataField: "SubConName",
+                alignment: "left",
+                width: "75px",
+                fixed: true,
+                fixedPosition: "left",
+                cssClass: "fixedcolumn"
+            },
+            {
+                caption: "SSD ID",
+                dataField: "SSD_Id",
+                alignment: "left",
+                fixed: true,
+                fixedPosition: "left",
+                cssClass: "fixedcolumn"
+            },
+            {
+                caption: "Inventory Location",
+                dataField: "InventoryLocation",
+                alignment: "left",
+                width: "100px",
+                fixed: true,
+                fixedPosition: "left",
+                cssClass: "fixedcolumn"
+            },
+            {
+                caption: "MM Number",
+                dataField: "MMNumber",
+                alignment: "left",
+                width: "95px",
+                fixed: true,
+                fixedPosition: "left",
+                cssClass: "fixedcolumn"
+            },
+            {
+                caption: "Location Type",
+                dataField: "LocationType",
+                alignment: "left",
+                width: "95px",
+                fixed: true,
+                fixedPosition: "left",
+                cssClass: "fixedcolumn"
+            },
+            {
+                caption: "Category",
+                dataField: "Category",
+                alignment: "left",
+                width: "95px",
+                fixed: true,
+                fixedPosition: "left",
+                cssClass: "fixedcolumn"
+            },
+            {
+                caption: "S-Lot",
+                dataField: "SLot",
+                width: "85px",
+                fixed: true,
+                fixedPosition: "left",
+                cssClass: "fixedcolumn"
+            },
+            {
+                caption: "S Code",
+                dataField: "SCode",
+                width: "85px",
+                fixed: true,
+                fixedPosition: "left",
+                cssClass: "fixedcolumn"
+            },
+            {
+                caption: "Media IPN",
+                dataField: "MediaIPN",
+                width: "105px",
+                fixed: true,
+                fixedPosition: "left",
+                cssClass: "fixedcolumn"
+            },
+            {
+                caption: "Por Major Probe Program Revision",
+                dataField: "PorMajorProbeProgramRevision",
+                fixed: false,
+                fixedPosition: "left"
+            },
+            {
+                caption: "Actual Major Probe Program Revision",
+                dataField: "ActualMajorProbeProgramRevision",
+                fixed: false,
+                fixedPosition: "left"
+            },
+            {
+                caption: "Por Burn Tape Revision",
+                dataField: "PorBurnTapeRevision",
+                fixed: false,
+                fixedPosition: "left"
+            },
+            {
+                caption: "Actual Burn Tape Revision",
+                dataField: "ActualBurnTapeRevision",
+                fixed: false,
+                fixedPosition: "left"
+            },
+            {
+                caption: "Por Cell Revision",
+                dataField: "PorCellRevision",
+                fixed: false,
+                fixedPosition: "left"
+            },
+            {
+                caption: "Actual Cell Revision",
+                dataField: "ActualCellRevision",
+                fixed: false,
+                fixedPosition: "left"
+            },
+            {
+                caption: "Por Custom Testing Required",
+                dataField: "PorCustomTestingRequired",
+                fixed: false,
+                fixedPosition: "left"
+            },
+            {
+                caption: "Actual Custom Testing Required",
+                dataField: "ActualCustomTestingRequired",
+                fixed: false,
+                fixedPosition: "left"
+            },
+            {
+                caption: "Por Fab Conv Id",
+                dataField: "PorFabConvId",
+                fixed: false,
+                fixedPosition: "left"
+            },
+            {
+                caption: "Actual Fab Conv Id",
+                dataField: "ActualFabConvId",
+                fixed: false,
+                fixedPosition: "left"
+            },
+            {
+                caption: "Por Fab Excr Id",
+                dataField: "PorFabExcrId",
+                fixed: false,
+                fixedPosition: "left"
+            },
+            {
+                caption: "Actual Fab Excr Id",
+                dataField: "ActualFabExcrId",
+                fixed: false,
+                fixedPosition: "left"
+            },
+            {
+                caption: "Por Product Grade",
+                dataField: "PorProductGrade",
+                fixed: false,
+                fixedPosition: "left"
+            },
+            {
+                caption: "Actual Product Grade",
+                dataField: "ActualProductGrade",
+                fixed: false,
+                fixedPosition: "left"
+            },
+            {
+                caption: "Por Reticle Wave Id",
+                dataField: "PorReticleWaveId",
+                fixed: false,
+                fixedPosition: "left"
+            },
+            {
+                caption: "Actual Reticle Wave Id",
+                dataField: "ActualReticleWaveId",
+                fixed: false,
+                fixedPosition: "left"
+            },
+            {
+                caption: "Por Fab Facility",
+                dataField: "PorFabFacility",
+                fixed: false,
+                fixedPosition: "left"
+            },
+            {
+                caption: "Actual Fab Facility",
+                dataField: "ActualFabFacility",
+                fixed: false,
+                fixedPosition: "left"
+            }, 
+            {
+                caption: "Por Probe Rev",
+                dataField: "PorProbeRev",
+                fixed: false,
+                fixedPosition: "left"
+            },
+            {
+                caption: "Actual Probe Rev",
+                dataField: "ActualProbeRev",
+                fixed: false,
+                fixedPosition: "left"
+            },
+        ];
+
+        config2.export = {
+            enabled: true,
+            fileName: "Explanations",
+        };
+        config2.keyExpr = "SCode";        
+        config2.dataSource = explanations;
+        // update\extend the existing framework data
+        var mergedConfig2 = $.extend(config2,
+            {
+                height: 600, //function () { return $(window).height() * .7 }, 
+                columnAutoWidth: true,
+                showColumnLines: true,
+                showRowLines: true,
+                rowAlternationEnabled: true,
+                showBorders: true,
+                wordWrapEnabled: true,
+                headerFilter: { visible: true },
+                filterRow: { visible: true },
+                loadPanel: { enabled: true },
+                paging: { enabled: false },
+                filterPanel: { visible: false },
+                scrolling: {
+                    showScrollbar: "always",
+                },
+                columnFixing: {
+                    enabled: false
+                },
+            });
+
+        $("#grdExplanations").dxDataGrid(mergedConfig2);
+
+        $(".dx-icon-export-excel-button").html($("<span class='exporttoexceltext'>Export To Excel</span>"));   //custom excel button
+        $(".dx-toolbar-before").prepend($("<div class='inline'><div class='infotext '><span class='padeightpixel fas fa-exclamation-circle' style='font-size:14px;'></span>Use scroll bar of the table below to scroll and view the content. If scroll bar is very thin and not evidently visible, hover over to bring it up. Columns with grey colored headings are fixed to scrolling. </div></div>"));
+
+    });
+</script>
+
+<div id="divResults" class="centeralign">
+    <div class="fixed centered" style="height:40px;">
+        <div style="margin-top:10px; vertical-align: top; padding-left:10px" class="bluebox bglightblue padfourpixel ">
+            <div class="heading">Bad S-Lots</div>
+            <div class='infotext'>Following S-Lots are considered bad since they have attribute data quality issues.</div>
+        </div>
+    </div>
+    <div class="padeightpixel">
+        <div>
+            <div id="grdBadSlots"></div>
+        </div>
+    </div>
+    <div class="fixed centered" style="height:40px;">
+        <div style="margin-top:10px; vertical-align: top; padding-left:10px" class="bluebox bglightblue padfourpixel ">
+            <div class="heading">ODM Qual Filter Explanations</div>
+            <div class='infotext'>Following report will show you the POR values vs Actual values side by side.</div>
+        </div>
+    </div>
+    <div class="grid-wrapper" style="margin-top:4px;">
+        <div>
+            <div class="marginfourpixel">
+                <div class="gridcontainer">
+                    <div id="grdExplanations" style="margin-right:20px;margin-left:10px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

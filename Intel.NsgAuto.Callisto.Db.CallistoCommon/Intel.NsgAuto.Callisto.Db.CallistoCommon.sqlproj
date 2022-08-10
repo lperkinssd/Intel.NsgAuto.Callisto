@@ -1,0 +1,199 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <Name>Intel.NsgAuto.Callisto.Db.CallistoCommon</Name>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectVersion>4.1</ProjectVersion>
+    <ProjectGuid>{439b648a-45e0-44e3-bf1b-1fd5f79c2602}</ProjectGuid>
+    <DSP>Microsoft.Data.Tools.Schema.Sql.Sql140DatabaseSchemaProvider</DSP>
+    <OutputType>Database</OutputType>
+    <RootPath>
+    </RootPath>
+    <RootNamespace>Intel.NsgAuto.Callisto.Db.CallistoCommon</RootNamespace>
+    <AssemblyName>Intel.NsgAuto.Callisto.Db.CallistoCommon</AssemblyName>
+    <ModelCollation>1033, CI</ModelCollation>
+    <DefaultFileStructure>BySchemaAndSchemaType</DefaultFileStructure>
+    <DeployToDatabase>True</DeployToDatabase>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetLanguage>CS</TargetLanguage>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <SqlServerVerification>False</SqlServerVerification>
+    <IncludeCompositeObjects>True</IncludeCompositeObjects>
+    <TargetDatabaseSet>True</TargetDatabaseSet>
+    <SccProjectName>SAK</SccProjectName>
+    <SccProvider>SAK</SccProvider>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccLocalPath>SAK</SccLocalPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>bin\Release\</OutputPath>
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
+    <!-- Default to the v11.0 targets path if the targets file for the current VS version is not found -->
+    <SSDTExists Condition="Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets')">True</SSDTExists>
+    <VisualStudioVersion Condition="'$(SSDTExists)' == ''">11.0</VisualStudioVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Integration|AnyCPU' ">
+    <OutputPath>bin\Debug\</OutputPath>
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <Import Condition="'$(SQLDBExtensionsRefPath)' != ''" Project="$(SQLDBExtensionsRefPath)\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <Import Condition="'$(SQLDBExtensionsRefPath)' == ''" Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <ItemGroup>
+    <Folder Include="Properties" />
+    <Folder Include="stage" />
+    <Folder Include="stage\Functions" />
+    <Folder Include="stage\Stored Procedures" />
+    <Folder Include="stage\Tables" />
+    <Folder Include="stage\User Defined Types" />
+    <Folder Include="Security" />
+    <Folder Include="stage\Views\" />
+    <Folder Include="setup" />
+    <Folder Include="setup\Stored Procedures" />
+    <Folder Include="ref" />
+    <Folder Include="ref\Functions" />
+    <Folder Include="ref\Tables\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="SchemaCompare_DEV.scmp" />
+    <None Include="SchemaCompare_INT.scmp" />
+    <None Include="SchemaCompare_PROD.scmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Build Include="stage\Tables\JobExecutions.sql" />
+    <Build Include="stage\Tables\JobSteps.sql" />
+    <Build Include="stage\Tables\PCodes.sql" />
+    <Build Include="stage\Tables\JobErrorLogs.sql" />
+    <Build Include="stage\Tables\Jobs.sql" />
+    <Build Include="stage\Tables\TaskMessages.sql" />
+    <Build Include="stage\Tables\Tasks.sql" />
+    <Build Include="stage\Functions\GetItemCharacteristicValue.sql" />
+    <Build Include="stage\Functions\ToDelimitedString.sql" />
+    <Build Include="stage\Stored Procedures\UpdateTaskStatus.sql" />
+    <Build Include="stage\Stored Procedures\UpdateTaskEnd.sql" />
+    <Build Include="stage\Stored Procedures\UpdateTaskAbort.sql" />
+    <Build Include="stage\Stored Procedures\CreateTaskMessage.sql" />
+    <Build Include="stage\Stored Procedures\CreateTask.sql" />
+    <Build Include="stage\Stored Procedures\TaskSpeedPull.sql" />
+    <Build Include="stage\Stored Procedures\GetItemCharacteristicDetailV2Records.sql" />
+    <Build Include="stage\Stored Procedures\GetItemDetailV2Records.sql" />
+    <Build Include="stage\Stored Procedures\GetRecordCountsMAT.sql" />
+    <Build Include="stage\Stored Procedures\GetRecordCountsLotShip.sql" />
+    <Build Include="stage\Stored Procedures\GetRecordCountsODM_WIP_Attributes.sql" />
+    <Build Include="stage\Stored Procedures\TaskTemplate.sql" />
+    <Build Include="stage\Stored Procedures\GetLatestTreadstoneMAT_Id.sql" />
+    <Build Include="stage\Stored Procedures\UpdateMAT_Archive.sql" />
+    <Build Include="stage\Stored Procedures\UpdateTaskUnresolved.sql" />
+    <Build Include="stage\Stored Procedures\UpdateTaskResolved.sql" />
+    <Build Include="stage\Stored Procedures\GetTaskMessages.sql" />
+    <Build Include="stage\Stored Procedures\GetTasks.sql" />
+    <Build Include="stage\User Defined Types\IMMRecipes.sql" />
+    <Build Include="stage\User Defined Types\IStrings.sql" />
+    <Build Include="Security\stage.sql" />
+    <Build Include="stage\Tables\odm_wip_attributes_daily_load.sql" />
+    <Build Include="stage\Tables\MAT.sql" />
+    <Build Include="stage\Tables\lot_ship.sql" />
+    <Build Include="stage\Tables\ItemDetailV2.sql" />
+    <Build Include="stage\Tables\ItemCharacteristicV2.sql" />
+    <Build Include="stage\Tables\BillOfMaterialExplosionDetailV2.sql" />
+    <Build Include="stage\Tables\BillOfMaterialDetailV2.sql" />
+    <Build Include="stage\Tables\PRFDCR.sql" />
+    <Build Include="stage\Views\VSpeedCustomers.sql" />
+    <Build Include="stage\Views\VSpeedProductFamilies.sql" />
+    <Build Include="stage\Views\VSpeedBomParentChildRelationships.sql" />
+    <Build Include="stage\Stored Procedures\GetSpeedItem.sql" />
+    <Build Include="Security\setup.sql" />
+    <Build Include="setup\Stored Procedures\CreateTaskTypes.sql" />
+    <Build Include="Security\ref.sql" />
+    <Build Include="ref\Functions\GetTaskTypeId.sql" />
+    <Build Include="ref\Tables\TaskTypes.sql" />
+    <Build Include="setup\Stored Procedures\CreateAll.sql" />
+    <Build Include="stage\Views\VSpeedFormFactors.sql" />
+    <Build Include="stage\Views\VSpeedBusinessUnits.sql" />
+    <Build Include="stage\Views\VSpeedCommodities.sql" />
+    <Build Include="stage\Views\VSpeedReleaseStatuses.sql" />
+    <Build Include="stage\Views\VSpeedItemTypes.sql" />
+    <Build Include="stage\Views\VSpeedItemRevisionProjects.sql" />
+    <Build Include="stage\Views\VSpeedMakeBuyNames.sql" />
+    <Build Include="stage\Views\VSpeedMaterialTypes.sql" />
+    <Build Include="stage\Views\VSpeedBomAssociationTypes.sql" />
+    <Build Include="stage\Views\VSpeedBomStructureTypes.sql" />
+    <Build Include="stage\Stored Procedures\UpdateTaskProgress.sql" />
+    <Build Include="stage\Stored Procedures\TaskSpeedDataTransform.sql" />
+    <Build Include="stage\Views\VSpeedMMRecipeItems.sql" />
+    <Build Include="stage\Views\VSpeedMMRecipeItemsGbCategory.sql" />
+    <Build Include="stage\Views\VSpeedPCodeCharacteristicSummary.sql" />
+    <Build Include="stage\Views\VSpeedSCodeCharacteristicSummary.sql" />
+    <Build Include="stage\Views\VSpeedPCodeItems.sql" />
+    <Build Include="stage\Views\VSpeedItemDetailV2.sql" />
+    <Build Include="stage\Views\VSpeedItemCharacteristicV2.sql" />
+    <Build Include="stage\Views\VSpeedBillOfMaterialExplosionDetailV2.sql" />
+    <Build Include="stage\Views\VSpeedBillOfMaterialDetailV2.sql" />
+    <Build Include="stage\Views\VSpeedSCodeItems.sql" />
+    <Build Include="stage\Views\VSpeedIcFlashCharacteristicSummary.sql" />
+    <Build Include="stage\Views\VSpeedIcFlashItems.sql" />
+    <Build Include="stage\Tables\SpeedSCodeItems.sql" />
+    <Build Include="stage\Tables\SpeedPCodeItems.sql" />
+    <Build Include="stage\Tables\SpeedIcFlashItems.sql" />
+    <Build Include="stage\Views\VSpeedMMRecipes.sql" />
+    <Build Include="stage\Stored Procedures\TaskSpeedMMRecipeData.sql" />
+    <Build Include="stage\Tables\SpeedMMRecipes.sql" />
+    <Build Include="stage\Tables\SpeedMMRecipeItemsGbCategory.sql" />
+    <Build Include="stage\Tables\SpeedMMRecipeItems.sql" />
+    <Build Include="stage\Stored Procedures\TaskTreadstonePullLotShip.sql" />
+    <Build Include="stage\Functions\CreatedByTask.sql" />
+    <Build Include="stage\Views\VSpeedDesignItems.sql" />
+    <Build Include="stage\Tables\SpeedDesignItems.sql" />
+    <Build Include="stage\Stored Procedures\CreateTaskByName.sql" />
+    <Build Include="stage\Stored Procedures\CreateTaskByNameReturnTask.sql" />
+    <Build Include="stage\Functions\FTasks.sql" />
+    <Build Include="stage\Stored Procedures\TaskTreadstonePullOdmWip.sql" />
+    <Build Include="stage\Tables\odm_wip_data.sql" />
+    <Build Include="stage\Stored Procedures\TaskTreadstonePullMat.sql" />
+    <Build Include="stage\Stored Procedures\TaskTreadstonePullPrf.sql" />
+    <Build Include="stage\Stored Procedures\UpdateTasksResolveAllAborted.sql" />
+    <Build Include="stage\Stored Procedures\UpdateTasksResolveAllAbortedReturnTask.sql" />
+    <Build Include="stage\Tables\OdmNPSGRemovableSLotsHistory.sql" />
+    <Build Include="stage\Tables\OdmNPSGRemovableSLots.sql" />
+    <Build Include="stage\Tables\OdmIOGRemovableSLotsHistory.sql" />
+    <Build Include="stage\Tables\OdmIOGRemovableSLots.sql" />
+    <Build Include="stage\Stored Procedures\TaskProcessNPSGRemovableSLots.sql" />
+    <Build Include="stage\Stored Procedures\TaskProcessIOGRemovableSLots.sql" />
+    <Build Include="stage\User Defined Types\IOdmRemovableSLots.sql" />
+    <Build Include="stage\Stored Procedures\GetQualFilterNPSGRemovableSLotUploads.sql" />
+    <Build Include="stage\Stored Procedures\GetQualFilterIOGRemovableSLotUploads.sql" />
+    <Build Include="stage\Stored Procedures\GetNPSGRemovableSLotsDetails.sql" />
+    <Build Include="stage\Stored Procedures\GetIOGRemovableSLotsDetails.sql" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,342 @@
+﻿@model Intel.NsgAuto.Callisto.UI.Models.MMRecipeDetailsModel
+
+@{
+    ViewBag.Title = "MM Recipe Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var supportEmail = Intel.NsgAuto.Callisto.Business.Core.Settings.SupportEmailAddress;
+}
+
+@Html.Partial("_ReviewStyling")
+
+@Html.Partial("_DetailsScript", Model)
+
+<script type="text/javascript">
+
+    function updateUiFromEntity() {
+        var editMode = false;
+        var statusName = model.Status.Name;
+        var divSubmitCancel = $("#divSubmitCancel");
+        var accReview = $("#accReview");
+        var acdReview = $("#acdReview");
+        if (statusName === "Draft") {
+            editMode = true;
+            divSubmitCancel.show();
+            accReview.show();
+            acdReview.hide();
+        }
+        else {
+            divSubmitCancel.hide();
+            if (statusName === "Canceled") {
+                accReview.hide();
+                acdReview.hide();
+            }
+            else {
+                accReview.show();
+                acdReview.show();
+            }
+        }
+        $("#dbPRQDate").dxDateBox("instance").option("readOnly", !editMode); // control initialized in _DetailsScript
+        $("#ddlCustomerQualStatus").dxSelectBox("instance").option("readOnly", !editMode); // control initialized in _DetailsScript
+        $("#ddlPLCStage").dxSelectBox("instance").option("readOnly", !editMode); // control initialized in _DetailsScript
+    }
+
+    function refreshAcdReview() {
+        var dataSource = null;
+        if (review && review.ReviewSteps) {
+            dataSource = review.ReviewSteps;
+        }
+        $("#acdReview").dxAccordion("instance").option("dataSource", dataSource);
+    }
+
+    function refreshFromResult(result) {
+        entity = result.Entity;
+        model = entity.MMRecipe;
+        customerQualStatuses = entity.CustomerQualStatuses;
+        plcStages = entity.PLCStages;
+        review = entity.Review;
+        populateFields();
+        updateUiFromEntity();
+        refreshAcdReview();
+    }
+
+    function onErrorBase(xhr, status) {
+        var result = null;
+        var message = "An unexpected error occurred. If the problem persists, contact support.";
+        if (xhr && xhr.responseJSON) {
+            result = xhr.responseJSON;
+            if (result.ExceptionMessage) message = result.ExceptionMessage;
+            else if (result.Message) message = result.Message;
+        }
+        Nsga.Callisto.Messages.showError(message);
+        return result;
+    };
+
+    function onError(xhr, status) {
+        var result = onErrorBase(xhr, status);
+        if (result.Entity) {
+            refreshFromResult(result);
+        }
+    };
+
+    function onSuccess(result) {
+        refreshFromResult(result);
+    }
+
+    function approve() {
+        Nsga.Callisto.MMRecipes.approve(model.Id, onSuccess, onError);
+    }
+
+    function cancel() {
+        Nsga.Callisto.MMRecipes.cancel(model.Id, onSuccess, onError);
+    }
+
+    function reject() {
+        Nsga.Callisto.MMRecipes.reject(model.Id, onSuccess, onError);
+    }
+
+    function submit1() {
+        Nsga.Callisto.MMRecipes.submit(model.Id, onSuccess, onError);
+    }
+
+    function onUpdateError() {
+        var result = onErrorBase(xhr, status);
+    }
+    function onUpdateSuccess() {
+        submit1();
+    }
+
+    function updateAndSubmit() {
+        var updateModel = {
+            Id: model.Id,
+            PRQDate: $("#dbPRQDate").dxDateBox("instance").option("value"),
+            CustomerQualStatusId: $("#ddlCustomerQualStatus").dxSelectBox("instance").option("value"),
+            PLCStageId: $("#ddlPLCStage").dxSelectBox("instance").option("value"),
+        };
+        Nsga.Callisto.MMRecipes.update(updateModel, onUpdateSuccess, onUpdateError);
+        // TODO: change to a single API call to do both the update and submit instead of the current two separate calls
+        // coded this way for now until review section implementation is finished as that may impact design
+    }
+
+    function createReviewDecision(snapshotReviewerId, isApproved, comment) {
+        return {
+            VersionId: model.Id,
+            SnapshotReviewerId: snapshotReviewerId,
+            IsApproved: isApproved,
+            Comment: comment,
+        };
+    }
+
+    function validateComment(txtComment) {
+        var result = true;
+        if (txtComment.val().trim().length === 0) {
+            Nsga.Callisto.Messages.showError("Please provide a comment");
+            txtComment.focus();
+            result = false;
+        }
+        return result;
+    }
+
+    function submitReviewDecision(e, element) {
+        var button = $(element);
+
+        if (button) {
+            var divButton = button.closest(".groupwrapper");
+            if (divButton) {
+                var txtComment = divButton.find(".reviewTxt");
+
+                if (txtComment) {
+                    if (validateComment(txtComment)) {
+                        var reviewButton = button.find(".decision");
+                        var snapshotReviewerId = reviewButton.attr('data-snapshot-reviewer-id');
+                        var comment = txtComment.val().trim();
+                        if (reviewButton.val() === 'Approve') {
+                            Nsga.Callisto.MMRecipes.approve(createReviewDecision(snapshotReviewerId, true, comment), onSuccess, onError);
+                        } else if (reviewButton.val() === 'Reject') {
+                            Nsga.Callisto.MMRecipes.reject(createReviewDecision(snapshotReviewerId, false, comment), onSuccess, onError);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    function reviewStageTemplate(data, index, element) {
+        var reviewStageStatus = data["StatusText"];
+        var reviewGroupReviewers = data["ReviewGroupReviewers"];
+
+        // render the group(s) and reviewers with review decision
+        var groupWrapper;
+        var reviewGroupReviewer, reviewers, reviewer, group;
+        var divReviewers;
+        var reviewerNames = [];
+        for (var g = 0; g < reviewGroupReviewers.length; g++) {
+            reviewerNames = [];
+            groupWrapper = $("<div class='groupwrapper' />");
+            reviewGroupReviewer = reviewGroupReviewers[g]; // 1-1 with group (reviewer.ReviewGroup) represents one review group
+            group = reviewGroupReviewer.ReviewGroup;
+            var groupStatus;
+            if (group) {
+                groupStatus = group.ReviewStatusText;
+                groupWrapper.append($("<div class='grouptitle' />").text(@MvcHtmlString.Create("group.DisplayName")));
+                divReviewers = $("<div  class='undecided ' ></div>");
+                groupWrapper.append(divReviewers);
+            }
+            // Get the reviewers with in the current group
+            reviewers = reviewGroupReviewer.Reviewers;
+            for (var a = 0; a < reviewers.length; a++) {
+                reviewer = reviewers[a];
+                if (reviewer) {
+                    if (reviewer.ReviewStatusText === "open") {
+                        // if this group has not made a decision, then list the approver, otherwise don't as it has been approved
+                        if (reviewGroupReviewer.ReviewGroup.ReviewStatusText === "open") {
+                            reviewerNames.push(reviewer.Employee.Name);
+                        }
+                    } else {
+                        var decision = (reviewer.ReviewStatusText === "approved") ? "Approved" : "Rejected";
+                        var decisionText = decision + " by " + reviewer.Employee.Name;
+                        if (reviewer.ReviewDate) {
+                            decisionText += " on " + Nsga.Callisto.Dates.isoToLocaleString(reviewer.ReviewDate);
+                        }
+                        decisionText += " with following comments:";
+                        groupWrapper.append($("<div class='" + decision + "' />").text(@MvcHtmlString.Create("decisionText")));
+                        groupWrapper.append($("<div class='comments display' />").text('"' + @MvcHtmlString.Create("reviewer.Comment") + '"'));
+                    }
+                }
+                if (reviewStageStatus === "open") { // if review has not been completed, then render the review controls & UX
+                    if (groupStatus === "open") {
+                        // only display the voting buttons if (1) this stage has not been reviewed yet and (2) the reviewer is the currently logged in user and (3) this stage is current stage
+                        if ((reviewer.Idsid === userId) && (data["IsCurrentStage"] === true)) {
+                            var divSecond = $("<div class='reviewControls showinline' />");
+                            divSecond.append($("<div class='txtacomments showinline' />").append(
+                                $("<div class='caption' style='margin-left:1px;font-size: 12px;' >You are a reviewer for " + group.DisplayName
+                                    + ". Input comments below, and provide your decision:<span class='mandatory' >*</span></div><textarea class='reviewTxt' data-idsid-txt='" + reviewer.Idsid
+                                    + "' style='margin-right:8px;' rows='3' cols='50'></textarea>")));
+                            divSecond.appendTo(groupWrapper);
+                            var divReviewSection = $("<div class='reviewactions showinline'/>");
+
+                            // reject
+                            divReviewSection.append($("<span class='reject-wrapper'><span class='thumbsdown fa fa-thumbs-down' style='color:red;'></span><input class='rejectBtn showinline decision' data-snapshot-reviewer-id='" + @MvcHtmlString.Create("reviewer.Id") + "' type='button' value='Reject'/></span>")
+                                .bind("click", function (e) {
+                                    submitReviewDecision(e, this);
+                                }));
+                            // approve
+                            divReviewSection.append($("<span class='approve-wrapper'><span class='thumbsup fa fa-thumbs-up' style='color:green;'></span><input class='approveBtn showinline decision' data-snapshot-reviewer-id='" + @MvcHtmlString.Create("reviewer.Id") + "' style='margin-right:8px;' type='button' value='Approve'/></span>")
+                                .bind("click", function (e) {
+                                    submitReviewDecision(e, this);
+                                }));
+                            divReviewSection.appendTo(groupWrapper);
+                        }
+                    }
+                }
+                // append all reviewer names
+                if (reviewerNames.length > 0) {
+                    divReviewers.text("Assigned Reviewers : " + reviewerNames.join(";  "));
+                }
+            }
+            element.append(groupWrapper);
+        }
+    }
+
+    $("document").ready(function () {
+        $("#divValidationSummary").dxValidationSummary({
+            validationGroup: "Update"
+        });
+        $("#btnSubmit").dxButton({
+            validationGroup: "Update",
+            text: "Submit For Review",
+            onClick: function validate(params) {
+                var result = params.validationGroup.validate();
+                if (result.isValid) {
+                    updateAndSubmit();
+                }
+            }
+        });
+
+        var acdReviewDataSource = null;
+        // acdReview
+        if (review && review.ReviewSteps) {
+            acdReviewDataSource = review.ReviewSteps;
+        }
+        $("#acdReview").dxAccordion({
+            dataSource: acdReviewDataSource,
+            multiple: true,
+            collapsible: true,
+
+            itemTitleTemplate:
+                function (itemData, itemIndex, itemElement) {
+                    var status = (itemData.StatusText) ? itemData.StatusText : 'open';
+                    itemElement.addClass('bg-' + status);
+                    itemElement.append($("<div class='accordiontitle " + status + " ' >" + itemData.ReviewStage.DisplayName + "</div>"));
+                },
+            itemTemplate:
+                function (itemData, itemIndex, itemElement) {
+                    var childSteps = itemData['ChildSteps'];
+                    // if we have child steps, no approval and no groups at the parent level
+                    if (childSteps && childSteps.length > 0) {
+                        $("<div class='childstepwrapper childstepaccordion bglightergray' />")
+                            .dxAccordion({
+                                dataSource: childSteps,
+                                multiple: true,
+                                collapsible: true,
+                                itemTitleTemplate:
+                                    function (childStepData, childItemIndex, childItemElement) {
+                                        var status = (childStepData.StatusText) ? childStepData.StatusText : 'open';
+                                        childItemElement.append($("<div class='childaccordiontitle " + status + " ' >" + childStepData.ReviewStage.DisplayName + "</div>"));
+                                    },
+                                itemTemplate:
+                                    function (childItemData, childItemIndex, childItemElement) {
+                                        reviewStageTemplate(childItemData, childItemIndex, childItemElement);
+                                    },
+                                onItemRendered: function (dataItem) {
+                                    var i = dataItem.itemIndex;
+                                    var el = this;
+                                    el.expandItem(i);
+                                }
+                            }).appendTo(itemElement);
+                    }
+                    else {
+                        reviewStageTemplate(itemData, itemIndex, itemElement);
+                    }
+                },
+            onItemRendered: function (dataItem) {
+                var i = dataItem.itemIndex;
+                var container = this;
+                container.collapseItem(i);
+                var isCurrent = dataItem.itemData["IsCurrentStage"];
+                if (isCurrent && isCurrent === true)
+                    container.expandItem(i);
+            },
+            noDataText: "<div class='noreviewsetup'>No review data is available. If you believe this represents an issue, please contact <a href='mailto:@(supportEmail)? Subject=No mm recipe review data for id = " + model.Id + "' target='_top'>Callisto Support Team</a> for assistance.</div>",
+        });
+
+        updateUiFromEntity();
+    });
+
+</script>
+
+
+<div id="popupContainer">
+    <div id="popupContent"></div>
+</div>
+
+<div class="padeightpixel">
+    <div class="rightalign">
+        <div class="padeightpixel">
+            <span><a title="Click here to view all MM Recipes" id="lnkViewAll" href="/MMRecipes/List/"><span class="imagelinkbutton bordered"><span class="fa fa-list-alt"></span><span class="margintwopixel">All MM Recipes</span> </span></a></span>
+        </div>
+    </div>
+    <div id="divDetails">
+        <div class="accordion-label open">Details</div>
+        <div class="accordion-panel" style="padding: 8px;">
+            @Html.Partial("_DetailsHtml", Model)
+        </div>
+    </div>
+    <div id="divReview">
+        <div id="accReview" class="accordion-label open">Review</div>
+        <div id="divReview" class="accordion-panel">
+            <div id="divValidationSummary" style="padding: 8px; width: 100%; text-align: center;"></div>
+            <div id="divSubmitCancel" style="padding: 8px; width: 100%; text-align: center; display: none;"><button id="btnCancel" onclick="cancel()">Cancel</button>&nbsp;&nbsp;<input id="btnSubmit" type="button" value="Submit For Review" /></div>
+            <div id="acdReview" style="padding: 8px; width: 100%;"></div>
+        </div>
+    </div>
+</div>

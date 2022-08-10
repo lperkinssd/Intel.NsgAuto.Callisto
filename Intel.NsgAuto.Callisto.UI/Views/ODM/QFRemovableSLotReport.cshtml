@@ -1,0 +1,626 @@
+﻿@model Intel.NsgAuto.Callisto.UI.Models.ODMModel
+
+@{
+    ViewBag.Title = "ODM - QF Removable SLots";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .redforecolor {
+        color: red !important;
+    }
+
+    #scrolledtabs {
+        margin-top: 20px;
+    }
+
+    #tabs {
+        margin-top: 4px;
+        width: 95%;
+    }
+
+    .dx-tabs {
+        table-layout: fixed;
+    }
+
+    .content {
+        text-align: justify;
+        margin-top: 5px;
+    }
+
+    .caption {
+        font-size: 12px;
+        padding: 2px;
+    }
+
+    .left-aligned {
+        text-align: left;
+    }
+
+    .dx-tab.dx-tab-selected {
+        background-color: #5b9bd5;
+        color: #f5f5f5;
+    }
+
+    .dx-tab-selected .dx-icon {
+        color: #f5f5f5 !important;
+    }
+
+    .flagcolorcss {
+        color: red;
+    }
+
+    .dx-icon-save {
+        font: 20px/1 DXIcons;
+    }
+
+    .dx-field-label {
+        text-align: left;
+        color: #0123b4;
+        vertical-align: middle;
+        font-size: 12px;
+    }
+
+    .dx-datagrid-header-panel .dx-toolbar {
+        margin-bottom: 1px;
+    }
+
+    .dx-datagrid-header-panel > .dx-icon-export-excel-button {
+        float: left !important
+    }
+
+    .dx-popup-title {
+        text-align: center;
+        position: relative;
+        color: red;
+    }
+
+    .gridContainer {
+        height: 440px;
+    }
+
+    .gridcontainer {
+        height: 100%;
+        width: 99.6%;
+        position: absolute;
+    }
+
+    .gridcontainer {
+        box-sizing: border-box;
+    }
+
+    .gridbox {
+        width: 98%;
+        position: absolute;
+        box-sizing: border-box;
+        height: 300px !important
+    }
+
+    .lnkslot {
+        text-decoration: underline !important;
+    }
+
+    .dx-datagrid-headers .editable-column {
+        background-color: lightgreen;
+    }
+</style>
+<script>
+    var tabsInstance = null;
+    var latestScenarioId;
+    var earliestRemovableDate = new Date();
+    var dbLoadToDate = null;
+
+    var tempId = 0;
+    var currentPageIndex = 0;
+    var tabs = [
+        {
+            id: 0,
+            text: "KINGSTON",
+            icon: "fas fa-chart-line",
+            content: "KINGSTON Results grid",
+            width: "150px"
+        },
+        {
+            id: 1,
+            text: "PEGATRON",
+            icon: "fas fa-chart-line",
+            content: "PEGATRON Results grid",
+            width: "150px"
+        },
+        {
+            id: tempId++,
+            text: "PTI",
+            icon: "fas fa-chart-line",
+            content: "PTI Results grid",
+            width: "150px"
+        }
+    ];
+
+    const gridColumns = [
+        {
+            dataField: "Version",
+            caption: "Version",
+            width: "85px"
+        },
+        {
+            dataField: "CreatedDate",
+            caption: "Created Date",
+            dataType: "date",
+            format: "MM/dd/yyyy",
+            width: "115px"
+        },
+        {
+            dataField: "OdmName",
+            caption: "ODM Name",
+            width: "100px"
+        },
+        {
+            dataField: "SourceFileName",
+            caption: "Download",
+            cellTemplate: function (container, options) {
+                var fileName = "" + options.data["SourceFileName"];
+                fileName = fileName.slice(0, -4);
+                $("<a>" + options.text + "</a>")
+                    .attr("href", "/api/ODMApi/DownloadOdmUploadedFile/" + options.data["OdmName"] + "/" + fileName)
+                    .appendTo(container);
+            }
+        },
+        {
+            caption: "Details",
+            width: "85px",
+            cellTemplate: function (container, options) {
+                $('<a class="lnkslot" data-Version=' + options.data["Version"] + ' data-odmName=' + options.data["OdmName"] + '>View Details</a>')
+                    .attr('href', 'JavaScript:void(0);')
+                    .bind("click", function (element) {
+                        var _self = $(this);
+                        var version = _self.attr('data-Version');
+                        var odmName = _self.attr('data-odmName');
+                        Nsga.Callisto.Odm.getRemovableSLotDetails(version, odmName, onGetRemovableSLotDetailsSuccess, onGetRemovableSLotDetailsError);
+                    })
+                    .appendTo(container);
+            }
+        },
+        {
+            dataField: "ProcessedOn",
+            caption: "Process Date",
+            dataType: "date",
+            format: "MM/dd/yyyy hh:mm:ss a",
+            width: "165px"
+        },
+        {
+            dataField: "TotalCount",
+            caption: "Total Count",
+            width: "105px"
+        },
+        {
+            dataField: "RemovableCount",
+            caption: "Removable Count",
+            width: "145px"
+        },
+    ];
+
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    var showProgress = function () {
+        $("#importIndicator").dxLoadIndicator("instance").option("visible", true);
+    };
+    var hideProgress = function () {
+        $("#importIndicator").dxLoadIndicator("instance").option("visible", false);
+    };
+
+    function createDownloadFileName() {
+
+        return "Download file name...to delete";
+    //    return `${tabsInstance.option("selectedItem").text}`;
+    };
+
+
+    var onGetRemovableSLotDetailsSuccess = function (results) {
+        if (results) {
+            var popup;
+            // display the data in a grid in a pop up
+            var popupOptions = {
+                width: "1000px",
+                height: "600px",
+                contentTemplate: function () {
+                    var dataGridOptions = {
+                        columns: [
+                            {
+                                dataField: "Version",
+                                width: "85px"
+                            },
+                            //{
+                            //    dataField: "OdmName",
+                            //    width: "100px"
+                            //},
+                            {
+                                dataField: "MMNum",
+                                width: "125px"
+                            },
+                            {
+                                dataField: "DesignId",
+                                width: "120px"
+                            },
+                            {
+                                dataField: "MediaIPN",
+                                width: "120px"
+                            },
+                            {
+                                dataField: "SLot",
+                                width: "85px"
+                            },
+                            {
+                                dataField: "CreatedDate",
+                                dataType: "datetime",
+                                width: "115px",
+                                format: "MM/dd/yyyy"
+                            },
+                            {
+                                dataField: "IsRemovable",
+                                width: "115px"
+                            },
+                            //{
+                            //    dataField: "SourceFileName",
+                            //    width: "120px"
+                            //},
+                            {
+                                dataField: "ProcessedOn",
+                                dataType: "datetime",
+                                width: "170px",
+                                format: "MM/dd/yyyy hh:mm:ss a"
+                            }
+                        ],
+                        dataSource: results,
+                        columnAutoWidth: true,
+                        showColumnLines: true,
+                        showRowLines: true,
+                        rowAlternationEnabled: true,
+                        showBorders: true,
+                        wordWrapEnabled: false,
+                        headerFilter: { visible: true },
+                        filterRow: { visible: true },
+                        loadPanel: { enabled: true },
+                        paging: { enabled: true, pageSize: 10 },
+                        filterPanel: { visible: false },
+                        columnFixing: {enabled: false},
+                    };
+
+                    var datagrid = $("<div />").dxDataGrid(dataGridOptions);
+
+                    var btnClose = $("<div class='btnWipDetailsClose floatright' style='margin-top:20px;' />").dxButton({
+                        icon: "close",
+                        text: "Close",
+                        width: 105,
+                        onClick: function (e) {
+                            popup.hide();
+                        }
+                    });
+
+                    return $("<div />").append(datagrid).append(btnClose);
+                },
+                showTitle: true,
+                title: "Removable SLots Details",
+                visible: false,
+                dragEnabled: false,
+                closeOnOutsideClick: false
+            }
+
+            if (popup) {
+                popup.option("contentTemplate", popupOptions.contentTemplate.bind(this));
+            } else {
+                popup = $("#divWipDetailsPopup").dxPopup(popupOptions).dxPopup("instance");
+            }
+
+            popup.show();
+        }
+    };
+
+    var onGetRemovableSLotDetailsError = function (xhr, err) {
+       // display an error message
+    };
+
+    function displayPegatronUploads(records) {
+        let config = Nsga.Callisto.Dx.dataGridDefaultConfig();
+        config.columns = gridColumns;
+        config.dataSource = records;
+
+        var mergedConfig2 = $.extend(config,
+            {
+                height: 600, //function () { return $(window).height() * .7 },
+                columnAutoWidth: true,
+                showColumnLines: true,
+                showRowLines: true,
+                rowAlternationEnabled: true,
+                showBorders: true,
+                wordWrapEnabled: false,
+                headerFilter: { visible: true },
+                filterRow: { visible: true },
+                loadPanel: { enabled: true },
+                paging: { enabled: true, pageSize: 15 },
+                filterPanel: { visible: false },
+                //scrolling: {
+                //    showScrollbar: "always",
+                //},
+                columnFixing: {
+                    enabled: false
+                },
+                export: {
+                    enabled: false,
+                    //fileName: createDownloadFileName(),
+                    //allowExportSelectedData: false
+                },
+            });
+        $("#grdPegatron").dxDataGrid(mergedConfig2);
+    };
+
+    function displayKingstonUploads(records) {
+        var config = Nsga.Callisto.Dx.dataGridDefaultConfig();
+        config.columns = gridColumns;
+        config.dataSource = records;
+
+        var mergedConfig2 = $.extend(config,
+            {
+                //height: 600, //function () { return $(window).height() * .7 },
+                columnAutoWidth: true,
+                showColumnLines: true,
+                showRowLines: true,
+                rowAlternationEnabled: true,
+                showBorders: true,
+                wordWrapEnabled: false,
+                headerFilter: { visible: true },
+                filterRow: { visible: true },
+                loadPanel: { enabled: true },
+                paging: { enabled: true, pageSize: 15 },
+                filterPanel: { visible: false },
+                //scrolling: {
+                //    showScrollbar: "always",
+                //},
+                columnFixing: {
+                    enabled: false
+                },
+                export: {
+                    enabled: false,
+                    //fileName: createDownloadFileName(),
+                    //allowExportSelectedData: false
+                },
+            });
+        // If the scenario id in the scenarioObj is same as that in the
+        $("#grdKingston").dxDataGrid(mergedConfig2);
+    };
+
+    function displayPTIUploads(records) {
+        let config = Nsga.Callisto.Dx.dataGridDefaultConfig();
+        config.columns = gridColumns;
+        config.keyExpr = "";
+        config.dataSource = records;
+
+        var mergedConfig2 = $.extend(config,
+            {
+                height: 600, //function () { return $(window).height() * .7 },
+                columnAutoWidth: true,
+                showColumnLines: true,
+                showRowLines: true,
+                rowAlternationEnabled: true,
+                showBorders: true,
+                wordWrapEnabled: false,
+                headerFilter: { visible: true },
+                filterRow: { visible: true },
+                loadPanel: { enabled: true },
+                paging: { enabled: false },
+                filterPanel: { visible: false },
+                //scrolling: {
+                //    showScrollbar: "always",
+                //},
+                columnFixing: {
+                    enabled: false
+                },
+                export: {
+                    enabled: false,
+                    //fileName: createDownloadFileName(),
+                    //allowExportSelectedData: false
+                },
+            });
+        $("#grdPTI").dxDataGrid(mergedConfig2);
+    };
+        
+    var hideGrids = function () {
+        $("#grdKingston").hide();
+        $("#grdPegatron").hide();
+        $("#grdPTI").hide();
+    };
+
+    var displayTabContent = function (id) {
+        showProgress();
+        tabsInstance.option("selectedIndex", id);
+        tabsInstance.option("visible", true);
+        hideGrids();
+
+        switch (id) {
+            case 0:
+                $("#grdKingston").show();
+                break;
+            case 1:
+                $("#grdPegatron").show();
+                break;
+            case 2:
+                $("#grdPTI").show();
+                break;
+            default:
+                $("#grdPTI").show();
+                break;
+        }
+        hideProgress();
+        $(".dx-icon-export-excel-button").html($("<span class='exporttoexceltext'>Export To Excel</span>"));
+    };
+
+    function formatIntlDate(dt) {
+        let separator = "-";
+        let dd = new Date(dt);
+        let retVal = dd.getDate() + separator + months[dd.getMonth()] + separator + dd.getFullYear();
+        return retVal;
+        //return `${dd.getDate()}-${months[dd.getMonth()]}-${dd.getFullYear()}`;
+    };
+
+    function formatIntlDateTime(dt) {
+        let separator = ":";
+        let space = " ";
+        let dd = new Date(dt);
+        let retVal = formatIntlDate(dt) + space + dd.getHours() + separator + dd.getMinutes() + separator + dd.getSeconds();
+        return retVal;
+        //return `${formatIntlDate(dt)} ${dd.getHours()}:${dd.getMinutes()}:${dd.getSeconds()}`;
+    };
+
+    function onError(xhr, status) {
+        hideProgress();
+        Nsga.Callisto.Messages.showError("An unexpected error occurred. If the problem persists, contact support.");
+    };
+
+    var onGetEarliestRemovableDateSuccess = function (minScenarioDate) {
+        earliestRemovableDate = new Date(minScenarioDate);
+        initLoadToDate();
+        hideProgress();
+    };
+
+    var getEarliestRemovableDate = function () {
+        showProgress();
+        Nsga.Callisto.Odm.getEarliestRemovableDate(onGetEarliestRemovableDateSuccess, onError);
+    };
+
+    var onGetQualFilterRemovableSLotUploadsSuccess = function (result) {
+        if (result) {
+            tabsInstance.option("dataSource", tabs);
+
+            displayKingstonUploads(result.KingstonUploads);
+            displayPegatronUploads(result.PegatronUploads);
+            displayPTIUploads(result.PTIUploads);
+            displayTabContent(2);
+            hideProgress();
+        }
+    };
+
+    function retrieveRemovableSLotData() {
+
+        var selectedDate = dbLoadToDate.option("value");
+        var dateString = formatDate(selectedDate);
+
+        if (dateString) {
+            showProgress();
+            Nsga.Callisto.Odm.getQualFilterRemovableSLotUploads(dateString, onGetQualFilterRemovableSLotUploadsSuccess, onError);
+        } else {
+            Nsga.Callisto.Messages.showWarning("No data available.");
+        }
+    };
+
+    var unblockUI = function () {
+        document.body.style.cursor = "default";
+        hideProgress();
+    }
+
+    var blockUI = function () {
+        document.body.style.cursor = "wait";
+        showProgress();
+    }
+
+    var hideTabs = function () {
+        tabsInstance.option("visible", false);
+    }
+
+    var formatDate = function (date) {
+        return (date.getMonth() + 1) + "-" + date.getDate() + "-" + date.getFullYear();
+    }
+
+    var initLoadToDate = function () {
+        var toDate = new Date();
+
+        $("#dbLoadToDate").dxDateBox({
+            onValueChanged: function (args) {                
+                //alert("onValueChanged with  new value" + formatDate(args.value) + " and previousValue: " + formatDate(args.previousValue));
+            },
+            width: 120,
+            type: "date",
+            min: earliestRemovableDate,
+            max: toDate,
+            value: toDate
+        });
+
+        dbLoadToDate = $("#dbLoadToDate").dxDateBox("instance");
+    }
+
+    $("document").ready(function () {
+        $("#importIndicator").dxLoadIndicator({ visible: false });
+        //getEarliestRemovableDate();
+
+        // temp below
+        earliestRemovableDate = new Date();
+        earliestRemovableDate.setDate(earliestRemovableDate.getDate() - 150);
+        initLoadToDate();
+        hideProgress();
+        // temp above
+
+        tabsInstance = $("#tabs > .tabs-container").dxTabs({
+            dataSource: tabs,
+            //selectedIndex: 2,
+            onItemClick: function (e) {
+                switch (e.itemData.text) {
+                    case "KINGSTON":
+                        displayTabContent(0);
+                        break;
+                    case "PEGATRON":
+                        displayTabContent(1);
+                        break;
+                    case "PTI":
+                        displayTabContent(2);
+                        break;
+                    default:
+                        displayTabContent(2);
+                        break;
+                }
+
+               //displayTabContent(e.itemData.id);
+            }
+        }).dxTabs("instance");
+
+        hideTabs();
+    });
+
+</script>
+
+<div class="fixed centered">
+    <div style="margin-top:5px;vertical-align: top;" class="bluebox bglightblue padeightpixel">
+        <div class="">
+            <div class="infotext">
+                <span class="fas fa-exclamation-circle" style="font-size:14px;"></span>To view the processed removable SLots, select a Load To Date  &amp; click submit. This will load data back to 120 days from the selected Load To Date.
+            </div>
+            <div id="divScenarios" class="showinline" style="width: 100%;">
+                <!-- Load to date -->
+                <div class="showinline" style="width: 35%; margin-top:8px;">
+                    <div class="dx-field-label">Load To Date</div>
+                    <div class="colon floatleft" style="margin-top: 8px;"></div>
+                    <div class="inlineblock">
+                        <div id="dbLoadToDate" style="display:inline-block;"></div>
+                    </div>
+                </div>
+                <div class="showinline" style="width: 15%; margin-top: 12px; vertical-align: top;">
+                    <span class="marginfourpixel"><input id="btnSubmit" type="button" value="Submit" onclick="retrieveRemovableSLotData()" style="" /></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div style="width:960px;display: block;clear: both;text-align: center;">
+        <div id="importIndicator" style="text-align:center;"></div>
+    </div>
+</div>
+
+<div class="fluid" style="margin-top:2px;">
+    <div id="tabs">
+        <div class="tabs-container" style=""></div>
+        <div>
+            <div class="marginfourpixel gridcontainer">
+                <div id="grdKingston" class="" style="margin-right:10px;margin-left:10px;margin-bottom:10px;display:none;"></div>
+                <div id="grdPegatron" class="" style="margin-right:10px;margin-left:10px;margin-bottom:10px;display:none;"></div>
+                <div id="grdPTI" class="" style="margin-right:10px;margin-left:10px;margin-bottom:10px;display:none;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="divWipDetailsPopup"></div>

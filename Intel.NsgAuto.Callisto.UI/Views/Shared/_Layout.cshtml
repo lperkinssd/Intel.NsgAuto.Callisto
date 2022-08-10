@@ -1,0 +1,86 @@
+﻿@model Intel.NsgAuto.Web.Mvc.Models.LayoutModel
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" />
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+    <!-- DevExtreme themes -->
+    <link rel="stylesheet" type="text/css" href="/Styles/dx/dx.common.css" />
+    <link rel="stylesheet" type="text/css" href="/Styles/dx/dx.light.css" />
+
+    @System.Web.Optimization.Styles.Render("~/bundles/nsgacss")
+    @System.Web.Optimization.Styles.Render("~/bundles/appcss")
+    @RenderSection("styles", false)
+    @System.Web.Optimization.Scripts.Render("~/bundles/scripts/jquery")
+    <!-- The DevExtreme library -->
+    @System.Web.Optimization.Scripts.Render("~/bundles/scripts/dx")
+    <!-- The nsga library -->
+    @System.Web.Optimization.Scripts.Render("~/bundles/scripts/nsgajs")
+    <script type="text/javascript">
+        ; (function ($, window, document, undefined) {
+            var fxData = {
+                "SessionId": "",
+                "IdSid": ""
+            };
+            if (fxData) {
+                //Nsga.Framework.Config.Init(fxData);
+            }
+        })(jQuery, window, document);
+    </script>
+    @System.Web.Optimization.Scripts.Render("~/bundles/scripts/appjs")
+    
+    
+    @RenderSection("headScripts", false)
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            $('.clearonfocus').clearOnFocus();
+            $('.showhelpwindow').bind("click", function (e) {
+                e.preventDefault();
+                Nsga.Framework.openHelpWindow($(this).attr('href'), '780px', '980px', '100', '100');
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="workarea">
+            <div class="flathead">
+                @Html.Partial("_Header", Model.Header)
+            </div>
+            <div>
+                <div class="clearBoth"></div>
+                @if (Model.ToolBar != null)
+                {
+                    <div id="divToolbar">
+                        <div class="content">
+                            <span><a title="Click here to access the home page" id="homelink" href="/"><span class="imagelinkbutton bordered"><span class="homelink "></span></span></a></span>
+                            <span class="pageheading">
+                                @ViewBag.Title
+                            </span>
+                            <span>
+                                @RenderSection("toolbar", false)
+                            </span><span>
+                            @Html.Partial("_ToolBar", Model.ToolBar)
+                            </span>
+                        </div>
+                    </div>
+                }
+                <div id="divContent" class="content ">
+                    <div>
+                        <div class="padtwopixel" style="border-bottom: 1px solid #e2e2e2;"></div>
+                        <div id="divNotification"><span id="notification" style="display:none;height: 20px; line-height: 20px;"></span></div>
+                        <div class="padtwopixel">
+                            @RenderBody()
+                            @RenderSection("scripts", false)
+                        </div>
+                    </div>
+                    @RenderSection("Bottom", false)
+                    <div class="clearBoth"></div>
+                </div>
+            </div>
+        </div>
+    </div> 
+</body>
+</html>

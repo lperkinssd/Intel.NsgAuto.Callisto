@@ -1,0 +1,79 @@
+﻿<!DOCTYPE html>
+
+<html>
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" />
+    <title>@ViewBag.Title</title>
+    @System.Web.Optimization.Styles.Render("~/bundles/nsgacss")
+    @System.Web.Optimization.Styles.Render("~/bundles/appcss")
+    @System.Web.Optimization.Scripts.Render("~/bundles/scripts/jquery")
+</head>
+<body>
+    <div class="wrapper">
+        <div class="workarea">
+            <div class="flathead">
+
+                <!-- Header { -->
+                <div class="uheader header">
+                    <div class="component">
+                        <div id="header">
+                            <div class="content">
+                                <div class="">
+                                    <ul>
+                                        <li class="home">
+                                            <div class="logo">
+                                                <div class="component">
+                                                    <a href="http://www.domain.com/" target="_blank" title="Click here to view domain.com">
+                                                        <img src="/Images/intellogo.png" alt="visit intel web site" border="0" style="margin-top: 10px;" />
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <span class="applogo">Callisto</span>
+                                            <span class="classification">Intel Confidential</span>
+                                        </li>
+                                        <li>
+                                            <span class="poweredby ">Powered by : </span>
+                                        </li>
+                                        <li>
+                                            <img src="/Images/autoblocks.png" alt="" border="0" class="autoblocks" />
+                                        </li>
+                                        <li>
+                                            <span class="autologo">M&amp;O Automation</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div>
+                <div class="clearBoth"></div>
+                <div id="divToolbar">
+                    <div class="content">
+                        <span class="errortext fas fa-exclamation-circle" style="font-size:16px;">
+                        </span>
+                        <span class="pageheading">
+                            @ViewBag.Title
+                        </span>
+                    </div>
+                </div>
+
+                <div id="divContent" class="content ">
+                    <div>
+                        <div class="padtwopixel" style="border-bottom: 1px solid #e2e2e2;"></div>
+                        <div id="divNotification"><span id="notification" style="display:none;height: 20px; line-height: 20px;"></span></div>
+                        <div class="padtwopixel">
+                            @RenderBody()
+                        </div>
+                    </div>
+                    <div class="clearBoth"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

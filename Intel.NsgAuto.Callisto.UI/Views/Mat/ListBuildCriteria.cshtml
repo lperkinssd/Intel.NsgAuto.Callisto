@@ -1,0 +1,123 @@
+﻿@model Intel.NsgAuto.Callisto.UI.Models.Mat.ListBuildCriteriaModel
+
+@{
+    ViewBag.Title = Model.IsPOR ? "PRQ Build Criteria List" : "Non-PRQ Build Criteria List";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style scoped>
+    .dx-row {
+        cursor: pointer;
+    }
+</style>
+
+<script type="text/javascript">
+    var buildCriterias = @(JsonHelper.Serialize(Model.BuildCriterias));
+
+    $(document).ready(function () {
+
+        $("#tooltip").dxTooltip({
+            showEvent: "mouseenter",
+            hideEvent: "mouseleave",
+            closeOnOutsideClick: false,
+        });
+
+        // grdRecords
+        var config = Nsga.Callisto.Dx.dataGridDefaultConfig();
+        config.columns = [
+            {
+                dataField: "Design.Name",
+                caption: "Design Id",
+            },
+            {
+                dataField: "FabricationFacility.Name",
+                caption: "Fabrication Facility",
+            },
+            {
+                dataField: "Device.Name",
+                caption: "Device",
+            },
+            {
+                dataField: "ProductFamily.Name",
+                caption: "Product Family",
+            },
+            {
+                dataField: "Version",
+                caption: "Version",
+            },
+            {
+                dataField: "Capacity.Name",
+                caption: "Capacity"
+            },
+            {
+                dataField: "Scode.Name",
+                caption: "Scode"
+            },
+            {
+                dataField: "MediaIPN.Name",
+                caption: "MediaIPN"
+            },
+        @if (!Model.IsPOR)
+        {
+            <text>
+            {
+                dataField: "Status.Name",
+                caption: "Status",
+            },
+            </text>
+        }
+            {
+                dataField: "CreatedByUserName",
+                caption: "Created By",
+                cellTemplate: function (container, options) {
+                    var cellValue = options.text ? options.text : options.data.CreatedBy;
+                    container.append("<div>" + cellValue + "</div>");
+                }
+            },
+            {
+            dataField: "CreatedOn",
+                caption: "Created On",
+                dataType: "datetime",
+                format: "MM/dd/yyyy hh:mm:ss a",
+            },
+            {
+            caption: "",
+                cellTemplate: function (container, options) {
+                    $("<a>Details</a>").attr({ "href": "/Mat/BuildCriteriaDetails/" + options.data["Id"], "target": "_blank" }).appendTo(container);
+                },
+                allowFiltering: false,
+            },
+        ];
+        config.hoverStateEnabled = true;
+        config.onRowClick = function (e) {
+            if (e.rowType == "data") {
+                window.open('/Mat/BuildCriteriaDetails/' + e.data.Id, "_blank");
+            }
+        };
+        // using the row tooltip technique given by the devexpress support team
+        // https://supportcenter.devexpress.com/ticket/details/t383731/dxdatagrid-tooltip-on-row
+        config.onRowPrepared = function (e) {
+            if (e.rowType == "data") {
+                e.rowElement.mousemove(function () {
+                $("#tooltip").dxTooltip("instance").show(e.rowElement);
+                });
+            }
+        };
+        config.keyExpr = "Id";
+        config.dataSource = buildCriterias;
+        $("#grdRecords").dxDataGrid(config);
+
+    });
+
+</script>
+
+
+<div class="padeightpixel">
+    <div class="centeralign">
+        <div id="indicator"></div>
+    </div>
+    <div>
+        <div id="tooltip">Click to view the details for this item</div>
+        <div id="grdRecords"></div>
+    </div>
+</div>

@@ -1,0 +1,230 @@
+﻿@model Intel.NsgAuto.Callisto.UI.Models.MMRecipeDetailsModel
+
+<script type="text/javascript">
+
+    var entity = @(JsonHelper.Serialize(Model.Entity));
+    var model = entity.MMRecipe;
+    var customerQualStatuses = entity.CustomerQualStatuses;
+    var plcStages = entity.PLCStages;
+    var review = entity.Review;
+    var userId = "@(Html.Raw(Intel.NsgAuto.Web.Mvc.Core.Functions.GetCurrentUserIdSid()))";
+    var speedLinksVisible = true;
+
+    function populateFields() {
+        $("#divMMRecipeContent").show();
+
+        // System Information
+        $("#spnPCode").text(model.PCode);
+        $("#spnVersion").text(model.Version);
+        $("#spnCreatedBy").text(model.CreatedBy);
+        $("#spnCreatedOn").text(Nsga.Callisto.Dates.isoToLocaleString(model.CreatedOn));
+        $("#spnUpdatedBy").text(model.UpdatedBy);
+        $("#spnUpdatedOn").text(Nsga.Callisto.Dates.isoToLocaleString(model.UpdatedOn));
+        $("#spnIsPOR").text(model.IsPOR);
+        $("#spnStatus").text(model.Status.Name);
+
+        // Product Details
+        $("#spnProductName").text(model.ProductName);
+        if (model.ProductFamily) $("#spnFamilyName").text(model.ProductFamily.Name);
+        $("#spnMOQ").text(model.MOQ);
+        $("#spnProductionProductCode").text(model.ProductionProductCode);
+        $("#spnSCode").text(model.SCode);
+        if (model.FormFactor) $("#spnFormFactor").text(model.FormFactor.Name);
+        if (model.Customer) $("#spnCustomer").text(model.Customer.Name);
+        $("#dbPRQDate").dxDateBox("instance").option("value", model.PRQDate);
+        if (model.CustomerQualStatus) $("#ddlCustomerQualStatus").dxSelectBox("instance").option("value", model.CustomerQualStatus.Id);
+        $("#spnSCodeProductCode").text(model.SCodeProductCode);
+        $("#spnModelString").text(model.ModelString);
+        if (model.PLCStage) $("#ddlPLCStage").dxSelectBox("instance").option("value", model.PLCStage.Id);
+
+        // NAND/Media Details
+        var grdNandMediaItems = $("#grdNandMediaItems").dxDataGrid("instance");
+        grdNandMediaItems.option("dataSource", model.NandMediaItems);
+        // automatically expand all rows that have detail
+        // note that the datagrid has an expandAll(-1) method, but it renders a bunch of blank vertical space
+        // this technique looks better
+        if (model.NandMediaItems) {
+            for (var i = 0; i < model.NandMediaItems.length; i++) {
+                var item = model.NandMediaItems[i];
+                if (item.AttributeValues === null || item.AttributeValues.length == 0) { }
+                else {
+                    grdNandMediaItems.expandRow(item.ItemId);
+                }
+            }
+        }
+
+        // Other Associated Items
+        $("#grdOtherAssociatedItems").dxDataGrid("instance").option("dataSource", model.OtherAssociatedItems);
+
+        // Product Label List
+        if (model.ProductLabel) {
+            if (model.ProductLabel.OpalType) $("#spnOpalType").text(model.ProductLabel.OpalType.Name);
+            if (model.ProductLabel.ProductFamilyNameSeries) $("#spnProductFamilyNameSeries").text(model.ProductLabel.ProductFamilyNameSeries.Name);
+            $("#spnKCCId").text(model.ProductLabel.KCCId);
+            $("#spnCapacity").text(model.ProductLabel.Capacity);
+            $("#spnVoltageCurrent").text(model.ProductLabel.VoltageCurrent);
+            $("#spnCanadianStringClass").text(model.ProductLabel.CanadianStringClass);
+            $("#spnInterfaceSpeed").text(model.ProductLabel.InterfaceSpeed);
+            //$("#spnUPC").text(model.ProductLabel.UPC);
+
+            $("#grdProductLabelAttributes").dxDataGrid("instance").option("dataSource", model.ProductLabel.Attributes);
+        }
+
+        if (speedLinksVisible) {
+            var element = null;
+            element = $("#spnPCode");
+            element.wrap("<a href='/SpeedItems/Details/" + @MvcHtmlString.Create("element.text()") + "' target='_blank' />");
+
+            element = $("#spnProductionProductCode");
+            element.wrap("<a href='/SpeedItems/Details/" + @MvcHtmlString.Create("element.text()") + "' target='_blank' />");
+
+            element = $("#spnSCode");
+            element.wrap("<a href='/SpeedItems/Details/" + @MvcHtmlString.Create("element.text()") + "' target='_blank' />");
+        }
+    }
+
+    $("document").ready(function () {
+
+        $("#dbPRQDate").dxDateBox().dxValidator({
+            validationRules: [{
+                type: "required",
+                message: "PRQ Date is required"
+            }],
+            validationGroup: "Update",
+        });
+
+        $("#ddlCustomerQualStatus").dxSelectBox({
+            items: customerQualStatuses,
+            displayExpr: "Name",
+            valueExpr: "Id",
+        }).dxValidator({
+            validationRules: [{
+                type: "required",
+                message: "Customer Qual Status is required"
+            }],
+            validationGroup: "Update",
+        });
+
+        $("#ddlPLCStage").dxSelectBox({
+            items: plcStages,
+            displayExpr: "Name",
+            valueExpr: "Id",
+        }).dxValidator({
+            validationRules: [{
+                type: "required",
+                message: "PLC Stage is required"
+            }],
+            validationGroup: "Update",
+        });
+
+        // grdNandMediaItems
+        var config = Nsga.Callisto.Dx.dataGridDefaultConfig();
+        config.columns = [
+            {
+                caption: "NAND/Media IPN",
+                dataField: "ItemId",
+                cellTemplate: function (container, options) {
+                    var element = $("<span>" + options.data["ItemId"] + "</span>");
+                    element.appendTo(container);
+                    if (speedLinksVisible) {
+                        element.wrap("<a href='/SpeedItems/Details/" + @MvcHtmlString.Create("element.text()") + "' target='_blank' />");
+                    }
+                },
+            },
+            {
+                dataField: "Revision",
+            },
+            {
+                caption: "Association Type",
+                dataField: "SpeedBomAssociationType.Name",
+            },
+        ];
+        config.keyExpr = "ItemId";
+        config.noDataText = "No NAND/Media items were found";
+        config.masterDetail = {
+            enabled: true,
+            template: function (container, options) {
+                if (options.data.AttributeValues === null || options.data.AttributeValues.length == 0) { }
+                else {
+                    $("<div>")
+                        .dxDataGrid({
+                            columnAutoWidth: true,
+                            paging: { enabled: false },
+                            showBorders: true,
+                            columns: [
+                                {
+                                    caption: "Attribute Name",
+                                    dataField: "NameDisplay",
+                                },
+                                {
+                                    dataField: "Operator",
+                                },
+                                {
+                                    dataField: "Value",
+                                },
+                            ],
+                            dataSource: options.data.AttributeValues,
+                            noDataText: "No MAT attribute values were found",
+                        }).appendTo(container);
+                }
+            }
+        };
+        config.onCellPrepared = function (e) {
+            if (e.rowType === "data" && e.column.command === "expand") {
+                if (e.data.AttributeValues === null || e.data.AttributeValues.length == 0) {
+                    e.cellElement.removeClass("dx-datagrid-expand");
+                    e.cellElement.empty();
+                }
+            }
+        };
+        $("#grdNandMediaItems").dxDataGrid(config);
+
+        // grdOtherAssociatedItems
+        config = Nsga.Callisto.Dx.dataGridDefaultConfig();
+        config.columns = [
+            {
+                caption: "Item Category",
+                dataField: "SpeedItemCategory.Name",
+            },
+            {
+                caption: "Item Id",
+                dataField: "ItemId",
+                cellTemplate: function (container, options) {
+                    var element = $("<span>" + options.data["ItemId"] + "</span>");
+                    element.appendTo(container);
+                    if (speedLinksVisible) {
+                        element.wrap("<a href='/SpeedItems/Details/" + @MvcHtmlString.Create("element.text()") + "' target='_blank' />");
+                    }
+                },
+                allowFiltering: false,
+            },
+            {
+                dataField: "Revision",
+            },
+            {
+                caption: "Association Type",
+                dataField: "SpeedBomAssociationType.Name",
+            },
+        ];
+        $("#grdOtherAssociatedItems").dxDataGrid(config);
+
+        // grdProductLabelAttributes
+        config = Nsga.Callisto.Dx.dataGridDefaultConfig();
+        config.columns = [
+            {
+                caption: "Attribute Name",
+                dataField: "AttributeType.NameDisplay",
+            },
+            {
+                caption: "Attribute Value",
+                dataField: "Value",
+            },
+        ];
+        config.noDataText = "No customer specific attributes were found";
+        $("#grdProductLabelAttributes").dxDataGrid(config);
+
+        populateFields();
+
+    });
+
+</script>

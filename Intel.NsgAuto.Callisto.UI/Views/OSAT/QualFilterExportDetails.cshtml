@@ -1,0 +1,113 @@
+﻿@model Intel.NsgAuto.Callisto.UI.Models.OSAT.QualFilterExportDetailsModel
+
+@{
+    ViewBag.Title = "OSAT - Qual Filter Export Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script type="text/javascript">
+
+    var entity = null;
+    var model = null;
+
+    updateFromEntity(@(JsonHelper.Serialize(Model.Entity)));
+
+    function updateFromEntity(entityNew) {
+        entity = entityNew;
+        model = entity.Export;
+    }
+
+    function refreshFields() {
+        $("#spnId").text(model.Id);
+        $("#spnCreatedBy").text(model.CreatedByUserName ? model.CreatedByUserName : model.CreatedBy);
+        $("#spnCreatedOn").text(Nsga.Callisto.Dates.isoToLocaleString(model.CreatedOn));
+        $("#spnUpdatedBy").text(model.UpdatedByUserName ? model.UpdatedByUserName : model.UpdatedBy);
+        $("#spnUpdatedOn").text(Nsga.Callisto.Dates.isoToLocaleString(model.UpdatedOn));
+        $("#spnGemeratedOn").text(Nsga.Callisto.Dates.isoToLocaleString(model.GeneratedOn));
+        $("#spnDeliveredOn").text(Nsga.Callisto.Dates.isoToLocaleString(model.DeliveredOn));
+        $("#lnkFileName").text(model.FileName);
+        var divGenerating = $("#divGenerating");
+        var lnkDownload = $("#lnkDownload");
+        if (model.GeneratedOn) {
+            divGenerating.hide();
+            lnkDownload.show();
+        }
+        else {
+            divGenerating.show();
+            lnkDownload.hide();
+        }
+    }
+
+    function refreshUi() {
+        refreshFields();
+    }
+
+    function refreshFromEntity(entityNew) {
+        updateFromEntity(entityNew);
+        refreshUi();
+    }
+
+    function onSuccess(result) {
+        refreshFromEntity(result.Entity);
+    }
+
+    function onError(xhr, status) {
+        var message = "An unexpected error occurred. If the problem persists, contact support.";
+        var result = null;
+        if (xhr && xhr.responseJSON) {
+            result = xhr.responseJSON;
+            if (xhr.responseJSON.ExceptionMessage) message = xhr.responseJSON.ExceptionMessage;
+            else if (xhr.responseJSON.Message) message = xhr.responseJSON.Message;
+        }
+        Nsga.Callisto.Messages.showError(message);
+        if (result && result.Entity) {
+            refreshFromEntity(result.Entity);
+        }
+    };
+
+    $("document").ready(function () {
+
+        refreshUi();
+
+    });
+
+</script>
+
+<div class="padeightpixel">
+    <div class="rightalign">
+        <div class="padeightpixel">
+            <span><a title="Click here to download file" id="lnkDownload" href="/api/OSAT/DownloadQualFilterExport/@(Model?.Entity.Export.Id)"><span class="imagelinkbutton bordered"><span class="margintwopixel">Download</span></span></a></span>
+            <span><a title="Click here to view all exports" id="lnkAllExports" href="/OSAT/ListQualFilterExports/"><span class="imagelinkbutton bordered"><span class="fa fa-list-alt "></span><span class="margintwopixel">All Exports</span></span></a></span>
+        </div>
+    </div>
+    <div id="divGenerating" style="text-align: center; padding: 8px;">The files are still generating. Once they have been generated, the Generated On field will be populated and you can download them. Feel free to use the browser refresh button to check back in a bit.</div>
+    <div id="accDetails" class="accordion-label open">Details</div>
+    <div id="divDetails" class="accordion-panel" style="padding: 8px;">
+        <table style="width:96%; padding:2px;margin:2px;">
+            <tr>
+                <td style="width:25%"><label for="spnId" class="formlabel">Id</label></td>
+                <td style="width:25%"><span type="text" id="spnId"></span></td>
+                <td style="width:25%"><label for="spnCreatedBy" class="formlabel">Created By</label></td>
+                <td style="width:25%"><span type="text" id="spnCreatedBy"></span></td>
+            </tr>
+            <tr>
+                <td><label for="lnkFileName" class="formlabel">File Name</label></td>
+                <td><a title="Click here to download file" id="lnkFileName" href="/api/Osat/DownloadQualFilterExport/@(Model?.Entity.Export.Id)" /></td>
+                <td><label for="spnCreatedOn" class="formlabel">Created On</label></td>
+                <td><span type="text" id="spnCreatedOn"></span></td>
+            </tr>
+            <tr>
+                <td><label for="spnGeneratedOn" class="formlabel">Files Generated On</label></td>
+                <td><span type="text" id="spnGeneratedOn"></span></td>
+                <td><label for="spnUpdatedBy" class="formlabel">Updated By</label></td>
+                <td><span type="text" id="spnUpdatedBy"></span></td>
+            </tr>
+            <tr>
+                <td><label for="spnDeliveredOn" class="formlabel">Files Delivered On</label></td>
+                <td><span type="text" id="spnDeliveredOn"></span></td>
+                <td><label for="spnUpdatedOn" class="formlabel">Last Updated On</label></td>
+                <td><span type="text" id="spnUpdatedOn"></span></td>
+            </tr>
+        </table>
+    </div>
+</div>
